@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.cleven.clchat.clchat.activity.MainActivity">
+
+    <include layout="@layout/navgationbar"/>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#44000000"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <RadioButton
+            android:id="@+id/rb_main_home"
+            android:drawableTop="@drawable/rb_main_home_selector"
+            android:text="首页"
+            style="@style/tabBarStyle"
+            />
+        <RadioButton
+            android:id="@+id/rb_main_contact"
+            android:drawableTop="@drawable/rb_main_contact_selector"
+            android:text="联系人"
+            style="@style/tabBarStyle"
+            />
+        <RadioButton
+            android:id="@+id/rb_main_discover"
+            android:drawableTop="@drawable/rb_main_discover_selector"
+            android:text="发现"
+            style="@style/tabBarStyle"
+            />
+        <RadioButton
+            android:id="@+id/rb_main_profile"
+            android:drawableTop="@drawable/rb_main_profile_selector"
+            android:text="我"
+            style="@style/tabBarStyle"
+            />
+
+
+    </RadioGroup>
+
+
+</LinearLayout>
