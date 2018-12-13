@@ -19,6 +19,10 @@ public class CLApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+//        initDevUtil();
+    }
+
+    private void initDevUtil() {
         // 初始化工具类
         DevUtils.init(this.getApplicationContext());
         // == 初始化日志配置 ==

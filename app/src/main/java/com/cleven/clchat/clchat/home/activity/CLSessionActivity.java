@@ -48,7 +48,7 @@ public class CLSessionActivity extends AppCompatActivity {
             public void onClick(View view) {
                 HashMap<String,String> dict = new HashMap<>();
                 dict.put("id","12312312");
-                dict.put("msg","333");
+                dict.put("msg",editText.getText().toString().trim());
                 CLMQTTManager.getInstance().sendMessage(dict);
             }
         });

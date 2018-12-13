@@ -13,6 +13,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.util.Date;
 import java.util.Map;
 
+import dev.utils.common.StringUtils;
+
 /**
  * Created by cleven on 2018/12/12.
  */
@@ -22,7 +24,8 @@ public class CLMQTTManager {
     /**
      * 代理服务器ip地址
      */
-    public static final String MQTT_BROKER_HOST = "tcp://192.168.31.98:1883";
+//    public static final String MQTT_BROKER_HOST = "tcp://192.168.31.98:1883";
+    public static final String MQTT_BROKER_HOST = "tcp://192.168.10.6:1883";
 
     /**
      * 客户端唯一标识
@@ -76,12 +79,14 @@ public class CLMQTTManager {
             // 设置超时时间 单位为秒
             options.setConnectionTimeout(10);
             // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
-            options.setKeepAliveInterval(20);
+            options.setKeepAliveInterval(60);
+            /// 设置遗嘱
+            options.setWill( "chat/close","android 断开连接".getBytes(),1,false);
             // 连接
             mqttClient.connect(options);
-
             // 订阅
-            mqttClient.subscribe(MQTT_TOPIC);
+//            mqttClient.subscribe(MQTT_TOPIC);
+            mqttClient.subscribe(MQTT_TOPIC,1);
 
             // 设置回调
             mqttClient.setCallback(new MqttCallback() {
@@ -121,14 +126,12 @@ public class CLMQTTManager {
             MqttMessage message = new MqttMessage();
             Date date = new Date();
             String timestamp = String.valueOf(date.getTime()/1000);
-//            message.setId(Integer.valueOf(StringUtils.toUTF8Encode("1000")));
+            message.setId(Integer.valueOf(StringUtils.toUTF8Encode(timestamp)));
             message.setQos(1);
             message.setRetained(false);
-//            message.setPayload(ByteUtils.objectToByte(msg));
-            message.setPayload("回复".getBytes());
-            System.out.println("\"======\" + msg.toString().getBytes()");
+            message.setPayload(msg.toString().getBytes());
             try {
-                mqttClient.publish("chat",message);
+                mqttClient.publish(MQTT_TOPIC,message);
             } catch (MqttException e) {
                 e.printStackTrace();
             }
