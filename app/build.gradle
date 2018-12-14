@@ -28,4 +28,7 @@ dependencies {
     implementation files('libs/org.eclipse.paho.client.mqttv3-1.2.0.jar')
     // 因为内含 res 文件, 使用 aar 方式调用
     implementation 'com.github.afkT:DevUtils:1.1.7@aar'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
 }

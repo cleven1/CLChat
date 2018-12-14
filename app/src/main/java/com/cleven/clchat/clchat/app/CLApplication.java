@@ -19,7 +19,7 @@ public class CLApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-//        initDevUtil();
+        initDevUtil();
     }
 
     private void initDevUtil() {

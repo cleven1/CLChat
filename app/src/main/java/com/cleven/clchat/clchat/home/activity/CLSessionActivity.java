@@ -49,7 +49,7 @@ public class CLSessionActivity extends AppCompatActivity {
                 HashMap<String,String> dict = new HashMap<>();
                 dict.put("id","12312312");
                 dict.put("msg",editText.getText().toString().trim());
-                CLMQTTManager.getInstance().sendMessage(dict);
+                CLMQTTManager.getInstance().sendMessage("2",dict);
             }
         });
 
