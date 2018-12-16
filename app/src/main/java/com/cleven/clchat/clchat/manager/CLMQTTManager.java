@@ -1,4 +1,4 @@
-package com.cleven.clchat.clchat.utils.CLMQTTService;
+package com.cleven.clchat.clchat.manager;
 
 import android.util.Log;
 

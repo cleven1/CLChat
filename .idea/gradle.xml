@@ -8,7 +8,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/ChatMessageView_example" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/chat-message-view" />
             <option value="$PROJECT_DIR$/chatkit" />
             <option value="$PROJECT_DIR$/chatkit_sample" />
           </set>

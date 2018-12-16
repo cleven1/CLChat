@@ -2,13 +2,13 @@ package com.cleven.clchat.clchat.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.RadioGroup;
 
 import com.cleven.clchat.clchat.R;
+import com.cleven.clchat.clchat.base.CLBaseActivity;
 import com.cleven.clchat.clchat.base.CLBaseFragment;
 import com.cleven.clchat.clchat.fragment.CLContactFragment;
 import com.cleven.clchat.clchat.fragment.CLDiscoverFragment;
@@ -18,7 +18,7 @@ import com.cleven.clchat.clchat.fragment.CLProfileFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends CLBaseActivity {
 
     private FrameLayout frameLayout;
     private RadioGroup radioGroup;
@@ -48,6 +48,7 @@ public class MainActivity extends FragmentActivity {
         radioGroup.setOnCheckedChangeListener(new MyOnClickListener());
         /// 默认选中第一个
         radioGroup.check(R.id.rb_main_home);
+
     }
 
     private class MyOnClickListener implements RadioGroup.OnCheckedChangeListener {

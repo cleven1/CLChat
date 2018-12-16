@@ -29,7 +29,6 @@
             android:id="@+id/ib_voice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
             android:src="@drawable/ib_voice_selector"/>
 
         <EditText
@@ -43,6 +42,7 @@
             android:id="@+id/ib_emtion"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_marginRight="10dp"
             android:src="@drawable/ease_chatting_biaoqing_btn_normal"/>
 
         <ImageButton

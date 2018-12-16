@@ -4,7 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CLChat.iml" filepath="$PROJECT_DIR$/CLChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/CLChat-Android.iml" filepath="$PROJECT_DIR$/CLChat-Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ChatMessageView_example/ChatMessageView_example.iml" filepath="$PROJECT_DIR$/ChatMessageView_example/ChatMessageView_example.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chat-message-view/chat-message-view.iml" filepath="$PROJECT_DIR$/chat-message-view/chat-message-view.iml" />
       <module fileurl="file://$PROJECT_DIR$/chatkit/chatkit.iml" filepath="$PROJECT_DIR$/chatkit/chatkit.iml" />
       <module fileurl="file://$PROJECT_DIR$/chatkit_sample/chatkit_sample.iml" filepath="$PROJECT_DIR$/chatkit_sample/chatkit_sample.iml" />
       <module fileurl="file://$PROJECT_DIR$/chatkit_sample/sample.iml" filepath="$PROJECT_DIR$/chatkit_sample/sample.iml" />
