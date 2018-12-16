@@ -2,6 +2,8 @@ package com.cleven.clchat.clchat.app;
 
 import android.app.Application;
 
+import com.cleven.clchat.clchat.manager.CLMQTTManager;
+
 import dev.DevUtils;
 import dev.utils.app.logger.DevLogger;
 import dev.utils.app.logger.LogConfig;
@@ -20,6 +22,13 @@ public class CLApplication extends Application {
         super.onCreate();
 
         initDevUtil();
+
+        initMqtt();
+
+    }
+    /// 连接MQTT
+    private void initMqtt() {
+        CLMQTTManager.getInstance().connect();
     }
 
     private void initDevUtil() {
