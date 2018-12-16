@@ -22,9 +22,12 @@ public class CLApplication extends Application {
     // 日志TAG
     private final String LOG_TAG = CLApplication.class.getSimpleName();
 
+    private static Context mContext;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        this.mContext = this;
 
         initDevUtil();
 

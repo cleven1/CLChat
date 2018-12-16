@@ -1,5 +1,6 @@
 package com.cleven.clchat.home.Bean;
 
+import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.model.CLUserBean;
 
 public class CLMessageBean {
@@ -17,29 +18,21 @@ public class CLMessageBean {
      */
     private CLMessageDirection messageDirection;
     /**
-     * 消息的发送状态
+     * 消息的发送状态 CLSentStatus
      */
-    private CLSentStatus sentStatus;
+    private int sentStatus;
     /**
      * 消息的发送时间
      */
     private String sentTime;
     /**
-     * 消息的类型名
-     */
-    private String objectName;
-    /**
      * 目标会话id
      */
     private String targetId;
     /**
-     * 消息发送者id
+     * 消息类型 CLMessageBodyType
      */
-    private String senderUserId;
-    /**
-     * 消息类型
-     */
-    private CLMessageBodyType messageType;
+    private int messageType;
 
     /**
      * 发送者的用户信息
@@ -69,18 +62,17 @@ public class CLMessageBean {
     }
 
     public CLMessageDirection getMessageDirection() {
-        return messageDirection;
+        if (getUserInfo().getUserId().equals(CLUserManager.getInstence().getUserInfo().getUserId())){
+            return CLMessageDirection.MessageDirection_SEND;
+        }
+        return CLMessageDirection.MessageDirection_RECEIVE;
     }
 
-    public void setMessageDirection(CLMessageDirection messageDirection) {
-        this.messageDirection = messageDirection;
-    }
-
-    public CLSentStatus getSentStatus() {
+    public int getSentStatus() {
         return sentStatus;
     }
 
-    public void setSentStatus(CLSentStatus sentStatus) {
+    public void setSentStatus(int sentStatus) {
         this.sentStatus = sentStatus;
     }
 
@@ -92,14 +84,6 @@ public class CLMessageBean {
         this.sentTime = sentTime;
     }
 
-    public String getObjectName() {
-        return objectName;
-    }
-
-    public void setObjectName(String objectName) {
-        this.objectName = objectName;
-    }
-
     public String getTargetId() {
         return targetId;
     }
@@ -108,19 +92,11 @@ public class CLMessageBean {
         this.targetId = targetId;
     }
 
-    public String getSenderUserId() {
-        return senderUserId;
-    }
-
-    public void setSenderUserId(String senderUserId) {
-        this.senderUserId = senderUserId;
-    }
-
-    public CLMessageBodyType getMessageType() {
+    public int getMessageType() {
         return messageType;
     }
 
-    public void setMessageType(CLMessageBodyType messageType) {
+    public void setMessageType(int messageType) {
         this.messageType = messageType;
     }
 

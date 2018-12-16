@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.cleven.clchat.R;
 import com.cleven.clchat.home.Bean.CLMessageBean;
+import com.cleven.clchat.home.Bean.CLMessageBodyType;
 
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         CLMessageBean messageBean = mMessages.get(i);
-        if (messageBean.getMessageType() == MessageBodyType_Text){
+        if (CLMessageBodyType.fromTypeName(messageBean.getMessageType()) == MessageBodyType_Text){
             View baseView;
             /// 发送
             if (messageBean.getMessageDirection() == MessageDirection_SEND){

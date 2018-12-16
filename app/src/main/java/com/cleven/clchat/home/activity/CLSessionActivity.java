@@ -18,9 +18,8 @@ import android.widget.Toast;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
-import com.cleven.clchat.home.Bean.CLMessageBodyType;
-import com.cleven.clchat.home.Bean.CLMessageDirection;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
+import com.cleven.clchat.manager.CLMessageManager;
 import com.lqr.emoji.EmotionKeyboard;
 import com.lqr.emoji.EmotionLayout;
 import com.lqr.emoji.IEmotionExtClickListener;
@@ -90,20 +89,9 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         mElEmotion.attachEditText(mEtContent);
         initEmotionKeyboard();
 
+        /// 初始化数据源
         messageList = new ArrayList<>();
-        CLMessageBean message = new CLMessageBean();
-        message.setContent("了觉了我看过看解");
-//        message.setUserInfo(new CLUserBean().setName("张三"));
-        message.setMessageType(CLMessageBodyType.MessageBodyType_Text);
-        message.setMessageDirection(CLMessageDirection.MessageDirection_SEND);
-        messageList.add(message);
 
-        CLMessageBean message1 = new CLMessageBean();
-        message1.setContent("股而更科文agkgekgjkkljgjw爱国科技而我国进口为价格为国家列为件柜q");
-//        message.setUserInfo(new CLUserBean().setName("张三"));
-        message1.setMessageType(CLMessageBodyType.MessageBodyType_Text);
-        message1.setMessageDirection(CLMessageDirection.MessageDirection_RECEIVE);
-        messageList.add(message1);
         // 设置适配器
         mRvSessionView.setAdapter(new CLSessionRecyclerAdapter(this,messageList));
         mRvSessionView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
@@ -175,9 +163,11 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
             }
         });
+        /// 发送事件
         mBtnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim());
                 mEtContent.setText("");
                 Toast.makeText(getApplicationContext(), "发送成功", Toast.LENGTH_SHORT).show();
             }

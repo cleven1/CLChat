@@ -2,6 +2,9 @@ package com.cleven.clchat.manager;
 
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.cleven.clchat.home.Bean.CLMessageBean;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -9,14 +12,11 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.internal.wire.MqttWireMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-
-import java.util.Date;
-import java.util.Map;
 
 import dev.utils.LogPrintUtils;
 import dev.utils.app.ADBUtils;
-import dev.utils.common.StringUtils;
 
 /**
  * Created by cleven on 2018/12/12.
@@ -27,7 +27,8 @@ public class CLMQTTManager {
     /**
      * 代理服务器ip地址
      */
-    public static final String MQTT_BROKER_HOST = "tcp://192.168.31.98:1883";
+    public static final String MQTT_BROKER_HOST = "tcp://47.74.178.206:1883";
+//    public static final String MQTT_BROKER_HOST = "tcp://192.168.31.98:1883";
 //    public static final String MQTT_BROKER_HOST = "tcp://192.168.10.6:1883";
 
     /**
@@ -66,11 +67,7 @@ public class CLMQTTManager {
     public static final String PASSWORD = "password";
 
     private MqttClient mqttClient;
-
-
-    private CLMQTTManager() {
-
-    }
+    private CLMQTTManager() {}
     private static class SingleHodler{
         private static final CLMQTTManager instance=new CLMQTTManager();
     }
@@ -107,13 +104,13 @@ public class CLMQTTManager {
             IMqttToken connectWithResult = mqttClient.connectWithResult(options);
             if (connectWithResult.getClient().getClientId() != null){
                 // 连接成功
-                mqttClient.publish(MQTT_BASE_TOPIC+MQTT_CONNECT_TOPIC + "1","用户1 连接成功".getBytes(),1,false);
+                mqttClient.publish(MQTT_BASE_TOPIC+MQTT_CONNECT_TOPIC + CLUserManager.getInstence().getUserInfo().getUserId(),"用户连接成功".getBytes(),1,false);
             }
             LogPrintUtils.d("连接结果 = "+ connectWithResult.toString());
             LogPrintUtils.d("连接结果 clientId = "+ connectWithResult.getClient().getClientId());
             LogPrintUtils.d("连接结果 serverId = "+ connectWithResult.getClient().getServerURI());
             // 订阅
-            String[] topic = new String[1];
+            final String[] topic = new String[1];
             topic[0] = MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + "1";
             int[] qos = new int[topic.length];
             qos[0] = 1;
@@ -132,7 +129,6 @@ public class CLMQTTManager {
                     Log.d("test","connectionLost");
                 }
 
-
                 //subscribe后得到的消息会执行到这里面
                 @Override
                 public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
@@ -143,6 +139,22 @@ public class CLMQTTManager {
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
                     Log.d("test","deliveryComplete");
+                    String[] topics = iMqttDeliveryToken.getTopics();
+                    int messageId = iMqttDeliveryToken.getMessageId();
+                    Log.d("success topic = ",topics.toString());
+                    Log.d("success messageid = ","" + messageId);
+                    MqttWireMessage response = iMqttDeliveryToken.getResponse();
+                    Log.d("response = ",response.toString());
+                    try {
+                        MqttMessage message = iMqttDeliveryToken.getMessage();
+                        Log.d("success === ",message.toString());
+                        String messageJson = message.getPayload().toString();
+                        CLMessageBean messageBean = JSON.parseObject(messageJson, CLMessageBean.class);
+                        Log.d("successid ==== ",messageBean.getMessageId());
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                        Log.d("fail ====== ",e.getMessage());
+                    }
                 }
             });
 
@@ -157,17 +169,15 @@ public class CLMQTTManager {
      * 发送消息
      * @param msg 消息体
      */
-    public void sendMessage(String userId,Map msg){
+    public void sendMessage(String msg){
         if (mqttClient != null && mqttClient.isConnected()){
             MqttMessage message = new MqttMessage();
-            Date date = new Date();
-            String timestamp = String.valueOf(date.getTime()/1000);
-            message.setId(Integer.valueOf(StringUtils.toUTF8Encode(timestamp)));
+            message.setId(Integer.parseInt(CLUserManager.getInstence().getUserInfo().getUserId()));
             message.setQos(1);
             message.setRetained(false);
-            message.setPayload(msg.toString().getBytes());
+            message.setPayload(msg.getBytes());
             try {
-                mqttClient.publish( MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + userId,message);
+                mqttClient.publish( MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + CLUserManager.getInstence().getUserInfo().getUserId(),message);
             } catch (MqttException e) {
                 e.printStackTrace();
             }
