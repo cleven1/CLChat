@@ -92,14 +92,14 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
         messageList = new ArrayList<>();
         CLMessageBean message = new CLMessageBean();
-        message.setContent("消息上噶手机关机按实际噶开始上课了几个卡手机观看解");
+        message.setContent("了觉了我看过看解");
 //        message.setUserInfo(new CLUserBean().setName("张三"));
         message.setMessageType(CLMessageBodyType.MessageBodyType_Text);
         message.setMessageDirection(CLMessageDirection.MessageDirection_SEND);
         messageList.add(message);
 
         CLMessageBean message1 = new CLMessageBean();
-        message1.setContent("ajwqjkg是看了几个了可靠健康管理科技管理为控股而更为快捷管理科文件柜q");
+        message1.setContent("股而更科文agkgekgjkkljgjw爱国科技而我国进口为价格为国家列为件柜q");
 //        message.setUserInfo(new CLUserBean().setName("张三"));
         message1.setMessageType(CLMessageBodyType.MessageBodyType_Text);
         message1.setMessageDirection(CLMessageDirection.MessageDirection_RECEIVE);
