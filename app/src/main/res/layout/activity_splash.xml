@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.cleven.clchat.clchat.activity.SplashActivity">
+    tools:context="com.cleven.clchat.activity.SplashActivity">
 
     <TextView
         android:id="@+id/tv_text"

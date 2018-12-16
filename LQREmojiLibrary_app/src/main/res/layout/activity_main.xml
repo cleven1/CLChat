@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="com.lqr.MainActivity">
+
+    <Button
+        android:id="@+id/btnSimple"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="简单的聊天界面"/>
+
+    <Button
+        android:id="@+id/btnWx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="仿微信聊天界面"/>
+
+</LinearLayout>

@@ -5,53 +5,113 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.cleven.clchat.clchat.home.activity.CLSessionActivity">
+    tools:context="com.cleven.clchat.home.activity.CLSessionActivity">
 
     <include layout="@layout/navgationbar"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_sessionView"
+    <!--内容-->
+    <LinearLayout
+        android:id="@+id/llContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@android:color/white"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_sessionView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-        <ImageButton
-            android:id="@+id/ib_voice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ib_voice_selector"/>
-
-        <EditText
-            android:id="@+id/et_text"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            />
-
-        <ImageButton
-            android:id="@+id/ib_emtion"
-            android:layout_width="48dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginRight="10dp"
-            android:src="@drawable/ease_chatting_biaoqing_btn_normal"/>
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/ib_more"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ease_type_select_btn_pressed"/>
+            <ImageView
+                android:id="@+id/ivAudio"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="5dp"
+                android:src="@mipmap/ic_cheat_voice"/>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <EditText
+                    android:id="@+id/etContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@null"
+                    android:drawableBottom="@drawable/selector_edit_focus"
+                    android:visibility="visible"/>
+
+                <Button
+                    android:id="@+id/btnAudio"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/shape_session_btn_voice_normal"
+                    android:text="@string/please_to_talk"
+                    android:textColor="@color/gray1"
+                    android:visibility="gone"/>
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/ivEmo"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="5dp"
+                android:src="@mipmap/ic_cheat_emo"/>
+
+            <ImageView
+                android:id="@+id/ivMore"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="7dp"
+                android:src="@mipmap/ic_cheat_add"/>
+
+            <Button
+                android:id="@+id/btnSend"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="43dp"
+                android:layout_height="35dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/shape_session_btn_send"
+                android:text="@string/send"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:visibility="gone"/>
+        </LinearLayout>
 
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/flEmotionView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible">
+        <!--表情-->
+        <com.lqr.emoji.EmotionLayout
+            android:id="@+id/elEmotion"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+        <!--其他功能-->
+        <include
+            android:id="@+id/llMore"
+            layout="@layout/include_func_layout"
+            android:visibility="gone"/>
+    </FrameLayout>
 
 
 </LinearLayout>
