@@ -46,15 +46,15 @@
 
             <ImageView
                 android:id="@+id/sendfail"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:src="@mipmap/img_error"
                 />
 
             <ProgressBar
                 android:id="@+id/pb_bar"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
+                android:layout_width="25dp"
+                android:layout_height="25dp" />
 
         </RelativeLayout>
 
