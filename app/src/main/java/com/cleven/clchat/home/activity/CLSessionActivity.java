@@ -62,13 +62,19 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     private LinearLayout mLlContent;
     private CommonTitleBar titleBar;
     private CLSessionRecyclerAdapter adapter;
+    private String mUserName;
+    private String mUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session);
 
+        getIntentParams();
+
         findViews();
+
+        setupTitleBar();
 
         initListener();
     }
@@ -84,6 +90,28 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     protected void onResume() {
         super.onResume();
         mEtContent.clearFocus();
+    }
+
+    public void getIntentParams() {
+        mUserName = getIntent().getStringExtra("userName");
+        mUserId = getIntent().getStringExtra("userId");
+
+    }
+
+    private void setupTitleBar(){
+        /// 点击返回按钮
+        titleBar.setListener(new CommonTitleBar.OnTitleBarListener() {
+            @Override
+            public void onClicked(View v, int action, String extra) {
+                if (action == CommonTitleBar.ACTION_LEFT_BUTTON) {
+                    onBackPressed();
+                }
+            }
+        });
+
+        TextView centerTextView = titleBar.getCenterTextView();
+        centerTextView.setText(mUserName);
+
     }
 
     private void findViews() {
@@ -117,14 +145,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     }
 
     public void initListener() {
-        titleBar.setListener(new CommonTitleBar.OnTitleBarListener() {
-            @Override
-            public void onClicked(View v, int action, String extra) {
-                if (action == CommonTitleBar.ACTION_LEFT_BUTTON) {
-                    onBackPressed();
-                }
-            }
-        });
 
 
         mElEmotion.setEmotionSelectedListener(this);
@@ -340,4 +360,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         Toast.makeText(getApplicationContext(), stickerBitmapPath, Toast.LENGTH_SHORT).show();
         Log.e("CSDN_LQR", "stickerBitmapPath : " + stickerBitmapPath);
     }
+
+
 }
