@@ -3,9 +3,12 @@ package com.cleven.clchat.activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
@@ -14,6 +17,7 @@ import com.cleven.clchat.fragment.CLContactFragment;
 import com.cleven.clchat.fragment.CLDiscoverFragment;
 import com.cleven.clchat.fragment.CLHomeFragment;
 import com.cleven.clchat.fragment.CLProfileFragment;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +46,7 @@ public class MainActivity extends CLBaseActivity {
     }
 
     private void findViews() {
+
         frameLayout = (FrameLayout)findViewById( R.id.frameLayout );
         radioGroup = (RadioGroup)findViewById( R.id.radioGroup );
         /// 设置监听事件
@@ -49,6 +54,15 @@ public class MainActivity extends CLBaseActivity {
         /// 默认选中第一个
         radioGroup.check(R.id.rb_main_home);
 
+        setupTitleBar();
+    }
+
+    private void setupTitleBar(){
+        CommonTitleBar titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
+        ImageButton leftImageButton = titleBar.getLeftImageButton();
+        leftImageButton.setVisibility(View.GONE);
+        TextView rightTextView = titleBar.getRightTextView();
+        rightTextView.setVisibility(View.GONE);
     }
 
     private class MyOnClickListener implements RadioGroup.OnCheckedChangeListener {

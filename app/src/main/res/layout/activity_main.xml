@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context="com.cleven.clchat.activity.MainActivity">
 
-    <include layout="@layout/navgationbar"/>
+    <include layout="@layout/titlebar_layout"/>
 
     <FrameLayout
         android:id="@+id/frameLayout"

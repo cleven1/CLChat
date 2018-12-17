@@ -7,7 +7,5 @@
     android:orientation="vertical"
     tools:context="com.cleven.clchat.base.CLBaseActivity">
 
-    <include layout="@layout/navgationbar"/>
-
 
 </LinearLayout>

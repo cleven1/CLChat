@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context="com.cleven.clchat.home.activity.CLSessionActivity">
 
-    <include layout="@layout/navgationbar"/>
+    <include layout="@layout/titlebar_layout"/>
 
     <!--内容-->
     <LinearLayout

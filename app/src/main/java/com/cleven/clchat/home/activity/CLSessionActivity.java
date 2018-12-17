@@ -27,6 +27,7 @@ import com.lqr.emoji.EmotionKeyboard;
 import com.lqr.emoji.EmotionLayout;
 import com.lqr.emoji.IEmotionExtClickListener;
 import com.lqr.emoji.IEmotionSelectedListener;
+import com.wuhenzhizao.titlebar.utils.KeyboardConflictCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,13 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         findViews();
 
         initListener();
+    }
+
+    /// 处理titleBar遮挡键盘的问题
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        KeyboardConflictCompat.assistWindow(getWindow());
     }
 
     @Override
