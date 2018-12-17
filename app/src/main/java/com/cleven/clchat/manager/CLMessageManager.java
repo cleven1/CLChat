@@ -24,7 +24,7 @@ public class CLMessageManager {
      * 发送文本消息
      * @param text 内容
      */
-    public void sendMessage(String text){
+    public CLMessageBean sendMessage(String text){
         CLMessageBean message = new CLMessageBean();
         /// 消息内容
         message.setContent(text);
@@ -47,6 +47,8 @@ public class CLMessageManager {
         CLMQTTManager.getInstance().sendMessage(jsonString);
 
         LogPrintUtils.d(jsonString);
+
+        return message;
     }
 
 

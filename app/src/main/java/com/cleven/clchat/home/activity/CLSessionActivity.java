@@ -28,6 +28,7 @@ import com.lqr.emoji.EmotionLayout;
 import com.lqr.emoji.IEmotionExtClickListener;
 import com.lqr.emoji.IEmotionSelectedListener;
 import com.wuhenzhizao.titlebar.utils.KeyboardConflictCompat;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,8 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     private List<CLMessageBean> messageList;
     /// 整个内容的父视图
     private LinearLayout mLlContent;
+    private CommonTitleBar titleBar;
+    private CLSessionRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +98,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         mFlEmotionView = (FrameLayout)findViewById( R.id.flEmotionView );
         mElEmotion = (EmotionLayout)findViewById( R.id.elEmotion );
         mLlMore = (LinearLayout)findViewById( R.id.llMore );
+        titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
 
         /// 实现输入框图文混排
         mElEmotion.attachEditText(mEtContent);
@@ -106,12 +110,23 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         messageList = new ArrayList<>();
 
         // 设置适配器
-        mRvSessionView.setAdapter(new CLSessionRecyclerAdapter(this,messageList));
+        adapter = new CLSessionRecyclerAdapter(this, messageList);
+        mRvSessionView.setAdapter(adapter);
         mRvSessionView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
 
     }
 
     public void initListener() {
+        titleBar.setListener(new CommonTitleBar.OnTitleBarListener() {
+            @Override
+            public void onClicked(View v, int action, String extra) {
+                if (action == CommonTitleBar.ACTION_LEFT_BUTTON) {
+                    onBackPressed();
+                }
+            }
+        });
+
+
         mElEmotion.setEmotionSelectedListener(this);
         mElEmotion.setEmotionAddVisiable(true);
         mElEmotion.setEmotionSettingVisiable(true);
@@ -186,7 +201,12 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     }
 
     private void sendMessage(){
-        CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim());
+        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim());
+        messageList.add(messageBean);
+        /// 插入并刷新
+        adapter.notifyItemInserted(messageList.size());
+        /// 滚到最后一个位置
+        mRvSessionView.scrollToPosition(messageList.size() - 1);
         mEtContent.setText("");
         Toast.makeText(getApplicationContext(), "发送成功", Toast.LENGTH_SHORT).show();
     }
