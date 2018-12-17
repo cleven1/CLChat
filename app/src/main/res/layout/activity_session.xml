@@ -49,6 +49,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@null"
+                    android:imeOptions="actionSend"
+                    android:singleLine="true"
                     android:drawableBottom="@drawable/selector_edit_focus"
                     android:visibility="visible"/>
 

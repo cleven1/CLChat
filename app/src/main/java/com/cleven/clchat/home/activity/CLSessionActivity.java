@@ -6,13 +6,16 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cleven.clchat.R;
@@ -28,7 +31,7 @@ import com.lqr.emoji.IEmotionSelectedListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener {
+public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener {
     /// 消息列表
     private RecyclerView mRvSessionView;
     /// 录音按钮
@@ -88,6 +91,8 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         /// 实现输入框图文混排
         mElEmotion.attachEditText(mEtContent);
         initEmotionKeyboard();
+        /// 设置键盘发送按钮监听
+        mEtContent.setOnEditorActionListener(this);
 
         /// 初始化数据源
         messageList = new ArrayList<>();
@@ -167,11 +172,32 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         mBtnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim());
-                mEtContent.setText("");
-                Toast.makeText(getApplicationContext(), "发送成功", Toast.LENGTH_SHORT).show();
+                sendMessage();
             }
         });
+    }
+
+    private void sendMessage(){
+        CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim());
+        mEtContent.setText("");
+        Toast.makeText(getApplicationContext(), "发送成功", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        switch(actionId){
+            case EditorInfo.IME_NULL:
+                System.out.println("Done_content: " + v.getText() );
+                break;
+            case EditorInfo.IME_ACTION_SEND:
+                sendMessage();
+                break;
+            case EditorInfo.IME_ACTION_DONE:
+                System.out.println("action done for number_content: "  + v.getText());
+                break;
+        }
+
+        return true;
     }
 
     private void initEmotionKeyboard() {
