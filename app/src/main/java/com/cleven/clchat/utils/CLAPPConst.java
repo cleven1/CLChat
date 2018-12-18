@@ -1,5 +1,7 @@
 package com.cleven.clchat.utils;
 
+import dev.utils.app.ADBUtils;
+
 /**
  * 所有常量
  */
@@ -15,7 +17,7 @@ public class CLAPPConst {
     /**
      * 客户端唯一标识
      */
-    public static final String MQTT_CLIENT_ID = "android-client";//ADBUtils.getIMEI();//"android-CLChat";
+    public static final String MQTT_CLIENT_ID = ADBUtils.getIMEI();
 
     /**
      * 订阅标识

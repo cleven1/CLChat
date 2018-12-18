@@ -12,11 +12,18 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import dev.utils.LogPrintUtils;
+
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_ADD_FRIEND_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_BASE_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_BROKER_HOST;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_CLIENT_ID;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_CONNECT_TOPIC;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_DELETE_FRIEND_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_DISCONNECT_TOPIC;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_GROUP_CHAT_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_SINLE_CHAT_TOPIC;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_SYSTEM_TOPIC;
 
 public class CLMQTTManager {
 
@@ -107,7 +114,8 @@ public class CLMQTTManager {
         if (client != null && client.isConnected()){
             try {
                 /// 断开之前先告诉服务端
-                client.publish(MQTT_BASE_TOPIC+MQTT_DISCONNECT_TOPIC + "1","用户1 断开连接".getBytes(),1,false);
+                String userId = CLUserManager.getInstence().getUserInfo().getUserId();
+                client.publish(MQTT_BASE_TOPIC+MQTT_DISCONNECT_TOPIC + userId,"disconnect".getBytes(),1,false);
                 client.disconnect(null, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
@@ -173,7 +181,8 @@ public class CLMQTTManager {
         final String userId = CLUserManager.getInstence().getUserInfo().getUserId();
         client = new MqttAndroidClient(mContext,MQTT_BROKER_HOST,MQTT_CLIENT_ID == null ? userId : MQTT_CLIENT_ID);
         options = new MqttConnectOptions();
-        options.setCleanSession(true);
+        /// 保持会话
+        options.setCleanSession(false);
         // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
         options.setKeepAliveInterval(60);
         // 设置超时时间 单位为秒
@@ -190,10 +199,25 @@ public class CLMQTTManager {
                 /// 重新连接
                 initMQTT();
             }
+            /// 消息到达
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 Log.d(TAG,message.toString());
-                CLMessageManager.getInstance().receiveMessageHandler(message.toString());
+                LogPrintUtils.eTag(TAG,"topic = " + topic);
+                String baseTopic = MQTT_BASE_TOPIC;
+
+                if (topic.equals(baseTopic + MQTT_SINLE_CHAT_TOPIC + userId)){/// 单聊
+                    CLMessageManager.getInstance().receiveMessageHandler(message.toString());
+                }else if (topic.equals(baseTopic + MQTT_GROUP_CHAT_TOPIC + userId)){ //群聊
+
+                }else if (topic.equals(baseTopic + MQTT_ADD_FRIEND_TOPIC + userId)){ //添加好友
+
+                }else if (topic.equals(baseTopic + MQTT_DELETE_FRIEND_TOPIC + userId)){ //删除好友
+
+                }else if (topic.equals(baseTopic + MQTT_SYSTEM_TOPIC)){ //系统通知
+
+                }
+
             }
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {
@@ -212,17 +236,13 @@ public class CLMQTTManager {
                     Log.e(TAG,"连接成功");
                     retryCount = 0;
                     currentStatus = CLMQTTStatus.connect_succss;
-                    // 订阅
-                    final String[] topic = new String[1];
-                    /// 订阅别人发给自己的消息
-                    topic[0] = MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + userId;
-                    int[] qos = new int[topic.length];
-                    qos[0] = 1;
                     try {
-                        client.subscribe(topic,qos);
+                        /// 连接成功通知服务器
+                        client.publish(MQTT_BASE_TOPIC + MQTT_CONNECT_TOPIC + userId,"connect".getBytes(),1,false);
                     } catch (MqttException e) {
                         e.printStackTrace();
                     }
+                    subscribeTopic();
                 }
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
@@ -242,6 +262,37 @@ public class CLMQTTManager {
             currentStatus = CLMQTTStatus.connect_fail;
         }
 
+    }
+
+    /**
+     * 订阅主题
+     */
+    private void subscribeTopic(){
+        String userId = CLUserManager.getInstence().getUserInfo().getUserId();
+        // 订阅
+        final String[] topic = new String[5];
+        /// 单聊
+        topic[0] = MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + userId;
+        /// 群聊
+        topic[1] = MQTT_BASE_TOPIC + MQTT_GROUP_CHAT_TOPIC + userId;
+        /// 添加好友
+        topic[2] = MQTT_BASE_TOPIC + MQTT_ADD_FRIEND_TOPIC + userId;
+        /// 删除好友
+        topic[3] = MQTT_BASE_TOPIC + MQTT_DELETE_FRIEND_TOPIC + userId;
+        /// 系统通知
+        topic[4] = MQTT_BASE_TOPIC + MQTT_SYSTEM_TOPIC;
+
+        int[] qos = new int[topic.length];
+        qos[0] = 1;
+        qos[1] = 1;
+        qos[2] = 1;
+        qos[3] = 1;
+        qos[4] = 1;
+        try {
+            client.subscribe(topic,qos);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
     }
 
 }
