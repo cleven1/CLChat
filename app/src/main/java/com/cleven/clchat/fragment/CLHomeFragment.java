@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,10 +87,13 @@ public class CLHomeFragment extends CLBaseFragment {
             if (view == null){
                 viewHolder = new ViewHolder();
                 view = View.inflate(mContext,R.layout.session_item,null);
-                viewHolder.avatar = view.findViewById(R.id.iv_avatar);
+                viewHolder.avatar = view.findViewById(R.id.iv_avatar1);
                 viewHolder.nickName = view.findViewById(R.id.tv_title);
                 viewHolder.content = view.findViewById(R.id.tv_content);
                 viewHolder.time = view.findViewById(R.id.tv_time);
+                viewHolder.unread_count = view.findViewById(R.id.unread_count);
+                viewHolder.group_avatar_layout = view.findViewById(R.id.sessionList_groupAvatar);
+                viewHolder.singnle_avatar_layout = view.findViewById(R.id.sessionList_singleAvatar);
                 view.setTag(viewHolder);
             }else{
                 viewHolder = (ViewHolder) view.getTag();
@@ -103,9 +107,19 @@ public class CLHomeFragment extends CLBaseFragment {
     }
 
     private static class ViewHolder{
+        /// 群头像布局
+        LinearLayout group_avatar_layout;
+        /// 单聊头像布局
+        LinearLayout singnle_avatar_layout;
+        /// 头像
         ImageView avatar;
+        /// 昵称
         TextView nickName;
+        /// 内容
         TextView content;
+        /// 时间
         TextView time;
+        /// 未读数
+        TextView unread_count;
     }
 }
