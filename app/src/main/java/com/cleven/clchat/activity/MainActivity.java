@@ -31,6 +31,7 @@ public class MainActivity extends CLBaseActivity {
     /// 记录当前显示的fragment
     private CLBaseFragment preFragment;
     private List<CLBaseFragment> fragments;
+    private TextView centerTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,8 @@ public class MainActivity extends CLBaseActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setupTitleBar();
 
         initFragments();
 
@@ -53,8 +56,6 @@ public class MainActivity extends CLBaseActivity {
         radioGroup.setOnCheckedChangeListener(new MyOnClickListener());
         /// 默认选中第一个
         radioGroup.check(R.id.rb_main_home);
-
-        setupTitleBar();
     }
 
     private void setupTitleBar(){
@@ -63,6 +64,8 @@ public class MainActivity extends CLBaseActivity {
         leftImageButton.setVisibility(View.GONE);
         TextView rightTextView = titleBar.getRightTextView();
         rightTextView.setVisibility(View.GONE);
+        centerTextView = titleBar.getCenterTextView();
+        centerTextView.setText("首页");
     }
 
     private class MyOnClickListener implements RadioGroup.OnCheckedChangeListener {
@@ -72,15 +75,19 @@ public class MainActivity extends CLBaseActivity {
             switch (checkedId){
                 case R.id.rb_main_home:
                     currentSelectIndex = 0;
+                    centerTextView.setText("首页");
                     break;
                 case R.id.rb_main_contact:
                     currentSelectIndex = 1;
+                    centerTextView.setText("联系人");
                     break;
                 case R.id.rb_main_discover:
                     currentSelectIndex = 2;
+                    centerTextView.setText("发现");
                     break;
                 case R.id.rb_main_profile:
                     currentSelectIndex = 3;
+                    centerTextView.setText("我");
                     break;
             }
             /// 获取Fragment
