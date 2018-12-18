@@ -30,6 +30,8 @@ public class CLMQTTManager {
         disconnect_success,
         disconnect_fail,
     }
+    /// 连接失败重拾次数
+    private int retryCount = 0;
 
     /**
      * 用户名
@@ -167,6 +169,7 @@ public class CLMQTTManager {
 
     /// 初始化MQTT
     private void initMQTT() {
+        client = null;
         final String userId = CLUserManager.getInstence().getUserInfo().getUserId();
         client = new MqttAndroidClient(mContext,MQTT_BROKER_HOST,MQTT_CLIENT_ID == null ? userId : MQTT_CLIENT_ID);
         options = new MqttConnectOptions();
@@ -185,8 +188,7 @@ public class CLMQTTManager {
                 Log.e(TAG,"断开连接了");
                 currentStatus = CLMQTTStatus.disconnect_success;
                 /// 重新连接
-                disconnectMQTT();
-                connectMQTT(mContext);
+                initMQTT();
             }
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
@@ -208,6 +210,7 @@ public class CLMQTTManager {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"连接成功");
+                    retryCount = 0;
                     currentStatus = CLMQTTStatus.connect_succss;
                     // 订阅
                     final String[] topic = new String[1];
@@ -225,7 +228,13 @@ public class CLMQTTManager {
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     Log.d(TAG,exception.getLocalizedMessage());
 //                    this.retryCount = 0;
-                    currentStatus = CLMQTTStatus.connect_fail;
+                    if (retryCount < 3) {
+                        initMQTT();
+                        retryCount += 1;
+                    }else {
+                        currentStatus = CLMQTTStatus.connect_fail;
+                        retryCount = 0;
+                    }
                 }
             });
         } catch (MqttException e) {
