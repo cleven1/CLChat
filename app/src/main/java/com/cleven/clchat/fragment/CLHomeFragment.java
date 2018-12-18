@@ -57,7 +57,7 @@ public class CLHomeFragment extends CLBaseFragment {
             Toast.makeText(mContext,"i == " + i,Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(mContext,CLSessionActivity.class);
             intent.putExtra("userName", "呵呵哒");
-            intent.putExtra("userId", "123456");
+            intent.putExtra("userId", "1234567");
             mContext.startActivity(intent);
         }
     }

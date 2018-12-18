@@ -77,6 +77,8 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         setupTitleBar();
 
         initListener();
+        /// 监听新消息
+        obseverReceiveMessage();
     }
 
     /// 处理titleBar遮挡键盘的问题
@@ -221,14 +223,56 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     }
 
     private void sendMessage(){
-        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim());
+        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim(),mUserId);
         messageList.add(messageBean);
         /// 插入并刷新
         adapter.notifyItemInserted(messageList.size());
         /// 滚到最后一个位置
         mRvSessionView.scrollToPosition(messageList.size() - 1);
         mEtContent.setText("");
-        Toast.makeText(getApplicationContext(), "发送成功", Toast.LENGTH_SHORT).show();
+        /// 发送回调
+        CLMessageManager.getInstance().setMessageStatusOnListener(new CLMessageManager.CLSendMessageStatusOnListener() {
+            @Override
+            public void onSuccess(CLMessageBean message) {
+                updateMessageStatus(message);
+            }
+            @Override
+            public void onFailure(CLMessageBean message) {
+                updateMessageStatus(message);
+            }
+        });
+
+    }
+
+    private void obseverReceiveMessage(){
+        CLMessageManager.getInstance().setReceiveMessageOnListener(new CLMessageManager.CLReceiveMessageOnListener() {
+            @Override
+            public void onMessage(CLMessageBean message) {
+                messageList.add(message);
+                /// 插入并刷新
+                adapter.notifyItemInserted(messageList.size());
+                /// 滚到最后一个位置
+                mRvSessionView.scrollToPosition(messageList.size() - 1);
+            }
+        });
+    }
+
+    /// 发送成功后更新状态
+    private void updateMessageStatus(CLMessageBean message){
+        if (messageList.size() == 1){
+            CLMessageBean bean = messageList.get(0);
+            bean.setSendStatus(message.getSendStatus());
+            adapter.notifyItemChanged(0);
+        }else {
+            for (int i = messageList.size() - 1; i > 0; i--) {
+                CLMessageBean bean = messageList.get(i);
+                if (bean.getMessageId().equals(message.getMessageId())){
+                    bean.setSendStatus(message.getSendStatus());
+                    adapter.notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
     }
 
     @Override

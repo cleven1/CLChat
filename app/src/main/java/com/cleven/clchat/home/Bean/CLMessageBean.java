@@ -1,6 +1,5 @@
 package com.cleven.clchat.home.Bean;
 
-import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.model.CLUserBean;
 
 public class CLMessageBean {
@@ -14,13 +13,9 @@ public class CLMessageBean {
      */
     private String content;
     /**
-     * 消息的方向
+     * 消息的发送状态 CLSendStatus
      */
-    private CLMessageDirection messageDirection;
-    /**
-     * 消息的发送状态 CLSentStatus
-     */
-    private int sentStatus;
+    private int sendStatus;
     /**
      * 消息的发送时间
      */
@@ -29,6 +24,10 @@ public class CLMessageBean {
      * 目标会话id
      */
     private String targetId;
+    /**
+     * 是否是群聊会话
+     */
+    private boolean isGroupSession;
     /**
      * 消息类型 CLMessageBodyType
      */
@@ -61,19 +60,12 @@ public class CLMessageBean {
         this.content = content;
     }
 
-    public CLMessageDirection getMessageDirection() {
-        if (getUserInfo().getUserId().equals(CLUserManager.getInstence().getUserInfo().getUserId())){
-            return CLMessageDirection.MessageDirection_SEND;
-        }
-        return CLMessageDirection.MessageDirection_RECEIVE;
+    public int getSendStatus() {
+        return sendStatus;
     }
 
-    public int getSentStatus() {
-        return sentStatus;
-    }
-
-    public void setSentStatus(int sentStatus) {
-        this.sentStatus = sentStatus;
+    public void setSendStatus(int sendStatus) {
+        this.sendStatus = sendStatus;
     }
 
     public String getSentTime() {
@@ -114,5 +106,13 @@ public class CLMessageBean {
 
     public void setMentionedInfo(CLMentionedInfo mentionedInfo) {
         this.mentionedInfo = mentionedInfo;
+    }
+
+    public boolean isGroupSession() {
+        return isGroupSession;
+    }
+
+    public void setGroupSession(boolean groupSession) {
+        isGroupSession = groupSession;
     }
 }

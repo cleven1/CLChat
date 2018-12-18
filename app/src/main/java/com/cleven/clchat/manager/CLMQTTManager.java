@@ -2,7 +2,6 @@ package com.cleven.clchat.manager;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -82,6 +81,18 @@ public class CLMQTTManager {
     public CLMQTTStatus currentStatus;
 
     /**
+     * 定义发送消息回调接口
+     */
+    public interface CLSendMessageStatusOnListener {
+        void onSuccess(String message);
+        void onFailure(String message);
+    }
+    private CLSendMessageStatusOnListener messageStatusOnListener;
+    public void setMessageStatusOnListener(CLSendMessageStatusOnListener messageStatusOnListener) {
+        this.messageStatusOnListener = messageStatusOnListener;
+    }
+
+    /**
      * 连接MQTT
      * @param context 上下文
      */
@@ -125,9 +136,9 @@ public class CLMQTTManager {
      * 发送单聊消息
      * @param msg 文本
      */
-    public void sendSingleMessage(String msg,String userId){
+    public void sendSingleMessage(final String msg, String userId){
         if (client != null && client.isConnected()){
-            MqttMessage message = new MqttMessage();
+            final MqttMessage message = new MqttMessage();
             message.setQos(1);
             message.setRetained(false);
             message.setPayload(msg.getBytes());
@@ -136,12 +147,16 @@ public class CLMQTTManager {
                 client.publish(MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + userId,message,null, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
-                        Toast.makeText(mContext,"发送成功",Toast.LENGTH_SHORT).show();
+                        if (messageStatusOnListener != null){
+                            messageStatusOnListener.onSuccess(msg);
+                        }
                     }
 
                     @Override
                     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                        Toast.makeText(mContext,"发送失败",Toast.LENGTH_SHORT).show();
+                         if (messageStatusOnListener != null) {
+                             messageStatusOnListener.onFailure(msg);
+                         }
                     }
                 });
             } catch (MqttException e) {
@@ -176,6 +191,7 @@ public class CLMQTTManager {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 Log.d("收到消息",message.toString());
+                CLMessageManager.getInstance().receiveMessageHandler(message.toString());
             }
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {

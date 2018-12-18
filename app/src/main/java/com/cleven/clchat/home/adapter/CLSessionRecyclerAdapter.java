@@ -11,15 +11,19 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cleven.clchat.R;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
+import com.cleven.clchat.home.Bean.CLSendStatus;
+import com.cleven.clchat.manager.CLUserManager;
 
 import java.util.List;
 
+import dev.utils.app.SizeUtils;
+
 import static com.cleven.clchat.home.Bean.CLMessageBodyType.MessageBodyType_Text;
-import static com.cleven.clchat.home.Bean.CLMessageDirection.MessageDirection_SEND;
 
 /**
  * Created by cleven on 2018/12/14.
@@ -63,15 +67,36 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             if (isGroup == false){
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                params.topMargin = SizeUtils.dipConvertPx(15);
                 contentLayout.setLayoutParams(params);
+                name.setVisibility(View.GONE);
+            }else {
+                name.setVisibility(View.VISIBLE);
             }
 
         }
 
-        public void setData(CLMessageBean data) {
+        public void setData(final CLMessageBean data) {
             this.data = data;
-//            name.setText("");
+            name.setText(data.getUserInfo().getName());
             mContent.setText(data.getContent());
+
+//            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            // 发送失败
+            if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
+                sendfail.setVisibility(View.VISIBLE);
+                pbBar.setVisibility(View.GONE);
+                sendfail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND){
+                // 发送成功
+                pbBar.setVisibility(View.GONE);
+                sendfail.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -82,12 +107,12 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         if (CLMessageBodyType.fromTypeName(messageBean.getMessageType()) == MessageBodyType_Text){
             View baseView;
             /// 发送
-            if (messageBean.getMessageDirection() == MessageDirection_SEND){
+            if (messageBean.getUserInfo().getUserId() == CLUserManager.getInstence().getUserInfo().getUserId()){
                 baseView = layoutInflater.inflate(R.layout.message_right_text_item,null);
             }else { // 接受
                 baseView = layoutInflater.inflate(R.layout.message_left_text_item,null);
             }
-            return new CLMessageTextViewHolder(mContext, baseView,true);
+            return new CLMessageTextViewHolder(mContext, baseView,messageBean.isGroupSession());
         }
         return null;
     }

@@ -1,12 +1,17 @@
 package com.cleven.clchat.manager;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSON;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
-import com.cleven.clchat.home.Bean.CLSentStatus;
 import com.cleven.clchat.utils.CLUtils;
 
 import dev.utils.LogPrintUtils;
+
+import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_FAILED;
+import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_SEND;
+import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_SENDING;
 
 /**
  * Created by cleven on 2018/12/16.
@@ -21,22 +26,48 @@ public class CLMessageManager {
     }
 
     /**
+     * 定义发送消息回调接口
+     */
+    public interface CLSendMessageStatusOnListener {
+        void onSuccess(CLMessageBean message);
+        void onFailure(CLMessageBean message);
+    }
+    private CLSendMessageStatusOnListener messageStatusOnListener;
+    public void setMessageStatusOnListener(CLSendMessageStatusOnListener messageStatusOnListener) {
+        this.messageStatusOnListener = messageStatusOnListener;
+    }
+
+    /**
+     * 定义收到消息的接口
+     */
+    public interface CLReceiveMessageOnListener{
+        void onMessage(CLMessageBean message);
+    }
+    private CLReceiveMessageOnListener receiveMessageOnListener;
+    public void setReceiveMessageOnListener(CLReceiveMessageOnListener receiveMessageOnListener) {
+        this.receiveMessageOnListener = receiveMessageOnListener;
+    }
+
+    /**
      * 发送文本消息
      * @param text 内容
      */
     public CLMessageBean sendMessage(String text,String userId){
         CLMessageBean message = new CLMessageBean();
+        /// 是否是群聊会话
+        message.setGroupSession(false);
         /// 消息内容
         message.setContent(text);
         /// 发送者信息
         message.setUserInfo(CLUserManager.getInstence().getUserInfo());
         /// 消息类型
         message.setMessageType(CLMessageBodyType.MessageBodyType_Text.getTypeName());
+
         int timeStamp = CLUtils.timeStamp;
         /// 消息id
         message.setMessageId("" + timeStamp);
         /// 发送状态
-        message.setSentStatus(CLSentStatus.SentStatus_SENT.getTypeName());
+        message.setSendStatus(SendStatus_SENDING.getTypeName());
         /// 发送时间
         message.setSentTime("" + timeStamp);
         /// 目标id
@@ -48,9 +79,39 @@ public class CLMessageManager {
 
         LogPrintUtils.d(jsonString);
 
+        CLMQTTManager.getInstance().setMessageStatusOnListener(new CLMQTTManager.CLSendMessageStatusOnListener() {
+            @Override
+            public void onSuccess(String message) {
+                if (messageStatusOnListener != null){
+                    Log.e("tag","message = " + message);
+                    CLMessageBean messageBean = JSON.parseObject(message, CLMessageBean.class);
+                    // 发送成功  CLSendStatus
+                    messageBean.setSendStatus(SendStatus_SEND.getTypeName());
+                    messageStatusOnListener.onSuccess(messageBean);
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+                if (messageStatusOnListener != null){
+                    CLMessageBean messageBean = JSON.parseObject(message, CLMessageBean.class);
+                    /// 发送失败 CLSendStatus
+                    messageBean.setSendStatus(SendStatus_FAILED.getTypeName());
+                    messageStatusOnListener.onFailure(messageBean);
+                }
+            }
+        });
+
         return message;
     }
 
+
+    public void receiveMessageHandler(String msg){
+        CLMessageBean messageBean = JSON.parseObject(msg, CLMessageBean.class);
+        if (receiveMessageOnListener != null){
+            receiveMessageOnListener.onMessage(messageBean);
+        }
+    }
 
 
 }
