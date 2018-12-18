@@ -17,6 +17,7 @@ import com.cleven.clchat.fragment.CLContactFragment;
 import com.cleven.clchat.fragment.CLDiscoverFragment;
 import com.cleven.clchat.fragment.CLHomeFragment;
 import com.cleven.clchat.fragment.CLProfileFragment;
+import com.cleven.clchat.manager.CLMQTTManager;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public class MainActivity extends CLBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initMqtt();
+
         setupTitleBar();
 
         initFragments();
@@ -48,6 +51,11 @@ public class MainActivity extends CLBaseActivity {
 
     }
 
+    /// 连接MQTT
+    private void initMqtt() {
+        CLMQTTManager.getInstance().connectMQTT(this);
+    }
+    
     private void findViews() {
 
         frameLayout = (FrameLayout)findViewById( R.id.frameLayout );

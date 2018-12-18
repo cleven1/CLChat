@@ -10,6 +10,7 @@ import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 
 import com.cleven.clchat.R;
+import com.cleven.clchat.manager.CLUserManager;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -45,9 +46,13 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                Intent intent = new Intent(SplashActivity.this,MainActivity.class);
-                startActivity(intent);
-
+                if (CLUserManager.getInstence().getUserInfo() == null){
+                    Intent intent = new Intent(SplashActivity.this,CLLoginActivity.class);
+                    startActivity(intent);
+                }else {
+                    Intent intent = new Intent(SplashActivity.this,MainActivity.class);
+                    startActivity(intent);
+                }
                 finish();
             }
 

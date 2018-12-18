@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/CLChat.iml" filepath="$PROJECT_DIR$/CLChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/CLChat-Android.iml" filepath="$PROJECT_DIR$/CLChat-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/ChatMessageView_example/ChatMessageView_example.iml" filepath="$PROJECT_DIR$/ChatMessageView_example/ChatMessageView_example.iml" />
       <module fileurl="file://$PROJECT_DIR$/LQREmojiLibrary_app/LQREmojiLibrary_app.iml" filepath="$PROJECT_DIR$/LQREmojiLibrary_app/LQREmojiLibrary_app.iml" />
