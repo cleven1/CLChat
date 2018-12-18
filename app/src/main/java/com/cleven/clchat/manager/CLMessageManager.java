@@ -67,15 +67,22 @@ public class CLMessageManager {
         /// 消息id
         message.setMessageId("" + timeStamp);
         /// 发送状态
-        message.setSendStatus(SendStatus_SENDING.getTypeName());
+        if (CLMQTTManager.getInstance().getCurrentStatus() != CLMQTTManager.CLMQTTStatus.connect_succss){
+            message.setSendStatus(SendStatus_FAILED.getTypeName());
+        }else {
+            message.setSendStatus(SendStatus_SENDING.getTypeName());
+        }
         /// 发送时间
         message.setSentTime("" + timeStamp);
         /// 目标id
         message.setTargetId(userId);
 
         String jsonString = JSON.toJSONString(message);
+
         /// 发送
-        CLMQTTManager.getInstance().sendSingleMessage(jsonString,userId);
+        if (CLMQTTManager.getInstance().getCurrentStatus() == CLMQTTManager.CLMQTTStatus.connect_succss){
+            CLMQTTManager.getInstance().sendSingleMessage(jsonString,userId);
+        }
 
         LogPrintUtils.d(jsonString);
 

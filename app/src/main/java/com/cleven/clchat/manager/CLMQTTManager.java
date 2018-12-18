@@ -12,8 +12,17 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_BASE_TOPIC;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_BROKER_HOST;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_CLIENT_ID;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_DISCONNECT_TOPIC;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_SINLE_CHAT_TOPIC;
+
 public class CLMQTTManager {
 
+    private final static String TAG = "MQTT";
+
+    /// 连接状态枚举
     enum CLMQTTStatus {
         connect_onknow,
         connect_succss,
@@ -21,39 +30,6 @@ public class CLMQTTManager {
         disconnect_success,
         disconnect_fail,
     }
-
-    /**
-     * 代理服务器ip地址
-     */
-    public static final String MQTT_BROKER_HOST = "tcp://47.74.178.206:1883";
-//    public static final String MQTT_BROKER_HOST = "tcp://192.168.31.98:1883";
-//    public static final String MQTT_BROKER_HOST = "tcp://192.168.10.6:1883";
-
-    /**
-     * 客户端唯一标识
-     */
-    public static final String MQTT_CLIENT_ID = "android-client";//ADBUtils.getIMEI();//"android-CLChat";
-
-    /**
-     * 订阅标识
-     */
-    public static final String MQTT_BASE_TOPIC = "CLChat/topic/";
-    /// 单聊 + userId
-    public static final String MQTT_SINLE_CHAT_TOPIC = "chat/single/";
-    /// 群聊 + groupId
-    public static final String MQTT_GROUP_CHAT_TOPIC = "chat/group/";
-    /// 邀请 + userId
-    public static final String MQTT_INVITE_TOPIC = "chat/invite/";
-    /// 添加好友 + userId
-    public static final String MQTT_ADD_FRIEND_TOPIC = "add/friend/";
-    /// 删除好友 + userId
-    public static final String MQTT_DELETE_FRIEND_TOPIC = "delete/friend/";
-    /// 系统通知
-    public static final String MQTT_SYSTEM_TOPIC = "system";
-    /// 连接成功 + userId
-    public static final String MQTT_CONNECT_TOPIC = "connect/user/";
-    /// 断开连接 + userId
-    public static final String MQTT_DISCONNECT_TOPIC = "disconnect/user/";
 
     /**
      * 用户名
@@ -79,6 +55,27 @@ public class CLMQTTManager {
      * 当前连接状态
      */
     public CLMQTTStatus currentStatus;
+    public void setCurrentStatus(CLMQTTStatus currentStatus) {
+        this.currentStatus = currentStatus;
+        /// 回调状态
+        if (connectStatusOnListener != null){
+            connectStatusOnListener.onConnectStatus(currentStatus);
+        }
+    }
+    public CLMQTTStatus getCurrentStatus() {
+        return currentStatus;
+    }
+
+    /**
+     * 定义连接状态的回调接口
+     */
+    public interface CLMQTTConnectStatusOnListener{
+        void onConnectStatus(CLMQTTStatus status);
+    }
+    private CLMQTTConnectStatusOnListener connectStatusOnListener;
+    public void setConnectStatusOnListener(CLMQTTConnectStatusOnListener connectStatusOnListener) {
+        this.connectStatusOnListener = connectStatusOnListener;
+    }
 
     /**
      * 定义发送消息回调接口
@@ -112,13 +109,13 @@ public class CLMQTTManager {
                 client.disconnect(null, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.d("MQTT","断开连接成功");
+                        Log.d(TAG,"断开连接成功");
                         currentStatus = CLMQTTStatus.disconnect_success;
                     }
 
                     @Override
                     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                        Log.d("MQTT","断开连接失败");
+                        Log.d(TAG,"断开连接失败");
                         currentStatus = CLMQTTStatus.disconnect_fail;
                     }
                 });
@@ -127,7 +124,7 @@ public class CLMQTTManager {
                 currentStatus = CLMQTTStatus.disconnect_fail;
             }
         }else {
-            Log.d("MQTT","未连接,请先连接");
+            Log.d(TAG,"未连接,请先连接");
             currentStatus = CLMQTTStatus.connect_onknow;
         }
     }
@@ -163,7 +160,7 @@ public class CLMQTTManager {
                 e.printStackTrace();
             }
         }else {
-            Log.d("MQTT","未连接,请先连接");
+            Log.d(TAG,"未连接,请先连接");
             currentStatus = CLMQTTStatus.connect_onknow;
         }
     }
@@ -185,21 +182,24 @@ public class CLMQTTManager {
         client.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {
-                Log.e("断开连接了","断开连接了");
+                Log.e(TAG,"断开连接了");
                 currentStatus = CLMQTTStatus.disconnect_success;
+                /// 重新连接
+                disconnectMQTT();
+                connectMQTT(mContext);
             }
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                Log.d("收到消息",message.toString());
+                Log.d(TAG,message.toString());
                 CLMessageManager.getInstance().receiveMessageHandler(message.toString());
             }
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {
                 try {
-                    Log.d("发送",token.getMessage().toString());
+                    Log.d(TAG,token.getMessage().toString());
                 } catch (MqttException e) {
                     e.printStackTrace();
-                    Log.e("失败",e.getMessage());
+                    Log.e(TAG,e.getMessage());
                 }
             }
         });
@@ -207,7 +207,7 @@ public class CLMQTTManager {
             client.connect(options, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("TA","连接成功");
+                    Log.e(TAG,"连接成功");
                     currentStatus = CLMQTTStatus.connect_succss;
                     // 订阅
                     final String[] topic = new String[1];
@@ -223,7 +223,7 @@ public class CLMQTTManager {
                 }
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d("失败",exception.getLocalizedMessage());
+                    Log.d(TAG,exception.getLocalizedMessage());
 //                    this.retryCount = 0;
                     currentStatus = CLMQTTStatus.connect_fail;
                 }
