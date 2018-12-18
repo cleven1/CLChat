@@ -24,7 +24,7 @@ public class CLMessageManager {
      * 发送文本消息
      * @param text 内容
      */
-    public CLMessageBean sendMessage(String text){
+    public CLMessageBean sendMessage(String text,String userId){
         CLMessageBean message = new CLMessageBean();
         /// 消息内容
         message.setContent(text);
@@ -40,11 +40,11 @@ public class CLMessageManager {
         /// 发送时间
         message.setSentTime("" + timeStamp);
         /// 目标id
-        message.setTargetId(CLUserManager.getInstence().getUserInfo().getUserId());
+        message.setTargetId(userId);
 
         String jsonString = JSON.toJSONString(message);
         /// 发送
-        CLMQTTManager.getInstance().sendMessage(jsonString);
+        CLMQTTManager.getInstance().sendSingleMessage(jsonString,userId);
 
         LogPrintUtils.d(jsonString);
 

@@ -1,28 +1,27 @@
 package com.cleven.clchat.manager;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
-import com.cleven.clchat.home.Bean.CLMessageBean;
-
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.internal.wire.MqttWireMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-
-import dev.utils.LogPrintUtils;
-import dev.utils.app.ADBUtils;
-
-/**
- * Created by cleven on 2018/12/12.
- */
 
 public class CLMQTTManager {
+
+    enum CLMQTTStatus {
+        connect_onknow,
+        connect_succss,
+        connect_fail,
+        disconnect_success,
+        disconnect_fail,
+    }
 
     /**
      * 代理服务器ip地址
@@ -34,7 +33,7 @@ public class CLMQTTManager {
     /**
      * 客户端唯一标识
      */
-    public static final String MQTT_CLIENT_ID = ADBUtils.getIMEI();//"android-CLChat";
+    public static final String MQTT_CLIENT_ID = "android-client";//ADBUtils.getIMEI();//"android-CLChat";
 
     /**
      * 订阅标识
@@ -66,141 +65,158 @@ public class CLMQTTManager {
      */
     public static final String PASSWORD = "password";
 
-    private MqttClient mqttClient;
-    private CLMQTTManager() {}
-    private static class SingleHodler{
-        private static final CLMQTTManager instance=new CLMQTTManager();
-    }
-    public static CLMQTTManager getInstance() {
-        return SingleHodler.instance;
+    private MqttAndroidClient client;
+    private MqttConnectOptions options;
+
+    private static CLMQTTManager instance = new CLMQTTManager();
+    private Context mContext;
+
+    private CLMQTTManager(){}
+    public static CLMQTTManager getInstance(){
+        return instance;
     }
 
     /**
-     * 连接mqtt
+     * 当前连接状态
      */
-    public void connect(){
-        try {
-            // host为主机名，clientid即连接MQTT的客户端ID，一般以客户端唯一标识符表示，
-            // MemoryPersistence设置clientid的保存形式，默认为以内存保存
-            LogPrintUtils.d("安卓标识 = " + MQTT_CLIENT_ID);
-            LogPrintUtils.d("安卓标识 androidID = " + ADBUtils.getAndroidId());
-            mqttClient = new MqttClient(MQTT_BROKER_HOST,MQTT_CLIENT_ID == null ? "android-client" : MQTT_CLIENT_ID,new MemoryPersistence());
-            // 配置参数信息
-            MqttConnectOptions options = new MqttConnectOptions();
-            // 设置是否清空session,这里如果设置为false表示服务器会保留客户端的连接记录，
-            // 这里设置为true表示每次连接到服务器都以新的身份连接
-            options.setCleanSession(false);
-            // 设置用户名
-            options.setUserName(USERNAME);
-            // 设置密码
-            options.setPassword(PASSWORD.toCharArray());
-            // 设置超时时间 单位为秒
-            options.setConnectionTimeout(10);
-            // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
-            options.setKeepAliveInterval(60);
-            /// 设置遗嘱
-            options.setWill( MQTT_BASE_TOPIC+MQTT_DISCONNECT_TOPIC + "1","android 断开连接".getBytes(),1,false);
-            // 连接
-            IMqttToken connectWithResult = mqttClient.connectWithResult(options);
-            if (connectWithResult.getClient().getClientId() != null){
-                // 连接成功
-                mqttClient.publish(MQTT_BASE_TOPIC+MQTT_CONNECT_TOPIC + CLUserManager.getInstence().getUserInfo().getUserId(),"用户连接成功".getBytes(),1,false);
+    public CLMQTTStatus currentStatus;
+
+    /**
+     * 连接MQTT
+     * @param context 上下文
+     */
+    public void connectMQTT(Context context){
+        this.mContext = context;
+        initMQTT();
+    }
+
+    /**
+     * 断开连接MQTT
+     */
+    public void disconnectMQTT(){
+        if (client != null && client.isConnected()){
+            try {
+                /// 断开之前先告诉服务端
+                client.publish(MQTT_BASE_TOPIC+MQTT_DISCONNECT_TOPIC + "1","用户1 断开连接".getBytes(),1,false);
+                client.disconnect(null, new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d("MQTT","断开连接成功");
+                        currentStatus = CLMQTTStatus.disconnect_success;
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        Log.d("MQTT","断开连接失败");
+                        currentStatus = CLMQTTStatus.disconnect_fail;
+                    }
+                });
+            } catch (MqttException e) {
+                e.printStackTrace();
+                currentStatus = CLMQTTStatus.disconnect_fail;
             }
-            LogPrintUtils.d("连接结果 = "+ connectWithResult.toString());
-            LogPrintUtils.d("连接结果 clientId = "+ connectWithResult.getClient().getClientId());
-            LogPrintUtils.d("连接结果 serverId = "+ connectWithResult.getClient().getServerURI());
-            // 订阅
-            final String[] topic = new String[1];
-            topic[0] = MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + "1";
-            int[] qos = new int[topic.length];
-            qos[0] = 1;
-            mqttClient.subscribe(topic,qos);
-
-            // 设置回调
-            mqttClient.setCallback(new MqttCallback() {
-                //连接丢失后，一般在这里面进行重连
-                @Override
-                public void connectionLost(Throwable throwable) {
-                    try {
-                        mqttClient.publish(MQTT_BASE_TOPIC+MQTT_DISCONNECT_TOPIC + "1","用户1 断开连接".getBytes(),1,false);
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
-                    Log.d("test","connectionLost");
-                }
-
-                //subscribe后得到的消息会执行到这里面
-                @Override
-                public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-                    Log.d("test","messageArrived = "+mqttMessage.toString());
-                }
-
-                //publish后会执行到这里
-                @Override
-                public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-                    Log.d("test","deliveryComplete");
-                    String[] topics = iMqttDeliveryToken.getTopics();
-                    int messageId = iMqttDeliveryToken.getMessageId();
-                    Log.d("success topic = ",topics.toString());
-                    Log.d("success messageid = ","" + messageId);
-                    MqttWireMessage response = iMqttDeliveryToken.getResponse();
-                    Log.d("response = ",response.toString());
-                    try {
-                        MqttMessage message = iMqttDeliveryToken.getMessage();
-                        Log.d("success === ",message.toString());
-                        String messageJson = message.getPayload().toString();
-                        CLMessageBean messageBean = JSON.parseObject(messageJson, CLMessageBean.class);
-                        Log.d("successid ==== ",messageBean.getMessageId());
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                        Log.d("fail ====== ",e.getMessage());
-                    }
-                }
-            });
-
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }catch (Exception e) {
-            e.printStackTrace();
+        }else {
+            Log.d("MQTT","未连接,请先连接");
+            currentStatus = CLMQTTStatus.connect_onknow;
         }
     }
 
     /**
-     * 发送消息
-     * @param msg 消息体
+     * 发送单聊消息
+     * @param msg 文本
      */
-    public void sendMessage(String msg){
-        if (mqttClient != null && mqttClient.isConnected()){
+    public void sendSingleMessage(String msg,String userId){
+        if (client != null && client.isConnected()){
             MqttMessage message = new MqttMessage();
-            message.setId(Integer.parseInt(CLUserManager.getInstence().getUserInfo().getUserId()));
             message.setQos(1);
             message.setRetained(false);
             message.setPayload(msg.getBytes());
+
             try {
-                mqttClient.publish( MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + CLUserManager.getInstence().getUserInfo().getUserId(),message);
+                client.publish(MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + userId,message,null, new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Toast.makeText(mContext,"发送成功",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        Toast.makeText(mContext,"发送失败",Toast.LENGTH_SHORT).show();
+                    }
+                });
             } catch (MqttException e) {
                 e.printStackTrace();
             }
+        }else {
+            Log.d("MQTT","未连接,请先连接");
+            currentStatus = CLMQTTStatus.connect_onknow;
         }
-
     }
 
-    /**
-     * 断开连接
-     */
-    public void disconnect(){
-        if(mqttClient != null){
-            if(mqttClient.isConnected()){
+    /// 初始化MQTT
+    private void initMQTT() {
+        final String userId = CLUserManager.getInstence().getUserInfo().getUserId();
+        client = new MqttAndroidClient(mContext,MQTT_BROKER_HOST,MQTT_CLIENT_ID == null ? userId : MQTT_CLIENT_ID);
+        options = new MqttConnectOptions();
+        options.setCleanSession(true);
+        // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
+        options.setKeepAliveInterval(60);
+        // 设置超时时间 单位为秒
+        options.setConnectionTimeout(30);
+        options.setUserName(USERNAME);
+        options.setPassword(PASSWORD.toCharArray());
+        /// 设置遗嘱
+        options.setWill(MQTT_BASE_TOPIC+MQTT_DISCONNECT_TOPIC + userId,"disconnect".getBytes(),1,false);
+        client.setCallback(new MqttCallback() {
+            @Override
+            public void connectionLost(Throwable cause) {
+                Log.e("断开连接了","断开连接了");
+                currentStatus = CLMQTTStatus.disconnect_success;
+            }
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                Log.d("收到消息",message.toString());
+            }
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
                 try {
-                    mqttClient.publish(MQTT_BASE_TOPIC+MQTT_DISCONNECT_TOPIC + "1","用户1 断开连接".getBytes(),1,false);
-                    mqttClient.disconnect();
-                    mqttClient = null;
+                    Log.d("发送",token.getMessage().toString());
                 } catch (MqttException e) {
                     e.printStackTrace();
+                    Log.e("失败",e.getMessage());
                 }
             }
+        });
+        try {
+            client.connect(options, null, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.d("TA","连接成功");
+                    currentStatus = CLMQTTStatus.connect_succss;
+                    // 订阅
+                    final String[] topic = new String[1];
+                    /// 订阅别人发给自己的消息
+                    topic[0] = MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + userId;
+                    int[] qos = new int[topic.length];
+                    qos[0] = 1;
+                    try {
+                        client.subscribe(topic,qos);
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Log.d("失败",exception.getLocalizedMessage());
+//                    this.retryCount = 0;
+                    currentStatus = CLMQTTStatus.connect_fail;
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+            currentStatus = CLMQTTStatus.connect_fail;
         }
-    }
 
+    }
 
 }

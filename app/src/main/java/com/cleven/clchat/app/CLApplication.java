@@ -50,7 +50,7 @@ public class CLApplication extends Application {
 
     /// 连接MQTT
     private void initMqtt() {
-        CLMQTTManager.getInstance().connect();
+        CLMQTTManager.getInstance().connectMQTT(this);
     }
 
     private void initDevUtil() {
