@@ -41,9 +41,9 @@ public class MainActivity extends CLBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initMqtt();
-
         setupTitleBar();
+
+        initMqtt();
 
         initFragments();
 
@@ -54,6 +54,21 @@ public class MainActivity extends CLBaseActivity {
     /// 连接MQTT
     private void initMqtt() {
         CLMQTTManager.getInstance().connectMQTT(this);
+        CLMQTTManager.getInstance().setConnectStatusOnListener(new CLMQTTManager.CLMQTTConnectStatusOnListener() {
+            @Override
+            public void onConnectStatus(CLMQTTManager.CLMQTTStatus status) {
+                if (currentSelectIndex != 0){
+                    return;
+                }
+                if (status == CLMQTTManager.CLMQTTStatus.connect_succss) {
+                    centerTextView.setText("首页");
+                }else if (status == CLMQTTManager.CLMQTTStatus.connect_fail){
+                    centerTextView.setText("连接失败");
+                }else {
+                    centerTextView.setText("连接中");
+                }
+            }
+        });
     }
     
     private void findViews() {

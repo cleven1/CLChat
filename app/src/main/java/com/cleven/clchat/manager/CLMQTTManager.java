@@ -27,10 +27,10 @@ import static com.cleven.clchat.utils.CLAPPConst.MQTT_SYSTEM_TOPIC;
 
 public class CLMQTTManager {
 
-    private final static String TAG = "MQTT";
+    private final static String TAG = CLMQTTManager.class.getSimpleName();
 
     /// 连接状态枚举
-    enum CLMQTTStatus {
+    public enum CLMQTTStatus {
         connect_onknow,
         connect_succss,
         connect_fail,
