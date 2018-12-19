@@ -11,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/chat-message-view/chat-message-view.iml" filepath="$PROJECT_DIR$/chat-message-view/chat-message-view.iml" />
       <module fileurl="file://$PROJECT_DIR$/chatkit/chatkit.iml" filepath="$PROJECT_DIR$/chatkit/chatkit.iml" />
       <module fileurl="file://$PROJECT_DIR$/chatkit_sample/chatkit_sample.iml" filepath="$PROJECT_DIR$/chatkit_sample/chatkit_sample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/easypermissions/easypermissions.iml" filepath="$PROJECT_DIR$/easypermissions/easypermissions.iml" />
     </modules>
   </component>
 </project>

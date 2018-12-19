@@ -39,6 +39,8 @@ public class CLMQTTManager {
     }
     /// 连接失败重拾次数
     private int retryCount = 0;
+    ///
+    private boolean isConnect = false;
 
     /**
      * 用户名
@@ -177,6 +179,8 @@ public class CLMQTTManager {
 
     /// 初始化MQTT
     private void initMQTT() {
+        if (isConnect == true){return;}
+        isConnect = true;
         client = null;
         final String userId = CLUserManager.getInstence().getUserInfo().getUserId();
         client = new MqttAndroidClient(mContext,MQTT_BROKER_HOST,MQTT_CLIENT_ID == null ? userId : MQTT_CLIENT_ID);
@@ -235,6 +239,7 @@ public class CLMQTTManager {
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"连接成功");
                     retryCount = 0;
+                    isConnect = false;
                     currentStatus = CLMQTTStatus.connect_succss;
                     try {
                         /// 连接成功通知服务器
@@ -248,6 +253,7 @@ public class CLMQTTManager {
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     Log.d(TAG,exception.getLocalizedMessage());
 //                    this.retryCount = 0;
+                    isConnect = false;
                     if (retryCount < 3) {
                         initMQTT();
                         retryCount += 1;

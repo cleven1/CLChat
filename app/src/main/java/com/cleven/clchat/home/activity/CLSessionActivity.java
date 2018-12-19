@@ -191,6 +191,13 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
             }
         });
 
+        mBtnAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(CLSessionActivity.this,"录音",Toast.LENGTH_SHORT).show();
+            }
+        });
+
         mEtContent.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -31,10 +32,13 @@ import dev.utils.common.validator.ValiToPhoneUtils;
 
 public class CLLoginActivity extends CLBaseActivity implements View.OnClickListener {
 
-    private EditText etMobile;
-    private EditText etPassword;
-    private Button btLogin;
-    private Button btnRegister;
+    private EditText mEtMobile;
+    private EditText mEtPassword;
+    private Button mBtLogin;
+    private Button mBtnRegister;
+    private ImageButton mIb_qq;
+    private ImageButton mIb_wx;
+    private ImageButton mIb_wb;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,31 +49,37 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
 
     private void findViews() {
 
-        etMobile = (EditText)findViewById( R.id.et_mobile );
-        etPassword = (EditText)findViewById( R.id.et_password );
-        btLogin = (Button)findViewById( R.id.bt_login );
-        btnRegister = findViewById(R.id.bt_register);
+        mEtMobile = (EditText)findViewById( R.id.et_mobile );
+        mEtPassword = (EditText)findViewById( R.id.et_password );
+        mBtLogin = (Button)findViewById( R.id.bt_login );
+        mBtnRegister = findViewById(R.id.bt_register);
+        mIb_qq = (ImageButton)findViewById(R.id.ib_qq);
+        mIb_wx = findViewById(R.id.ib_wx);
+        mIb_wb = findViewById(R.id.ib_wb);
 
-        btLogin.setOnClickListener( this );
-        btnRegister.setOnClickListener( this );
+        mBtLogin.setOnClickListener( this );
+        mBtnRegister.setOnClickListener( this );
+        mIb_qq.setOnClickListener(this);
+        mIb_wx.setOnClickListener(this);
+        mIb_wb.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View v) {
-        if ( v == btLogin ) {
+        if ( v == mBtLogin) {
             
-            if (!ValiToPhoneUtils.isPhone(etMobile.getText().toString().trim())){
+            if (!ValiToPhoneUtils.isPhone(mEtMobile.getText().toString().trim())){
                 Toast.makeText(this,"手机号不正确",Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (TextUtils.isEmpty(etPassword.getText())) {
+            if (TextUtils.isEmpty(mEtPassword.getText())) {
                 Toast.makeText(this,"密码不能为空",Toast.LENGTH_SHORT).show();
                 return;
             }
             HttpParams params = new HttpParams();
-            params.put("mobile",etMobile.getText().toString().trim());
-            params.put("pwd",etPassword.getText().toString().trim());
+            params.put("mobile", mEtMobile.getText().toString().trim());
+            params.put("pwd", mEtPassword.getText().toString().trim());
             params.put("identifier","Android");
             OkGo.<String>post(CLAPPConst.LOGIN).params(params).execute(new StringCallback(){
                 @Override
@@ -100,10 +110,16 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
                 }
             });
 
-        }else if (v == btnRegister){
+        }else if (v == mBtnRegister){
             Intent intent = new Intent(this,CLRegisgerActivity.class);
 
             startActivity(intent);
+        }else if (v == mIb_qq){
+
+        }else if (v == mIb_wx){
+
+        }else if (v == mIb_wb){
+
         }
     }
 

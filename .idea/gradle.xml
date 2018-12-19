@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/chat-message-view" />
             <option value="$PROJECT_DIR$/chatkit" />
             <option value="$PROJECT_DIR$/chatkit_sample" />
+            <option value="$PROJECT_DIR$/easypermissions" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

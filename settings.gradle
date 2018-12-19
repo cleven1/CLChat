@@ -1,1 +1,1 @@
-include ':app', ':chatkit_sample', ':chatkit', ':chat-message-view', ':ChatMessageView_example', ':LQREmojiLibrary_library', ':LQREmojiLibrary_app'
+include ':app', ':chatkit_sample', ':chatkit', ':chat-message-view', ':ChatMessageView_example', ':LQREmojiLibrary_library', ':LQREmojiLibrary_app', ':easypermissions'
