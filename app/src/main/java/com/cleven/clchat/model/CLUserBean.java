@@ -40,14 +40,7 @@ public class CLUserBean {
      * 城市
      */
     private String city;
-    /**
-     * token
-     */
-    private String token;
-    /**
-     * 手机号
-     */
-    private String mobilePhone;
+
 
     public String getUserId() {
         return userId;
@@ -111,21 +104,5 @@ public class CLUserBean {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getMobilePhone() {
-        return mobilePhone;
-    }
-
-    public void setMobilePhone(String mobilePhone) {
-        this.mobilePhone = mobilePhone;
     }
 }

@@ -6,6 +6,20 @@ import dev.utils.app.ADBUtils;
  * 所有常量
  */
 public class CLAPPConst {
+    /**
+     * http server base url
+     */
+    public static final String HTTP_SERVER_BASE_URL = "http://192.168.20.52:5000/api/";
+    /// 获取验证码
+    public static final String SMSCODE = HTTP_SERVER_BASE_URL + "user/smscode";
+    /// 注册
+    public static final String REGISTER = HTTP_SERVER_BASE_URL + "user/register";
+    /// 登录
+    public static final String LOGIN = HTTP_SERVER_BASE_URL + "user/login";
+    /// 退出登录
+    public static final String LOGOFF = HTTP_SERVER_BASE_URL + "user/logoff";
+
+
 
     /**
      * 代理服务器ip地址

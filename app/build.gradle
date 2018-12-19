@@ -29,7 +29,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     // 因为内含 res 文件, 使用 aar 方式调用
     implementation 'com.github.afkT:DevUtils:1.1.7@aar'
-    implementation ("com.github.bumptech.glide:glide:4.8.0") {
+    implementation("com.github.bumptech.glide:glide:4.8.0") {
         exclude group: "com.android.support"
     }
     implementation 'com.android.support:recyclerview-v7:27.1.1'
@@ -46,10 +46,10 @@ dependencies {
     /// titleBar
     compile 'com.wuhenzhizao:titlebar:1.1.3'
 
-    compile ('org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'){
+    compile('org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2') {
         exclude module: 'support-v4'
     }
-    compile ('org.eclipse.paho:org.eclipse.paho.android.service:1.0.2'){
+    compile('org.eclipse.paho:org.eclipse.paho.android.service:1.0.2') {
         exclude module: 'support-v4'
     }
 }

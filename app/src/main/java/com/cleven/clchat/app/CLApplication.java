@@ -50,8 +50,7 @@ public class CLApplication extends Application {
     private void initOkGo() {
         //设置全局请求头,不支持中文,不允许有中文字符
         HttpHeaders headers = new HttpHeaders();
-//        headers.put("commonHeaderKey1", "commonHeaderValue1");
-
+        headers.put("Content-Type", "application/json");
 
         //设置全局请求参数,支持中文
 //        HttpParams params = new HttpParams();
@@ -80,8 +79,8 @@ public class CLApplication extends Application {
                 .setOkHttpClient(builder.build())//不设置则使用默认
                 .setCacheMode(CacheMode.NO_CACHE)//设置缓存模式
                 .setCacheTime(CacheEntity.CACHE_NEVER_EXPIRE)//设置缓存时间,默认永不过期
-                .setRetryCount(3);//请求超时重连次数,默认3次
-//                .addCommonHeaders(headers)
+                .setRetryCount(3)//请求超时重连次数,默认3次
+                .addCommonHeaders(headers);
 //                .addCommonParams(params);
 
     }

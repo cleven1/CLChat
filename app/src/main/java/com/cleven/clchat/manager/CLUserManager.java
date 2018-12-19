@@ -1,10 +1,11 @@
 package com.cleven.clchat.manager;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.alibaba.fastjson.JSON;
 import com.cleven.clchat.app.CLApplication;
 import com.cleven.clchat.model.CLUserBean;
-
-import dev.utils.app.cache.DevCache;
 
 /**
  * Created by cleven on 2018/12/14.
@@ -24,16 +25,16 @@ public class CLUserManager {
     private CLUserBean userInfo;
 
     public CLUserBean getUserInfo() {
-        DevCache cache = DevCache.get(CLApplication.mContext, CACHE_USERINFOKEY);
-        String string = cache.getAsString(CACHE_USERINFOKEY);
+        SharedPreferences sp = CLApplication.mContext.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        String string = sp.getString(CACHE_USERINFOKEY,"");
         CLUserBean userBean = JSON.parseObject(string, CLUserBean.class);
         return userBean;
     }
 
     public void setUserInfo(CLUserBean userInfo) {
         this.userInfo = userInfo;
+        SharedPreferences sp = CLApplication.mContext.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         String jsonString = JSON.toJSONString(userInfo);
-        DevCache cache = DevCache.get(CLApplication.mContext);
-        cache.put(CACHE_USERINFOKEY,jsonString);
+        sp.edit().putString(CACHE_USERINFOKEY,jsonString).commit();
     }
 }
