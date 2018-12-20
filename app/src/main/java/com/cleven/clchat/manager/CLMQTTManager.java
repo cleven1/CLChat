@@ -183,6 +183,7 @@ public class CLMQTTManager {
         if (isConnect == true){return;}
         isConnect = true;
         client = null;
+        if (CLUserManager.getInstence().getUserInfo() == null){return;}
         final String userId = CLUserManager.getInstence().getUserInfo().getUserId();
         client = new MqttAndroidClient(mContext,MQTT_BROKER_HOST,MQTT_CLIENT_ID == null ? userId : MQTT_CLIENT_ID);
         options = new MqttConnectOptions();

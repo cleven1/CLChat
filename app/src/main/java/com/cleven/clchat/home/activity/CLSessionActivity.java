@@ -1,9 +1,7 @@
 package com.cleven.clchat.home.activity;
 
-import android.Manifest;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +26,7 @@ import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
+import com.cleven.clchat.utils.CLAPPConst;
 import com.lqr.audio.AudioRecordManager;
 import com.lqr.audio.IAudioRecordListener;
 import com.lqr.emoji.EmotionKeyboard;
@@ -65,6 +64,10 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     private EmotionLayout mElEmotion;
     /// 更多
     private LinearLayout mLlMore;
+    /// 相册
+    private ImageView mIvAlbum;
+    /// 拍照
+    private ImageView mIvShot;
     /// 键盘管理
     private EmotionKeyboard mEmotionKeyboard;
     /// 数据源
@@ -75,7 +78,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     private CLSessionRecyclerAdapter adapter;
     private String mUserName;
     private String mUserId;
-    private String[] perms;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,17 +95,16 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         /// 监听新消息
         obseverReceiveMessage();
 
-        checkSDCardPermission();
-
+        initAudioRecord();
     }
     private void initAudioRecord() {
-        File mAudioDir = new File(Environment.getExternalStorageDirectory(),"CLChat_Audio");
+        AudioRecordManager.getInstance(this).setMaxVoiceDuration(CLAPPConst.DEFAULT_MAX_AUDIO_RECORD_TIME_SECOND);
+        File mAudioDir = new File(CLAPPConst.AUDIO_SAVE_DIR);
         /// 判断文件夹是否存在,不存在创建
         if (!mAudioDir.exists()){
             mAudioDir.mkdirs();
         }
-        AudioRecordManager.getInstance(CLSessionActivity.this).setAudioSavePath(mAudioDir.getAbsolutePath());
-        AudioRecordManager.getInstance(this).setMaxVoiceDuration(60);
+        AudioRecordManager.getInstance(this).setAudioSavePath(mAudioDir.getAbsolutePath());
         AudioRecordManager.getInstance(this).setAudioRecordListener(new IAudioRecordListener() {
 
             private TextView mTimerTV;
@@ -185,6 +187,10 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
             @Override
             public void onFinish(Uri audioPath, int duration) {
+                if (audioPath == null){
+                    Toast.makeText(CLSessionActivity.this,"录音文件保存失败",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 //发送文件
                 File file = new File(audioPath.getPath());
                 if (file.exists()) {
@@ -222,19 +228,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                 }
             }
         });
-    }
-
-    private void checkSDCardPermission() {
-        //所要申请的权限
-        perms = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE};
-        if (EasyPermissions.hasPermissions(CLSessionActivity.this, perms)){
-            initAudioRecord();
-        }else {
-            //第二个参数是被拒绝后再次申请该权限的解释
-            //第三个参数是请求码
-            //第四个参数是要申请的权限
-            EasyPermissions.requestPermissions(this,"发送语音消息需要SD卡权限",0, perms);
-        }
     }
 
     @Override
@@ -307,6 +300,8 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         mElEmotion = (EmotionLayout)findViewById( R.id.elEmotion );
         mLlMore = (LinearLayout)findViewById( R.id.llMore );
         titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
+        mIvAlbum = (ImageView) findViewById(R.id.ivAlbum);
+        mIvShot = (ImageView) findViewById(R.id.ivShot);
 
         /// 实现输入框图文混排
         mElEmotion.attachEditText(mEtContent);
@@ -374,14 +369,9 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        if (EasyPermissions.hasPermissions(CLSessionActivity.this,perms)){
-                            AudioRecordManager.getInstance(CLSessionActivity.this).startRecord();
-                        }else {
-                            Toast.makeText(CLSessionActivity.this,"请开启SD卡权限",Toast.LENGTH_SHORT).show();
-                        }
+                        AudioRecordManager.getInstance(CLSessionActivity.this).startRecord();
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (!EasyPermissions.hasPermissions(CLSessionActivity.this,perms)){return false;}
                         if (isCancelled(view, motionEvent)) {
                             AudioRecordManager.getInstance(CLSessionActivity.this).willCancelRecord();
                         } else {
@@ -389,7 +379,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                         }
                         break;
                     case MotionEvent.ACTION_UP:
-                        if (!EasyPermissions.hasPermissions(CLSessionActivity.this,perms)){return false;}
                         AudioRecordManager.getInstance(CLSessionActivity.this).stopRecord();
                         AudioRecordManager.getInstance(CLSessionActivity.this).destroyRecord();
                         break;
@@ -421,6 +410,21 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
             }
         });
+        /// 相册
+        mIvAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(CLSessionActivity.this,"相册",Toast.LENGTH_SHORT).show();
+            }
+        });
+        /// 相机
+        mIvShot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(CLSessionActivity.this,"相机",Toast.LENGTH_SHORT).show();
+            }
+        });
+
         /// 发送事件
         mBtnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -430,6 +434,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         });
     }
 
+    /// 判断录音事件是否取消
     private boolean isCancelled(View view, MotionEvent event) {
         int[] location = new int[2];
         view.getLocationOnScreen(location);

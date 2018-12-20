@@ -54,4 +54,13 @@ public class CLAPPConst {
     public static final String MQTT_CONNECT_TOPIC = "connect/user/";
     /// 断开连接 + userId
     public static final String MQTT_DISCONNECT_TOPIC = "disconnect/user/";
+
+
+    //语音存放位置
+    public static final String AUDIO_SAVE_DIR = CLFileUtils.getDir("audio");
+    public static final int DEFAULT_MAX_AUDIO_RECORD_TIME_SECOND = 120;
+    //视频存放位置
+    public static final String VIDEO_SAVE_DIR = CLFileUtils.getDir("video");
+    //照片存放位置
+    public static final String PHOTO_SAVE_DIR = CLFileUtils.getDir("photo");
 }
