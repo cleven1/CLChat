@@ -1,5 +1,6 @@
 package com.cleven.clchat.home.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,6 +34,10 @@ import com.lqr.emoji.EmotionKeyboard;
 import com.lqr.emoji.EmotionLayout;
 import com.lqr.emoji.IEmotionExtClickListener;
 import com.lqr.emoji.IEmotionSelectedListener;
+import com.lqr.imagepicker.ImagePicker;
+import com.lqr.imagepicker.bean.ImageItem;
+import com.lqr.imagepicker.ui.ImageGridActivity;
+import com.lqr.imagepicker.ui.ImagePreviewActivity;
 import com.wuhenzhizao.titlebar.utils.KeyboardConflictCompat;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
@@ -78,7 +83,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     private CLSessionRecyclerAdapter adapter;
     private String mUserName;
     private String mUserId;
-
+    public static final int IMAGE_PICKER = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -410,10 +415,14 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
             }
         });
+
         /// 相册
         mIvAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                Intent intent = new Intent(CLSessionActivity.this, ImageGridActivity.class);
+                startActivityForResult(intent, IMAGE_PICKER);
                 Toast.makeText(CLSessionActivity.this,"相册",Toast.LENGTH_SHORT).show();
             }
         });
@@ -432,6 +441,24 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                 sendMessage();
             }
         });
+    }
+
+    /// 图片选择回调
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == ImagePicker.RESULT_CODE_ITEMS) {//返回多张照片
+            if (data != null) {
+                //是否发送原图
+                boolean isOrig = data.getBooleanExtra(ImagePreviewActivity.ISORIGIN, false);
+                ArrayList<ImageItem> images = (ArrayList<ImageItem>) data.getSerializableExtra(ImagePicker.EXTRA_RESULT_ITEMS);
+
+                Log.e("CSDN_LQR", isOrig ? "发原图" : "不发原图");//若不发原图的话，需要在自己在项目中做好压缩图片算法
+                for (ImageItem imageItem : images) {
+                    Log.e("CSDN_LQR", imageItem.path);
+                }
+            }
+        }
     }
 
     /// 判断录音事件是否取消
