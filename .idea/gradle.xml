@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ChatMessageView_example" />
+            <option value="$PROJECT_DIR$/LQRAudioRecord_library" />
             <option value="$PROJECT_DIR$/LQREmojiLibrary_app" />
             <option value="$PROJECT_DIR$/LQREmojiLibrary_library" />
             <option value="$PROJECT_DIR$/app" />

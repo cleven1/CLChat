@@ -1,6 +1,9 @@
 package com.cleven.clchat.home.activity;
 
+import android.Manifest;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -23,6 +26,7 @@ import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
+import com.lqr.audio.AudioRecordManager;
 import com.lqr.emoji.EmotionKeyboard;
 import com.lqr.emoji.EmotionLayout;
 import com.lqr.emoji.IEmotionExtClickListener;
@@ -30,10 +34,13 @@ import com.lqr.emoji.IEmotionSelectedListener;
 import com.wuhenzhizao.titlebar.utils.KeyboardConflictCompat;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener {
+import pub.devrel.easypermissions.EasyPermissions;
+
+public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener,EasyPermissions.PermissionCallbacks {
     /// 消息列表
     private RecyclerView mRvSessionView;
     /// 录音按钮
@@ -79,6 +86,52 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         initListener();
         /// 监听新消息
         obseverReceiveMessage();
+
+        checkSDCardPermission();
+
+    }
+    private void initAudioRecord() {
+        File mAudioDir = new File(Environment.getExternalStorageDirectory(),"CLChat_Audio");
+        /// 判断文件夹是否存在,不存在创建
+        if (!mAudioDir.exists()){
+            mAudioDir.mkdirs();
+        }
+        AudioRecordManager.getInstance(CLSessionActivity.this).setAudioSavePath(mAudioDir.getAbsolutePath());
+        AudioRecordManager.getInstance(this).setMaxVoiceDuration(60);
+    }
+
+    private void checkSDCardPermission() {
+        //所要申请的权限
+        String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE};
+        if (EasyPermissions.hasPermissions(CLSessionActivity.this,perms)){
+            initAudioRecord();
+        }else {
+            //第二个参数是被拒绝后再次申请该权限的解释
+            //第三个参数是请求码
+            //第四个参数是要申请的权限
+            EasyPermissions.requestPermissions(this,"发送语音消息需要SD卡权限",0,perms);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //把申请权限的回调交由EasyPermissions处理
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    //下面两个方法是实现EasyPermissions的EasyPermissions.PermissionCallbacks接口
+    //分别返回授权成功和失败的权限
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+//        Log.i(TAG, ”获取成功的权限” + perms);
+        initAudioRecord();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+//        Log.i(TAG, ”获取失败的权限” + perms);
+        Toast.makeText(this,"权限获取失败",Toast.LENGTH_SHORT).show();
     }
 
     /// 处理titleBar遮挡键盘的问题
@@ -190,11 +243,28 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                 }
             }
         });
-
+        // 录音事件
         mBtnAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(CLSessionActivity.this,"录音",Toast.LENGTH_SHORT).show();
+                /// 判断有没有写入sd卡权限
+                if (EasyPermissions.hasPermissions(CLSessionActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                    AudioRecordManager.getInstance(CLSessionActivity.this).startRecord();
+                }else {
+                    Toast.makeText(CLSessionActivity.this,"请开启SD卡权限",Toast.LENGTH_SHORT).show();
+                }
+
+//                //将要取消录音（参与微信手指上滑）
+//                AudioRecordManager.getInstance(CLSessionActivity.this).willCancelRecord();
+//
+//                //继续录音（参与微信手指上滑后加下滑回到原位）
+//                AudioRecordManager.getInstance(CLSessionActivity.this).continueRecord();
+//
+//                //停止录音
+//                AudioRecordManager.getInstance(CLSessionActivity.this).stopRecord();
+//
+//                //销毁录音
+//                AudioRecordManager.getInstance(CLSessionActivity.this).destroyRecord();
             }
         });
 
