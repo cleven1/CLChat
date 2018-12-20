@@ -321,15 +321,26 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
     }
 
+    // 监听新消息的到来
     private void obseverReceiveMessage(){
         CLMessageManager.getInstance().setReceiveMessageOnListener(new CLMessageManager.CLReceiveMessageOnListener() {
             @Override
-            public void onMessage(CLMessageBean message) {
-                messageList.add(message);
-                /// 插入并刷新
-                adapter.notifyItemInserted(messageList.size());
-                /// 滚到最后一个位置
-                mRvSessionView.scrollToPosition(messageList.size() - 1);
+            public void onMessage(final CLMessageBean message) {
+                String targetUserId = message.getUserInfo().getUserId();
+                /// 判断收到的消息是否是发给当前会话的
+                if (!targetUserId.equals(mUserId)){
+                    return;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        messageList.add(message);
+                        /// 插入并刷新
+                        adapter.notifyItemInserted(messageList.size());
+                        /// 滚到最后一个位置
+                        mRvSessionView.scrollToPosition(messageList.size() - 1);
+                    }
+                });
             }
         });
     }

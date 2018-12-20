@@ -32,6 +32,14 @@ public class CLMessageBean {
      * 消息类型 CLMessageBodyType
      */
     private int messageType;
+    /**
+     * 多媒体时长
+     */
+    private int duration;
+    /**
+     * 多媒体url
+     */
+    private String mediaUrl;
 
     /**
      * 发送者的用户信息
@@ -102,6 +110,22 @@ public class CLMessageBean {
 
     public CLMentionedInfo getMentionedInfo() {
         return mentionedInfo;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
     }
 
     public void setMentionedInfo(CLMentionedInfo mentionedInfo) {

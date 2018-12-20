@@ -13,6 +13,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import dev.utils.LogPrintUtils;
+import dev.utils.app.assist.manager.ThreadManager;
 
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_ADD_FRIEND_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_BASE_TOPIC;
@@ -205,23 +206,28 @@ public class CLMQTTManager {
             }
             /// 消息到达
             @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
+            public void messageArrived(final String topic, final MqttMessage message) throws Exception {
                 Log.d(TAG,message.toString());
                 LogPrintUtils.eTag(TAG,"topic = " + topic);
-                String baseTopic = MQTT_BASE_TOPIC;
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        String baseTopic = MQTT_BASE_TOPIC;
+                        if (topic.equals(baseTopic + MQTT_SINLE_CHAT_TOPIC + userId)){/// 单聊
+                            CLMessageManager.getInstance().receiveMessageHandler(message.toString());
+                        }else if (topic.equals(baseTopic + MQTT_GROUP_CHAT_TOPIC + userId)){ //群聊
 
-                if (topic.equals(baseTopic + MQTT_SINLE_CHAT_TOPIC + userId)){/// 单聊
-                    CLMessageManager.getInstance().receiveMessageHandler(message.toString());
-                }else if (topic.equals(baseTopic + MQTT_GROUP_CHAT_TOPIC + userId)){ //群聊
+                        }else if (topic.equals(baseTopic + MQTT_ADD_FRIEND_TOPIC + userId)){ //添加好友
 
-                }else if (topic.equals(baseTopic + MQTT_ADD_FRIEND_TOPIC + userId)){ //添加好友
+                        }else if (topic.equals(baseTopic + MQTT_DELETE_FRIEND_TOPIC + userId)){ //删除好友
 
-                }else if (topic.equals(baseTopic + MQTT_DELETE_FRIEND_TOPIC + userId)){ //删除好友
+                        }else if (topic.equals(baseTopic + MQTT_SYSTEM_TOPIC)){ //系统通知
 
-                }else if (topic.equals(baseTopic + MQTT_SYSTEM_TOPIC)){ //系统通知
-
-                }
-
+                        }
+                    }
+                };
+                /// 添加到线程池中执行
+                ThreadManager.getInstance().addTask(runnable);
             }
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {
