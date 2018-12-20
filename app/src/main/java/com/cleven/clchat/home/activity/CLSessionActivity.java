@@ -1,6 +1,7 @@
 package com.cleven.clchat.home.activity;
 
 import android.Manifest;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -18,6 +19,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.lqr.audio.AudioRecordManager;
+import com.lqr.audio.IAudioRecordListener;
 import com.lqr.emoji.EmotionKeyboard;
 import com.lqr.emoji.EmotionLayout;
 import com.lqr.emoji.IEmotionExtClickListener;
@@ -41,6 +44,7 @@ import java.util.List;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener,EasyPermissions.PermissionCallbacks {
+    private LinearLayout mLlRoot;
     /// 消息列表
     private RecyclerView mRvSessionView;
     /// 录音按钮
@@ -71,6 +75,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     private CLSessionRecyclerAdapter adapter;
     private String mUserName;
     private String mUserId;
+    private String[] perms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,18 +103,137 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         }
         AudioRecordManager.getInstance(CLSessionActivity.this).setAudioSavePath(mAudioDir.getAbsolutePath());
         AudioRecordManager.getInstance(this).setMaxVoiceDuration(60);
+        AudioRecordManager.getInstance(this).setAudioRecordListener(new IAudioRecordListener() {
+
+            private TextView mTimerTV;
+            private TextView mStateTV;
+            private ImageView mStateIV;
+            private PopupWindow mRecordWindow;
+
+            @Override
+            public void initTipView() {
+                View view = View.inflate(CLSessionActivity.this, R.layout.popup_audio_wi_vo, null);
+                mStateIV = (ImageView) view.findViewById(R.id.rc_audio_state_image);
+                mStateTV = (TextView) view.findViewById(R.id.rc_audio_state_text);
+                mTimerTV = (TextView) view.findViewById(R.id.rc_audio_timer);
+                mRecordWindow = new PopupWindow(view, -1, -1);
+                mRecordWindow.showAtLocation(mLlRoot, 17, 0, 0);
+                mRecordWindow.setFocusable(true);
+                mRecordWindow.setOutsideTouchable(false);
+                mRecordWindow.setTouchable(false);
+            }
+
+            @Override
+            public void setTimeoutTipView(int counter) {
+                if (this.mRecordWindow != null) {
+                    this.mStateIV.setVisibility(View.GONE);
+                    this.mStateTV.setVisibility(View.VISIBLE);
+                    this.mStateTV.setText(R.string.voice_rec);
+                    this.mStateTV.setBackgroundResource(R.drawable.bg_voice_popup);
+                    this.mTimerTV.setText(String.format("%s", new Object[]{Integer.valueOf(counter)}));
+                    this.mTimerTV.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void setRecordingTipView() {
+                if (this.mRecordWindow != null) {
+                    this.mStateIV.setVisibility(View.VISIBLE);
+                    this.mStateIV.setImageResource(R.mipmap.ic_volume_1);
+                    this.mStateTV.setVisibility(View.VISIBLE);
+                    this.mStateTV.setText(R.string.voice_rec);
+                    this.mStateTV.setBackgroundResource(R.drawable.bg_voice_popup);
+                    this.mTimerTV.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void setAudioShortTipView() {
+                if (this.mRecordWindow != null) {
+                    mStateIV.setImageResource(R.mipmap.ic_volume_wraning);
+                    mStateTV.setText(R.string.voice_short);
+                }
+            }
+
+            @Override
+            public void setCancelTipView() {
+                if (this.mRecordWindow != null) {
+                    this.mTimerTV.setVisibility(View.GONE);
+                    this.mStateIV.setVisibility(View.VISIBLE);
+                    this.mStateIV.setImageResource(R.mipmap.ic_volume_cancel);
+                    this.mStateTV.setVisibility(View.VISIBLE);
+                    this.mStateTV.setText(R.string.voice_cancel);
+                    this.mStateTV.setBackgroundResource(R.drawable.corner_voice_style);
+                }
+            }
+
+            @Override
+            public void destroyTipView() {
+                if (this.mRecordWindow != null) {
+                    this.mRecordWindow.dismiss();
+                    this.mRecordWindow = null;
+                    this.mStateIV = null;
+                    this.mStateTV = null;
+                    this.mTimerTV = null;
+                }
+            }
+
+            @Override
+            public void onStartRecord() {
+               Toast.makeText(CLSessionActivity.this,"开始录制",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFinish(Uri audioPath, int duration) {
+                //发送文件
+                File file = new File(audioPath.getPath());
+                if (file.exists()) {
+//                    mPresenter.sendAudioFile(audioPath, duration);
+                    Toast.makeText(CLSessionActivity.this,"录制完成 时长 = " + duration,Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onAudioDBChanged(int db) {
+                switch (db / 5) {
+                    case 0:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_1);
+                        break;
+                    case 1:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_2);
+                        break;
+                    case 2:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_3);
+                        break;
+                    case 3:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_4);
+                        break;
+                    case 4:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_5);
+                        break;
+                    case 5:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_6);
+                        break;
+                    case 6:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_7);
+                        break;
+                    default:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_8);
+                }
+            }
+        });
     }
 
     private void checkSDCardPermission() {
         //所要申请的权限
-        String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE};
-        if (EasyPermissions.hasPermissions(CLSessionActivity.this,perms)){
+        perms = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE};
+        if (EasyPermissions.hasPermissions(CLSessionActivity.this, perms)){
             initAudioRecord();
         }else {
             //第二个参数是被拒绝后再次申请该权限的解释
             //第三个参数是请求码
             //第四个参数是要申请的权限
-            EasyPermissions.requestPermissions(this,"发送语音消息需要SD卡权限",0,perms);
+            EasyPermissions.requestPermissions(this,"发送语音消息需要SD卡权限",0, perms);
         }
     }
 
@@ -170,6 +294,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     }
 
     private void findViews() {
+        mLlRoot = (LinearLayout) findViewById(R.id.llRoot);
         mLlContent = (LinearLayout) findViewById(R.id.llContent);
         mRvSessionView = (RecyclerView)findViewById( R.id.rv_sessionView );
         mIvAudio = (ImageView)findViewById( R.id.ivAudio );
@@ -244,29 +369,35 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
             }
         });
         // 录音事件
-        mBtnAudio.setOnClickListener(new View.OnClickListener() {
+        mBtnAudio.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                /// 判断有没有写入sd卡权限
-                if (EasyPermissions.hasPermissions(CLSessionActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                    AudioRecordManager.getInstance(CLSessionActivity.this).startRecord();
-                }else {
-                    Toast.makeText(CLSessionActivity.this,"请开启SD卡权限",Toast.LENGTH_SHORT).show();
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (EasyPermissions.hasPermissions(CLSessionActivity.this,perms)){
+                            AudioRecordManager.getInstance(CLSessionActivity.this).startRecord();
+                        }else {
+                            Toast.makeText(CLSessionActivity.this,"请开启SD卡权限",Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (!EasyPermissions.hasPermissions(CLSessionActivity.this,perms)){return false;}
+                        if (isCancelled(view, motionEvent)) {
+                            AudioRecordManager.getInstance(CLSessionActivity.this).willCancelRecord();
+                        } else {
+                            AudioRecordManager.getInstance(CLSessionActivity.this).continueRecord();
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (!EasyPermissions.hasPermissions(CLSessionActivity.this,perms)){return false;}
+                        AudioRecordManager.getInstance(CLSessionActivity.this).stopRecord();
+                        AudioRecordManager.getInstance(CLSessionActivity.this).destroyRecord();
+                        break;
                 }
-
-//                //将要取消录音（参与微信手指上滑）
-//                AudioRecordManager.getInstance(CLSessionActivity.this).willCancelRecord();
-//
-//                //继续录音（参与微信手指上滑后加下滑回到原位）
-//                AudioRecordManager.getInstance(CLSessionActivity.this).continueRecord();
-//
-//                //停止录音
-//                AudioRecordManager.getInstance(CLSessionActivity.this).stopRecord();
-//
-//                //销毁录音
-//                AudioRecordManager.getInstance(CLSessionActivity.this).destroyRecord();
+                return false;
             }
         });
+
 
         mEtContent.addTextChangedListener(new TextWatcher() {
             @Override
@@ -297,6 +428,18 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                 sendMessage();
             }
         });
+    }
+
+    private boolean isCancelled(View view, MotionEvent event) {
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+
+        if (event.getRawX() < location[0] || event.getRawX() > location[0] + view.getWidth()
+                || event.getRawY() < location[1] - 40) {
+            return true;
+        }
+
+        return false;
     }
 
     private void sendMessage(){
