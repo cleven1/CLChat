@@ -63,7 +63,7 @@ public class CLMessageManager {
         /// 消息类型
         message.setMessageType(CLMessageBodyType.MessageBodyType_Text.getTypeName());
 
-        int timeStamp = CLUtils.timeStamp;
+        long timeStamp = CLUtils.timeStamp;
         /// 消息id
         message.setMessageId("" + timeStamp);
         /// 发送状态

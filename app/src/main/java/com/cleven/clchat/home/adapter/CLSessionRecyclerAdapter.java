@@ -18,12 +18,11 @@ import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.manager.CLUserManager;
+import com.cleven.clchat.utils.CLUtils;
 
-import java.util.Date;
 import java.util.List;
 
 import dev.utils.app.SizeUtils;
-import dev.utils.common.DateUtils;
 
 import static com.cleven.clchat.home.Bean.CLMessageBodyType.MessageBodyType_Text;
 
@@ -56,14 +55,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }
 
         public void setTimeData(String sentTime) {
-            long timeDiff = DateUtils.getTimeDiff("1545298409000",sentTime);
-
-            String formatTime = DateUtils.formatTime(Long.parseLong(sentTime), "yyyy-MM-dd HH:mm:ss +8000");
-            Date dateTime = DateUtils.parseDate(formatTime);
-
-            int hour = DateUtils.get24Hour(dateTime);
-            int minute = DateUtils.getMinute(dateTime);
-            mTime.setText(hour + ":" + minute + "==" + timeDiff);
+            mTime.setText(CLUtils.formatTiem(sentTime));
         }
     }
 

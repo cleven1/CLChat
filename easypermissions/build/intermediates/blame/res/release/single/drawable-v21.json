@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/Users/cleven/Desktop/AndroidDemo/CLChat/easypermissions/build/intermediates/res/merged/release/drawable-v21/abc_action_bar_item_background_material.xml",
+        "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/b6df9cb0f83ac16ab963e723131600b1/res/drawable-v21/abc_action_bar_item_background_material.xml"
+    },
+    {
+        "merged": "/Users/cleven/Desktop/AndroidDemo/CLChat/easypermissions/build/intermediates/res/merged/release/drawable-v21/abc_edit_text_material.xml",
+        "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/b6df9cb0f83ac16ab963e723131600b1/res/drawable-v21/abc_edit_text_material.xml"
+    },
+    {
+        "merged": "/Users/cleven/Desktop/AndroidDemo/CLChat/easypermissions/build/intermediates/res/merged/release/drawable-v21/notification_action_background.xml",
+        "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/support-compat-27.1.1.aar/53e27f69e39c1f6bbed5148678781107/res/drawable-v21/notification_action_background.xml"
+    },
+    {
+        "merged": "/Users/cleven/Desktop/AndroidDemo/CLChat/easypermissions/build/intermediates/res/merged/release/drawable-v21/abc_btn_colored_material.xml",
+        "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/b6df9cb0f83ac16ab963e723131600b1/res/drawable-v21/abc_btn_colored_material.xml"
+    }
+]
