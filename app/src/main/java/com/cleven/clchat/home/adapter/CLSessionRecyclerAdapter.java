@@ -19,9 +19,11 @@ import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.manager.CLUserManager;
 
+import java.util.Date;
 import java.util.List;
 
 import dev.utils.app.SizeUtils;
+import dev.utils.common.DateUtils;
 
 import static com.cleven.clchat.home.Bean.CLMessageBodyType.MessageBodyType_Text;
 
@@ -44,6 +46,26 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         layoutInflater = LayoutInflater.from(this.mContext);
     }
 
+    class  CLTimeViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView mTime;
+
+        public CLTimeViewHolder(Context mContext, View itemView) {
+            super(itemView);
+            mTime = itemView.findViewById(R.id.message_time);
+        }
+
+        public void setTimeData(String sentTime) {
+            long timeDiff = DateUtils.getTimeDiff("1545298409000",sentTime);
+
+            String formatTime = DateUtils.formatTime(Long.parseLong(sentTime), "yyyy-MM-dd HH:mm:ss +8000");
+            Date dateTime = DateUtils.parseDate(formatTime);
+
+            int hour = DateUtils.get24Hour(dateTime);
+            int minute = DateUtils.getMinute(dateTime);
+            mTime.setText(hour + ":" + minute + "==" + timeDiff);
+        }
+    }
 
     class CLMessageTextViewHolder extends RecyclerView.ViewHolder {
 
@@ -104,7 +126,8 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         CLMessageBean messageBean = mMessages.get(i);
-        if (CLMessageBodyType.fromTypeName(messageBean.getMessageType()) == MessageBodyType_Text){
+        CLMessageBodyType messageBodyType = CLMessageBodyType.fromTypeName(messageBean.getMessageType());
+        if (messageBodyType == MessageBodyType_Text){
             View baseView;
             /// 发送
             if (messageBean.getUserInfo().getUserId() == CLUserManager.getInstence().getUserInfo().getUserId()){
@@ -113,6 +136,8 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 baseView = layoutInflater.inflate(R.layout.message_left_text_item,null);
             }
             return new CLMessageTextViewHolder(mContext, baseView,messageBean.isGroupSession());
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Time){
+            return new CLTimeViewHolder(mContext,layoutInflater.inflate(R.layout.message_time_layout,null));
         }
         return null;
     }
@@ -124,8 +149,16 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        CLMessageTextViewHolder textViewHolder = (CLMessageTextViewHolder) holder;
-        textViewHolder.setData(mMessages.get(position));
+        CLMessageBean messageBean = mMessages.get(position);
+        CLMessageBodyType messageBodyType = CLMessageBodyType.fromTypeName(messageBean.getMessageType());
+        if (messageBodyType == CLMessageBodyType.MessageBodyType_Text){
+            CLMessageTextViewHolder textViewHolder = (CLMessageTextViewHolder) holder;
+            textViewHolder.setData(mMessages.get(position));
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Time){
+            CLTimeViewHolder timeViewHolder = (CLTimeViewHolder) holder;
+            timeViewHolder.setTimeData(messageBean.getSentTime());
+        }
+
     }
 
     @Override
