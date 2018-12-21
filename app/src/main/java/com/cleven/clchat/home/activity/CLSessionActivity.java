@@ -193,8 +193,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
             @Override
             public void onFinish(Uri audioPath, int duration) {
                 if (audioPath == null){
-                    audioDuration = duration;
-                    sendMessage();
                     Toast.makeText(CLSessionActivity.this,"录音文件保存失败",Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -457,6 +455,8 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
             messageBodyType = CLMessageBodyType.MessageBodyType_Voice;
             duration = audioDuration;
             audioDuration = 0;
+            url = mediaUrl;
+            mediaUrl = null;
         }else if (mediaUrl != null){
             messageBodyType = CLMessageBodyType.MessageBodyType_Image;
             url = mediaUrl;
@@ -660,6 +660,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     protected void onDestroy() {
         super.onDestroy();
         /// 退出停止播放
+        AudioRecordManager.getInstance(this).stopRecord();
         AudioPlayManager.getInstance().stopPlay();
     }
 }
