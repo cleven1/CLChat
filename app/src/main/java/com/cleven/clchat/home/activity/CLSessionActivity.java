@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
+import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.utils.CLAPPConst;
@@ -48,7 +49,7 @@ import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener,EasyPermissions.PermissionCallbacks {
+public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener{
     private LinearLayout mLlRoot;
     /// 消息列表
     private RecyclerView mRvSessionView;
@@ -84,7 +85,9 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     private CLSessionRecyclerAdapter adapter;
     private String mUserName;
     private String mUserId;
-    public static final int IMAGE_PICKER = 100;
+    private static final int IMAGE_PICKER = 100;
+    private int audioDuration = 0;
+    private String mediaUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,6 +197,8 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
             @Override
             public void onFinish(Uri audioPath, int duration) {
                 if (audioPath == null){
+                    audioDuration = duration;
+                    sendMessage();
                     Toast.makeText(CLSessionActivity.this,"录音文件保存失败",Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -203,6 +208,9 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 //                    mPresenter.sendAudioFile(audioPath, duration);
                     Toast.makeText(CLSessionActivity.this,"录制完成 时长 = " + duration,Toast.LENGTH_SHORT).show();
                 }
+                mediaUrl = audioPath.getPath();
+                audioDuration = duration;
+                sendMessage();
             }
 
             @Override
@@ -234,27 +242,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                 }
             }
         });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        //把申请权限的回调交由EasyPermissions处理
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-    //下面两个方法是实现EasyPermissions的EasyPermissions.PermissionCallbacks接口
-    //分别返回授权成功和失败的权限
-    @Override
-    public void onPermissionsGranted(int requestCode, List<String> perms) {
-//        Log.i(TAG, ”获取成功的权限” + perms);
-        initAudioRecord();
-    }
-
-    @Override
-    public void onPermissionsDenied(int requestCode, List<String> perms) {
-//        Log.i(TAG, ”获取失败的权限” + perms);
-        Toast.makeText(this,"权限获取失败",Toast.LENGTH_SHORT).show();
     }
 
     /// 处理titleBar遮挡键盘的问题
@@ -476,14 +463,30 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     }
 
     private void sendMessage(){
-        if (mEtContent.getText().toString().length() <= 0){return;}
-        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim(),mUserId);
+        CLMessageBodyType messageBodyType = CLMessageBodyType.MessageBodyType_Text;
+        String content = "";
+        int duration = 0;
+        String url = "";
+        if (mEtContent.getText().toString().length() > 0){
+            messageBodyType = CLMessageBodyType.MessageBodyType_Text;
+            content = mEtContent.getText().toString().trim();
+            mEtContent.setText("");
+        }else if (audioDuration > 0){
+            messageBodyType = CLMessageBodyType.MessageBodyType_Voice;
+            duration = audioDuration;
+            audioDuration = 0;
+        }else if (mediaUrl != null){
+            messageBodyType = CLMessageBodyType.MessageBodyType_Image;
+            url = mediaUrl;
+            mediaUrl = null;
+        }
+        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(content,mUserId,messageBodyType,duration,url);
         messageList.add(messageBean);
         /// 插入并刷新
         adapter.notifyItemInserted(messageList.size());
         /// 滚到最后一个位置
         mRvSessionView.scrollToPosition(messageList.size() - 1);
-        mEtContent.setText("");
+
         /// 发送回调
         CLMessageManager.getInstance().setMessageStatusOnListener(new CLMessageManager.CLSendMessageStatusOnListener() {
             @Override

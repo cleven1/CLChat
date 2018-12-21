@@ -52,7 +52,7 @@ public class CLMessageManager {
      * 发送文本消息
      * @param text 内容
      */
-    public CLMessageBean sendMessage(String text,String userId){
+    public CLMessageBean sendMessage(String text,String userId,CLMessageBodyType messageBodyType,int duration,String mediaUrl){
         CLMessageBean message = new CLMessageBean();
         /// 是否是群聊会话
         message.setGroupSession(false);
@@ -61,7 +61,11 @@ public class CLMessageManager {
         /// 发送者信息
         message.setUserInfo(CLUserManager.getInstence().getUserInfo());
         /// 消息类型
-        message.setMessageType(CLMessageBodyType.MessageBodyType_Text.getTypeName());
+        message.setMessageType(messageBodyType.getTypeName());
+        /// 时长
+        message.setDuration(duration);
+        /// 音视频路径
+        message.setMediaUrl(mediaUrl);
 
         long timeStamp = CLUtils.timeStamp;
         /// 消息id

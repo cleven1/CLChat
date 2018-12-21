@@ -51,6 +51,7 @@
                 android:textSize="10sp"
                 android:layout_marginLeft="10dp"
                 android:text="0"
+                android:visibility="gone"
                 />
 
             <ImageView

@@ -95,6 +95,23 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
 
         public void setAudioData(CLMessageBean messageBean) {
             mAudio_duration.setText(messageBean.getDuration() + "″");
+            // 发送失败
+            if (CLSendStatus.fromTypeName(messageBean.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
+                sendfail.setVisibility(View.VISIBLE);
+                pbBar.setVisibility(View.GONE);
+                mAudio_duration.setVisibility(View.GONE);
+                sendfail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else if (CLSendStatus.fromTypeName(messageBean.getSendStatus()) == CLSendStatus.SendStatus_SEND){
+                // 发送成功
+                pbBar.setVisibility(View.GONE);
+                sendfail.setVisibility(View.GONE);
+                mAudio_duration.setVisibility(View.VISIBLE);
+            }
         }
     }
 
