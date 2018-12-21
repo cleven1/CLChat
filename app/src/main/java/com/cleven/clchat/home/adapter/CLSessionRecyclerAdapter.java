@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.cleven.clchat.R;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
+import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLUtils;
@@ -71,13 +72,14 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         private final RelativeLayout mContent;
         private final ImageView mVoiceImage;
         private final TextView mAudio_duration;
+        private View mAudio_unread;
         private AnimationDrawable animationDrawable;
         private int postion = 0;
         private int[] leftImages = {R.mipmap.audio_animation_list_left_1,R.mipmap.audio_animation_list_left_2,R.mipmap.audio_animation_list_left_3};
         private int[] rightImages = {R.mipmap.audio_animation_list_right_1,R.mipmap.audio_animation_list_right_2,R.mipmap.audio_animation_list_right_3};
         private Handler handler;
 
-        public CLAudioViewHolder(final Context mContext, View itemView, boolean isGroup, final boolean isMe) {
+        public CLAudioViewHolder(final Context mContext, View itemView, boolean isGroup) {
             super(itemView);
             LinearLayout contentLayout = (LinearLayout) itemView.findViewById(R.id.contentLayoout);
             ivAvatar = (ImageView)itemView.findViewById( R.id.iv_avatar );
@@ -85,6 +87,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             sendfail = (ImageView)itemView.findViewById( R.id.sendfail );
             pbBar = (ProgressBar)itemView.findViewById( R.id.pb_bar );
             mContent = (RelativeLayout) itemView.findViewById(R.id.content);
+            mAudio_unread = (View) itemView.findViewById(R.id.audio_unread);
             mVoiceImage = (ImageView) itemView.findViewById(R.id.voice_image);
             mAudio_duration = (TextView) itemView.findViewById(R.id.audio_duration);
             animationDrawable = (AnimationDrawable) mVoiceImage.getBackground();
@@ -99,18 +102,6 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             }else {
                 name.setVisibility(View.VISIBLE);
             }
-
-            /// 播放点击事件
-            mContent.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (isMe) {
-                        setAnimation(rightImages);
-                    }else {
-                        setAnimation(leftImages);
-                    }
-                }
-            });
         }
 
         private void setAnimation(final int[] images){
@@ -130,7 +121,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             handler.sendEmptyMessageDelayed(0,0);
         }
 
-        public void setAudioData(CLMessageBean messageBean) {
+        public void setAudioData(final CLMessageBean messageBean) {
             mAudio_duration.setText(messageBean.getDuration() + "″");
             Glide.with(mContext).load(messageBean.getUserInfo().getAvatarUrl()).into(ivAvatar);
             // 发送失败
@@ -150,6 +141,34 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 sendfail.setVisibility(View.GONE);
                 mAudio_duration.setVisibility(View.VISIBLE);
             }
+
+            boolean isMe = false;
+            if (messageBean.getUserInfo().getUserId().equals(CLUserManager.getInstence().getUserInfo().getUserId())){
+                isMe = true;
+            }
+
+            if (isMe == false){
+                if (messageBean.getReceivedStatus() != CLReceivedStatus.ReceivedStatus_LISTENED){
+                    mAudio_unread.setVisibility(View.VISIBLE);
+                }else {
+                    mAudio_unread.setVisibility(View.GONE);
+                }
+            }
+
+            /// 播放点击事件
+            final boolean finalIsMe = isMe;
+            mContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (finalIsMe){
+                        setAnimation(rightImages);
+                    }else {
+                        setAnimation(leftImages);
+                        mAudio_unread.setVisibility(View.GONE);
+                    }
+                    messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_LISTENED);
+                }
+            });
 
         }
     }
@@ -362,7 +381,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 isMe = false;
                 baseView = layoutInflater.inflate(R.layout.message_left_audio_item,null);
             }
-            return new CLAudioViewHolder(mContext,baseView,messageBean.isGroupSession(),isMe);
+            return new CLAudioViewHolder(mContext,baseView,messageBean.isGroupSession());
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Image){
             View baseView;
             /// 发送

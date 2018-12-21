@@ -62,6 +62,10 @@ public class CLMessageBean {
      * 消息中的@提醒信息
      */
     private CLMentionedInfo mentionedInfo;
+    /**
+     * 收到消息的状态
+     */
+    private CLReceivedStatus receivedStatus;
 
 
     public String getMessageId() {
@@ -130,6 +134,14 @@ public class CLMessageBean {
 
     public void setVideoThumbnail(String videoThumbnail) {
         this.videoThumbnail = videoThumbnail;
+    }
+
+    public CLReceivedStatus getReceivedStatus() {
+        return receivedStatus;
+    }
+
+    public void setReceivedStatus(CLReceivedStatus receivedStatus) {
+        this.receivedStatus = receivedStatus;
     }
 
     public int getWitdh() {

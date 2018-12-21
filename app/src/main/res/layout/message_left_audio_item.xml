@@ -17,7 +17,7 @@
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="22dp"
+            android:layout_marginLeft="10dp"
             android:text="gjlqjwlgjlqwjgqwgjlkqjwgl"
             android:textSize="15sp"
             android:lines="1"
@@ -51,20 +51,36 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:src="@mipmap/audio_animation_left"
-                    android:background="@drawable/audio_playing_left_anim"
                     />
 
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/audio_duration"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:textSize="10sp"
-                android:text="0"/>
+               >
+
+                <View
+                    android:id="@+id/audio_unread"
+                    android:background="@drawable/message_audio_unread_shape"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/audio_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:textSize="10sp"
+                    android:text="0"/>
+
+            </RelativeLayout>
+
 
         </LinearLayout>
 
