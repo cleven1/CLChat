@@ -113,7 +113,7 @@ public class CLMessageBean {
     }
 
     public int getDuration() {
-        return duration;
+        return duration > 0 ? duration : 0;
     }
 
     public void setDuration(int duration) {

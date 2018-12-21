@@ -28,6 +28,7 @@ import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.utils.CLAPPConst;
+import com.lqr.audio.AudioPlayManager;
 import com.lqr.audio.AudioRecordManager;
 import com.lqr.audio.IAudioRecordListener;
 import com.lqr.emoji.EmotionKeyboard;
@@ -475,6 +476,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     }
 
     private void sendMessage(){
+        if (mEtContent.getText().toString().length() <= 0){return;}
         CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(mEtContent.getText().toString().trim(),mUserId);
         messageList.add(messageBean);
         /// 插入并刷新
@@ -501,7 +503,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         CLMessageManager.getInstance().setReceiveMessageOnListener(new CLMessageManager.CLReceiveMessageOnListener() {
             @Override
             public void onMessage(final CLMessageBean message) {
-                String targetUserId = message.getUserInfo().getUserId();
+                String targetUserId = message.getTargetId();
                 /// 判断收到的消息是否是发给当前会话的
                 if (!targetUserId.equals(mUserId)){
                     return;
@@ -669,4 +671,10 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        /// 退出停止播放
+        AudioPlayManager.getInstance().stopPlay();
+    }
 }

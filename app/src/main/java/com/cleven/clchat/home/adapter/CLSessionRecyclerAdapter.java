@@ -59,6 +59,45 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }
     }
 
+    class  CLAudioViewHolder extends RecyclerView.ViewHolder {
+
+        private ImageView ivAvatar;
+        private TextView name;
+        private ImageView sendfail;
+        private ProgressBar pbBar;
+        private final RelativeLayout mContent;
+        private final ImageView mVoiceImage;
+        private final TextView mAudio_duration;
+
+        public CLAudioViewHolder(Context mContext, View itemView, boolean isGroup) {
+            super(itemView);
+            LinearLayout contentLayout = (LinearLayout) itemView.findViewById(R.id.contentLayoout);
+            ivAvatar = (ImageView)itemView.findViewById( R.id.iv_avatar );
+            name = (TextView)itemView.findViewById( R.id.name );
+            sendfail = (ImageView)itemView.findViewById( R.id.sendfail );
+            pbBar = (ProgressBar)itemView.findViewById( R.id.pb_bar );
+            mContent = (RelativeLayout) itemView.findViewById(R.id.content);
+            mVoiceImage = (ImageView) itemView.findViewById(R.id.voice_image);
+            mAudio_duration = (TextView) itemView.findViewById(R.id.audio_duration);
+
+            //单聊改变布局
+            if (isGroup == false){
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
+                params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                params.topMargin = SizeUtils.dipConvertPx(15);
+                contentLayout.setLayoutParams(params);
+                name.setVisibility(View.GONE);
+            }else {
+                name.setVisibility(View.VISIBLE);
+            }
+
+        }
+
+        public void setAudioData(CLMessageBean messageBean) {
+            mAudio_duration.setText(messageBean.getDuration() + "″");
+        }
+    }
+
     class CLMessageTextViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivAvatar;
@@ -66,7 +105,6 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         private ImageView sendfail;
         private ProgressBar pbBar;
         private final TextView mContent;
-        private CLMessageBean data;
 
         public CLMessageTextViewHolder(Context mContext, View itemView, boolean isGroup) {
             super(itemView);
@@ -91,7 +129,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }
 
         public void setData(final CLMessageBean data) {
-            this.data = data;
+
             name.setText(data.getUserInfo().getName());
             mContent.setText(data.getContent());
 
@@ -119,10 +157,12 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         CLMessageBean messageBean = mMessages.get(i);
         CLMessageBodyType messageBodyType = CLMessageBodyType.fromTypeName(messageBean.getMessageType());
+        String currentUserId = CLUserManager.getInstence().getUserInfo().getUserId();
+
         if (messageBodyType == MessageBodyType_Text){
             View baseView;
             /// 发送
-            if (messageBean.getUserInfo().getUserId() == CLUserManager.getInstence().getUserInfo().getUserId()){
+            if (messageBean.getUserInfo().getUserId() == currentUserId){
                 baseView = layoutInflater.inflate(R.layout.message_right_text_item,null);
             }else { // 接受
                 baseView = layoutInflater.inflate(R.layout.message_left_text_item,null);
@@ -130,6 +170,15 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             return new CLMessageTextViewHolder(mContext, baseView,messageBean.isGroupSession());
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Time){
             return new CLTimeViewHolder(mContext,layoutInflater.inflate(R.layout.message_time_layout,null));
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Voice){
+            View baseView;
+            /// 发送
+            if (messageBean.getUserInfo().getUserId() == currentUserId){
+                baseView = layoutInflater.inflate(R.layout.message_right_audio_item,null);
+            }else { // 接受
+                baseView = layoutInflater.inflate(R.layout.message_left_audio_item,null);
+            }
+            return new CLAudioViewHolder(mContext,baseView,messageBean.isGroupSession());
         }
         return null;
     }
@@ -145,10 +194,13 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         CLMessageBodyType messageBodyType = CLMessageBodyType.fromTypeName(messageBean.getMessageType());
         if (messageBodyType == CLMessageBodyType.MessageBodyType_Text){
             CLMessageTextViewHolder textViewHolder = (CLMessageTextViewHolder) holder;
-            textViewHolder.setData(mMessages.get(position));
+            textViewHolder.setData(messageBean);
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Time){
             CLTimeViewHolder timeViewHolder = (CLTimeViewHolder) holder;
             timeViewHolder.setTimeData(messageBean.getSentTime());
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Voice){
+            CLAudioViewHolder audioViewHolder = (CLAudioViewHolder) holder;
+            audioViewHolder.setAudioData(messageBean);
         }
 
     }
