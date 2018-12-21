@@ -173,9 +173,9 @@ public class EmotionKeyboard {
         if (softInputHeight == 0) {
             softInputHeight = mSp.getInt(SHARE_PREFERENCE_SOFT_INPUT_HEIGHT, dip2Px(270));
         }
-        hideSoftInput();
         mEmotionLayout.getLayoutParams().height = softInputHeight;
         mEmotionLayout.setVisibility(View.VISIBLE);
+        hideSoftInput();
     }
 
     public int dip2Px(int dip) {

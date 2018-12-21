@@ -45,6 +45,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.utils.LogPrintUtils;
+
 public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener{
     private LinearLayout mLlRoot;
     /// 消息列表
@@ -290,9 +292,9 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         mIvAlbum = (ImageView) findViewById(R.id.ivAlbum);
         mIvShot = (ImageView) findViewById(R.id.ivShot);
 
+        initEmotionKeyboard();
         /// 实现输入框图文混排
         mElEmotion.attachEditText(mEtContent);
-        initEmotionKeyboard();
         /// 设置键盘发送按钮监听
         mEtContent.setOnEditorActionListener(this);
 
@@ -323,7 +325,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         mIvAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mBtnAudio.isShown()) {
+                if (mBtnAudio.isShown()) { //展示键盘
                     hideAudioButton();
                     mEtContent.requestFocus();
                     if (mEmotionKeyboard != null) {
@@ -364,7 +366,10 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         mEtContent.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                LogPrintUtils.eTag("mEtContent","s = " + s);
+                LogPrintUtils.eTag("mEtContent","start = " + start);
+                LogPrintUtils.eTag("mEtContent","count = " + count);
+                LogPrintUtils.eTag("mEtContent","after = " + after);
             }
 
             @Override
@@ -380,7 +385,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                LogPrintUtils.eTag("afterTextChanged","s ==" + s);
             }
         });
 
@@ -525,6 +530,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         }
     }
 
+    /// 键盘发送键回调
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         switch(actionId){
