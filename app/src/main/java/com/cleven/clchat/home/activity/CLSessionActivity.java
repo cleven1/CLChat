@@ -33,7 +33,6 @@ import com.lqr.audio.AudioRecordManager;
 import com.lqr.audio.IAudioRecordListener;
 import com.lqr.emoji.EmotionKeyboard;
 import com.lqr.emoji.EmotionLayout;
-import com.lqr.emoji.IEmotionExtClickListener;
 import com.lqr.emoji.IEmotionSelectedListener;
 import com.lqr.imagepicker.ImagePicker;
 import com.lqr.imagepicker.bean.ImageItem;
@@ -311,21 +310,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
     public void initListener() {
 
-
         mElEmotion.setEmotionSelectedListener(this);
-        mElEmotion.setEmotionAddVisiable(true);
-        mElEmotion.setEmotionSettingVisiable(true);
-        mElEmotion.setEmotionExtClickListener(new IEmotionExtClickListener() {
-            @Override
-            public void onEmotionAddClick(View view) {
-                Toast.makeText(getApplicationContext(), "add", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onEmotionSettingClick(View view) {
-                Toast.makeText(getApplicationContext(), "setting", Toast.LENGTH_SHORT).show();
-            }
-        });
         mLlContent.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

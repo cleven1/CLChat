@@ -403,7 +403,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         if (messageBodyType == MessageBodyType_Text){
             View baseView;
             /// 发送
-            if (messageBean.getUserInfo().getUserId() == currentUserId){
+            if (messageBean.getUserInfo().getUserId().equals(currentUserId)){
                 baseView = layoutInflater.inflate(R.layout.message_right_text_item,null);
             }else { // 接受
                 baseView = layoutInflater.inflate(R.layout.message_left_text_item,null);
@@ -415,7 +415,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             View baseView;
             Boolean isMe = false;
             /// 发送
-            if (messageBean.getUserInfo().getUserId() == currentUserId){
+            if (messageBean.getUserInfo().getUserId().equals(currentUserId)){
                 isMe = true;
                 baseView = layoutInflater.inflate(R.layout.message_right_audio_item,null);
             }else { // 接受
@@ -426,7 +426,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Image){
             View baseView;
             /// 发送
-            if (messageBean.getUserInfo().getUserId() == currentUserId){
+            if (messageBean.getUserInfo().getUserId().equals(currentUserId)){
                 baseView = layoutInflater.inflate(R.layout.message_right_image_item,null);
             }else { // 接受
                 baseView = layoutInflater.inflate(R.layout.message_left_image_item,null);
@@ -435,7 +435,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Video){
             View baseView;
             /// 发送
-            if (messageBean.getUserInfo().getUserId() == currentUserId){
+            if (messageBean.getUserInfo().getUserId().equals(currentUserId)){
                 baseView = layoutInflater.inflate(R.layout.message_right_video_item,null);
             }else { // 接受
                 baseView = layoutInflater.inflate(R.layout.message_left_video_item,null);
