@@ -97,6 +97,7 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
                             finish();
                         }else {
                             LogPrintUtils.eTag("LOGIN","转模型失败");
+                            Toast.makeText(CLLoginActivity.this,parseMap.get("error_msg").toString(),Toast.LENGTH_LONG).show();
                         }
                     }else {
                         Toast.makeText(CLLoginActivity.this,parseMap.get("error_msg").toString(),Toast.LENGTH_LONG).show();

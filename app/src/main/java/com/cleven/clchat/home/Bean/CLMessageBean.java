@@ -40,6 +40,18 @@ public class CLMessageBean {
      * 多媒体url
      */
     private String mediaUrl;
+    /**
+     * 视频缩略图
+     */
+    private String videoThumbnail;
+    /**
+     * 图片的宽
+     */
+    private int witdh;
+    /**
+     * 图片的高
+     */
+    private int height;
 
     /**
      * 发送者的用户信息
@@ -112,6 +124,30 @@ public class CLMessageBean {
         return mentionedInfo;
     }
 
+    public String getVideoThumbnail() {
+        return videoThumbnail;
+    }
+
+    public void setVideoThumbnail(String videoThumbnail) {
+        this.videoThumbnail = videoThumbnail;
+    }
+
+    public int getWitdh() {
+        return witdh;
+    }
+
+    public void setWitdh(int witdh) {
+        this.witdh = witdh;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     public int getDuration() {
         return duration > 0 ? duration : 0;
     }
@@ -138,5 +174,25 @@ public class CLMessageBean {
 
     public void setGroupSession(boolean groupSession) {
         isGroupSession = groupSession;
+    }
+
+    @Override
+    public String toString() {
+        return "CLMessageBean{" +
+                "messageId='" + messageId + '\'' +
+                ", content='" + content + '\'' +
+                ", sendStatus=" + sendStatus +
+                ", sentTime='" + sentTime + '\'' +
+                ", targetId='" + targetId + '\'' +
+                ", isGroupSession=" + isGroupSession +
+                ", messageType=" + messageType +
+                ", duration=" + duration +
+                ", mediaUrl='" + mediaUrl + '\'' +
+                ", videoThumbnail='" + videoThumbnail + '\'' +
+                ", witdh=" + witdh +
+                ", height=" + height +
+                ", userInfo=" + userInfo +
+                ", mentionedInfo=" + mentionedInfo +
+                '}';
     }
 }

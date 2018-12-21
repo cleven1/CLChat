@@ -3,7 +3,6 @@ package com.cleven.clchat.home.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -46,8 +45,6 @@ import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import pub.devrel.easypermissions.EasyPermissions;
 
 public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener{
     private LinearLayout mLlRoot;

@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.cleven.clchat.R;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
@@ -115,6 +116,67 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }
     }
 
+    class CLImageViewHolder extends RecyclerView.ViewHolder {
+
+        private ImageView ivAvatar;
+        private TextView name;
+        private ImageView sendfail;
+        private ProgressBar pbBar;
+        private final ImageView mContent;
+        private final LinearLayout contentLayout;
+
+        public CLImageViewHolder(Context mContext, View itemView, boolean isGroup) {
+            super(itemView);
+            contentLayout = (LinearLayout) itemView.findViewById(R.id.contentLayoout);
+            ivAvatar = (ImageView)itemView.findViewById( R.id.iv_avatar );
+            name = (TextView)itemView.findViewById( R.id.name );
+            sendfail = (ImageView)itemView.findViewById( R.id.sendfail );
+            pbBar = (ProgressBar)itemView.findViewById( R.id.pb_bar );
+            mContent = (ImageView) itemView.findViewById(R.id.content);
+
+            //单聊改变布局
+            if (isGroup == false){
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
+                params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                params.topMargin = SizeUtils.dipConvertPx(15);
+                contentLayout.setLayoutParams(params);
+                name.setVisibility(View.GONE);
+            }else {
+                name.setVisibility(View.VISIBLE);
+            }
+
+        }
+
+        public void setImageData(final CLMessageBean data) {
+
+            name.setText(data.getUserInfo().getName());
+
+            /// 根据图片的size更新布局
+            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(mContent);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
+            params.width = SizeUtils.dipConvertPx(data.getWitdh());
+            params.height = SizeUtils.dipConvertPx(data.getHeight());
+            contentLayout.setLayoutParams(params);
+
+//            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            // 发送失败
+            if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
+                sendfail.setVisibility(View.VISIBLE);
+                pbBar.setVisibility(View.GONE);
+                sendfail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND){
+                // 发送成功
+                pbBar.setVisibility(View.GONE);
+                sendfail.setVisibility(View.GONE);
+            }
+        }
+    }
+
     class CLMessageTextViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivAvatar;
@@ -196,6 +258,15 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 baseView = layoutInflater.inflate(R.layout.message_left_audio_item,null);
             }
             return new CLAudioViewHolder(mContext,baseView,messageBean.isGroupSession());
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Image){
+            View baseView;
+            /// 发送
+            if (messageBean.getUserInfo().getUserId() == currentUserId){
+                baseView = layoutInflater.inflate(R.layout.message_right_image_item,null);
+            }else { // 接受
+                baseView = layoutInflater.inflate(R.layout.message_left_image_item,null);
+            }
+            return new CLImageViewHolder(mContext,baseView,messageBean.isGroupSession());
         }
         return null;
     }
@@ -218,6 +289,9 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Voice){
             CLAudioViewHolder audioViewHolder = (CLAudioViewHolder) holder;
             audioViewHolder.setAudioData(messageBean);
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Image){
+            CLImageViewHolder imageViewHolder = (CLImageViewHolder) holder;
+            imageViewHolder.setImageData(messageBean);
         }
 
     }
