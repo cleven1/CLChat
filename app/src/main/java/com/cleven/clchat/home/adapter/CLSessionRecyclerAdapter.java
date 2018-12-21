@@ -2,6 +2,7 @@ package com.cleven.clchat.home.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -24,6 +25,8 @@ import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLUtils;
+import com.lqr.audio.AudioPlayManager;
+import com.lqr.audio.IAudioPlayListener;
 
 import java.util.List;
 
@@ -78,6 +81,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         private int[] leftImages = {R.mipmap.audio_animation_list_left_1,R.mipmap.audio_animation_list_left_2,R.mipmap.audio_animation_list_left_3};
         private int[] rightImages = {R.mipmap.audio_animation_list_right_1,R.mipmap.audio_animation_list_right_2,R.mipmap.audio_animation_list_right_3};
         private Handler handler;
+        private  boolean isPlaying = false;
 
         public CLAudioViewHolder(final Context mContext, View itemView, boolean isGroup) {
             super(itemView);
@@ -109,16 +113,29 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                @Override
                public void handleMessage(Message msg) {
                    super.handleMessage(msg);
+                   if (isPlaying == false){return;}
                    mVoiceImage.setImageResource(images[postion]);
                    postion += 1;
                    if (postion >= images.length){
                        postion = 0;
                    }
                    handler.removeCallbacksAndMessages(0);
-                   sendEmptyMessageDelayed(0,500);
+                   if (isPlaying){
+                       sendEmptyMessageDelayed(0,500);
+                   }
                }
            };
             handler.sendEmptyMessageDelayed(0,0);
+        }
+
+        private void stopAnimation(CLMessageBean messageBean){
+            isPlaying = false;
+            handler.removeCallbacksAndMessages(0);
+            if (messageBean.getUserInfo().getUserId().equals(CLUserManager.getInstence().getUserInfo().getUserId())){
+                mVoiceImage.setImageResource(R.mipmap.audio_animation_right);
+            }else {
+                mVoiceImage.setImageResource(R.mipmap.audio_animation_left);
+            }
         }
 
         public void setAudioData(final CLMessageBean messageBean) {
@@ -160,12 +177,36 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             mContent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if (isPlaying){
+                        return;
+                    }
+                    isPlaying = true;
                     if (finalIsMe){
                         setAnimation(rightImages);
                     }else {
                         setAnimation(leftImages);
                         mAudio_unread.setVisibility(View.GONE);
                     }
+
+                    AudioPlayManager.getInstance().startPlay(mContext,Uri.parse(messageBean.getMediaUrl()), new IAudioPlayListener() {
+                        @Override
+                        public void onStart(Uri var1) {
+                            //开播（一般是开始语音消息动画）
+                        }
+
+                        @Override
+                        public void onStop(Uri var1) {
+                            //停播（一般是停止语音消息动画）
+                            stopAnimation(messageBean);
+                        }
+
+                        @Override
+                        public void onComplete(Uri var1) {
+                            //播完（一般是停止语音消息动画）
+                            stopAnimation(messageBean);
+                        }
+                    });
+                    /// 状态改为已听
                     messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_LISTENED);
                 }
             });
