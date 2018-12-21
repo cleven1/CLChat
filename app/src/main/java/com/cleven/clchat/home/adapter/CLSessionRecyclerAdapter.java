@@ -37,7 +37,6 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
     private final Context mContext;
     private final List<CLMessageBean> mMessages;
     private final LayoutInflater layoutInflater;
-    private int currentItemType;
 
     public CLSessionRecyclerAdapter(Context context, List<CLMessageBean> messages) {
         this.mContext = context;
@@ -96,6 +95,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
 
         public void setAudioData(CLMessageBean messageBean) {
             mAudio_duration.setText(messageBean.getDuration() + "″");
+            Glide.with(mContext).load(messageBean.getUserInfo().getAvatarUrl()).into(ivAvatar);
             // 发送失败
             if (CLSendStatus.fromTypeName(messageBean.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 sendfail.setVisibility(View.VISIBLE);
@@ -158,7 +158,71 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             params.height = SizeUtils.dipConvertPx(data.getHeight());
             contentLayout.setLayoutParams(params);
 
-//            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            // 发送失败
+            if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
+                sendfail.setVisibility(View.VISIBLE);
+                pbBar.setVisibility(View.GONE);
+                sendfail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND){
+                // 发送成功
+                pbBar.setVisibility(View.GONE);
+                sendfail.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    class CLVideoViewHolder extends RecyclerView.ViewHolder {
+
+        private ImageView ivAvatar;
+        private TextView name;
+        private ImageView sendfail;
+        private ProgressBar pbBar;
+        private final RelativeLayout mContent;
+        private final LinearLayout contentLayout;
+        private ImageView mVideo_thumbnail;
+        private ImageView mVideo_play;
+
+        public CLVideoViewHolder(Context mContext, View itemView, boolean isGroup) {
+            super(itemView);
+            contentLayout = (LinearLayout) itemView.findViewById(R.id.contentLayoout);
+            ivAvatar = (ImageView)itemView.findViewById( R.id.iv_avatar );
+            name = (TextView)itemView.findViewById( R.id.name );
+            sendfail = (ImageView)itemView.findViewById( R.id.sendfail );
+            pbBar = (ProgressBar)itemView.findViewById( R.id.pb_bar );
+            mContent = (RelativeLayout) itemView.findViewById(R.id.content);
+            mVideo_thumbnail = (ImageView) itemView.findViewById(R.id.video_thumbnail);
+            mVideo_play = (ImageView) itemView.findViewById(R.id.video_play);
+
+            //单聊改变布局
+            if (isGroup == false){
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
+                params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                params.topMargin = SizeUtils.dipConvertPx(15);
+                contentLayout.setLayoutParams(params);
+                name.setVisibility(View.GONE);
+            }else {
+                name.setVisibility(View.VISIBLE);
+            }
+
+        }
+
+        public void setVideoData(final CLMessageBean data) {
+
+            name.setText(data.getUserInfo().getName());
+            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(mVideo_thumbnail);
+            /// 根据图片的size更新布局
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
+            params.width = SizeUtils.dipConvertPx(data.getWitdh());
+            params.height = SizeUtils.dipConvertPx(data.getHeight());
+            contentLayout.setLayoutParams(params);
+
             // 发送失败
             if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 sendfail.setVisibility(View.VISIBLE);
@@ -212,7 +276,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             name.setText(data.getUserInfo().getName());
             mContent.setText(data.getContent());
 
-//            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
             // 发送失败
             if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 sendfail.setVisibility(View.VISIBLE);
@@ -267,6 +331,15 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 baseView = layoutInflater.inflate(R.layout.message_left_image_item,null);
             }
             return new CLImageViewHolder(mContext,baseView,messageBean.isGroupSession());
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Video){
+            View baseView;
+            /// 发送
+            if (messageBean.getUserInfo().getUserId() == currentUserId){
+                baseView = layoutInflater.inflate(R.layout.message_right_video_item,null);
+            }else { // 接受
+                baseView = layoutInflater.inflate(R.layout.message_left_video_item,null);
+            }
+            return new CLVideoViewHolder(mContext,baseView,messageBean.isGroupSession());
         }
         return null;
     }
@@ -292,6 +365,9 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Image){
             CLImageViewHolder imageViewHolder = (CLImageViewHolder) holder;
             imageViewHolder.setImageData(messageBean);
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Video){
+            CLVideoViewHolder videoViewHolder = (CLVideoViewHolder) holder;
+            videoViewHolder.setVideoData(messageBean);
         }
 
     }

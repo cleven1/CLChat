@@ -17,7 +17,7 @@
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="22dp"
+            android:layout_marginLeft="11dp"
             android:text="gjlqjwlgjlqwjgqwgjlkqjwgl"
             android:textSize="15sp"
             android:lines="1"
@@ -34,24 +34,29 @@
             android:layout_marginLeft="5dp"
             android:layout_below="@+id/name">
 
-            <TextView
+            <RelativeLayout
                 android:id="@+id/content"
-                android:paddingLeft="15dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingRight="10dp"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_marginLeft="8dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:text="量将拉开和我l"
-                android:textSize="15sp"
-                android:textColor="#000"
-                android:background="@drawable/img_bubble_receive"
-                />
+                >
+
+                <ImageView
+                    android:id="@+id/video_thumbnail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/default_image"/>
+
+                <ImageView
+                    android:id="@+id/video_play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/bg_unread"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
-
 
 
     </RelativeLayout>
