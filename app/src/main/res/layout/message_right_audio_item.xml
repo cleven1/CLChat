@@ -89,7 +89,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="10dp"
-                android:src="@mipmap/audio_animation_right"/>
+                android:src="@mipmap/audio_animation_right"
+                android:background="@drawable/audio_playing_right_anim"/>
 
         </RelativeLayout>
 

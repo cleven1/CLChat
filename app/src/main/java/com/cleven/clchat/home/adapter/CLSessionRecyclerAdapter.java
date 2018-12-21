@@ -1,6 +1,9 @@
 package com.cleven.clchat.home.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -68,8 +71,13 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         private final RelativeLayout mContent;
         private final ImageView mVoiceImage;
         private final TextView mAudio_duration;
+        private AnimationDrawable animationDrawable;
+        private int postion = 0;
+        private int[] leftImages = {R.mipmap.audio_animation_list_left_1,R.mipmap.audio_animation_list_left_2,R.mipmap.audio_animation_list_left_3};
+        private int[] rightImages = {R.mipmap.audio_animation_list_right_1,R.mipmap.audio_animation_list_right_2,R.mipmap.audio_animation_list_right_3};
+        private Handler handler;
 
-        public CLAudioViewHolder(Context mContext, View itemView, boolean isGroup) {
+        public CLAudioViewHolder(final Context mContext, View itemView, boolean isGroup, final boolean isMe) {
             super(itemView);
             LinearLayout contentLayout = (LinearLayout) itemView.findViewById(R.id.contentLayoout);
             ivAvatar = (ImageView)itemView.findViewById( R.id.iv_avatar );
@@ -79,6 +87,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             mContent = (RelativeLayout) itemView.findViewById(R.id.content);
             mVoiceImage = (ImageView) itemView.findViewById(R.id.voice_image);
             mAudio_duration = (TextView) itemView.findViewById(R.id.audio_duration);
+            animationDrawable = (AnimationDrawable) mVoiceImage.getBackground();
 
             //单聊改变布局
             if (isGroup == false){
@@ -91,6 +100,34 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 name.setVisibility(View.VISIBLE);
             }
 
+            /// 播放点击事件
+            mContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (isMe) {
+                        setAnimation(rightImages);
+                    }else {
+                        setAnimation(leftImages);
+                    }
+                }
+            });
+        }
+
+        private void setAnimation(final int[] images){
+            handler = new Handler(){
+               @Override
+               public void handleMessage(Message msg) {
+                   super.handleMessage(msg);
+                   mVoiceImage.setImageResource(images[postion]);
+                   postion += 1;
+                   if (postion >= images.length){
+                       postion = 0;
+                   }
+                   handler.removeCallbacksAndMessages(0);
+                   sendEmptyMessageDelayed(0,500);
+               }
+           };
+            handler.sendEmptyMessageDelayed(0,0);
         }
 
         public void setAudioData(CLMessageBean messageBean) {
@@ -113,6 +150,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 sendfail.setVisibility(View.GONE);
                 mAudio_duration.setVisibility(View.VISIBLE);
             }
+
         }
     }
 
@@ -315,13 +353,16 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             return new CLTimeViewHolder(mContext,layoutInflater.inflate(R.layout.message_time_layout,null));
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Voice){
             View baseView;
+            Boolean isMe = false;
             /// 发送
             if (messageBean.getUserInfo().getUserId() == currentUserId){
+                isMe = true;
                 baseView = layoutInflater.inflate(R.layout.message_right_audio_item,null);
             }else { // 接受
+                isMe = false;
                 baseView = layoutInflater.inflate(R.layout.message_left_audio_item,null);
             }
-            return new CLAudioViewHolder(mContext,baseView,messageBean.isGroupSession());
+            return new CLAudioViewHolder(mContext,baseView,messageBean.isGroupSession(),isMe);
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Image){
             View baseView;
             /// 发送
