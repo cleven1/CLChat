@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/LQREmojiLibrary_app/LQREmojiLibrary_app.iml" filepath="$PROJECT_DIR$/LQREmojiLibrary_app/LQREmojiLibrary_app.iml" />
       <module fileurl="file://$PROJECT_DIR$/LQREmojiLibrary_library/LQREmojiLibrary_library.iml" filepath="$PROJECT_DIR$/LQREmojiLibrary_library/LQREmojiLibrary_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/LQRImagePicker_library/LQRImagePicker_library.iml" filepath="$PROJECT_DIR$/LQRImagePicker_library/LQRImagePicker_library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/XhsEmoticonsKeyboard_library/XhsEmoticonsKeyboard_library.iml" filepath="$PROJECT_DIR$/XhsEmoticonsKeyboard_library/XhsEmoticonsKeyboard_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/chat-message-view/chat-message-view.iml" filepath="$PROJECT_DIR$/chat-message-view/chat-message-view.iml" />
       <module fileurl="file://$PROJECT_DIR$/chatkit/chatkit.iml" filepath="$PROJECT_DIR$/chatkit/chatkit.iml" />

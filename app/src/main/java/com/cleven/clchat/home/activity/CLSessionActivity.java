@@ -6,17 +6,13 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,19 +21,19 @@ import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
+import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
+import com.cleven.clchat.home.CLEmojiCommon.widget.CLKeyBoardMoreGridView;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.lqr.audio.AudioPlayManager;
 import com.lqr.audio.AudioRecordManager;
 import com.lqr.audio.IAudioRecordListener;
-import com.lqr.emoji.EmotionKeyboard;
-import com.lqr.emoji.EmotionLayout;
-import com.lqr.emoji.IEmotionSelectedListener;
 import com.lqr.imagepicker.ImagePicker;
 import com.lqr.imagepicker.bean.ImageItem;
 import com.lqr.imagepicker.ui.ImageGridActivity;
 import com.lqr.imagepicker.ui.ImagePreviewActivity;
+import com.sj.emoji.EmojiBean;
 import com.wuhenzhizao.titlebar.utils.KeyboardConflictCompat;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
@@ -45,40 +41,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.utils.LogPrintUtils;
+import sj.keyboard.XhsEmoticonsKeyBoard;
+import sj.keyboard.data.EmoticonEntity;
+import sj.keyboard.interfaces.EmoticonClickListener;
+import sj.keyboard.utils.EmoticonsKeyboardUtils;
+import sj.keyboard.widget.EmoticonsEditText;
+import sj.keyboard.widget.FuncLayout;
 
-public class CLSessionActivity extends CLBaseActivity implements IEmotionSelectedListener,TextView.OnEditorActionListener{
-    private LinearLayout mLlRoot;
+public class CLSessionActivity extends CLBaseActivity implements TextView.OnEditorActionListener,FuncLayout.OnFuncKeyBoardListener {
     /// 消息列表
     private RecyclerView mRvSessionView;
-    /// 录音按钮
-    private ImageView mIvAudio;
-    /// 输入文本
-    private EditText mEtContent;
-    /// 按住说话
-    private Button mBtnAudio;
-    /// 表情
-    private ImageView mIvEmo;
-    /// 更多
-    private ImageView mIvMore;
-    /// 发送按钮
-    private Button mBtnSend;
-    /// 表情和更多父view
-    private FrameLayout mFlEmotionView;
-    /// 表情
-    private EmotionLayout mElEmotion;
-    /// 更多
-    private LinearLayout mLlMore;
-    /// 相册
-    private ImageView mIvAlbum;
-    /// 拍照
-    private ImageView mIvShot;
-    /// 键盘管理
-    private EmotionKeyboard mEmotionKeyboard;
+    /// 表情管理键盘
+    private XhsEmoticonsKeyBoard ekBar;
     /// 数据源
     private List<CLMessageBean> messageList;
-    /// 整个内容的父视图
-    private LinearLayout mLlContent;
     private CommonTitleBar titleBar;
     private CLSessionRecyclerAdapter adapter;
     private String mUserName;
@@ -86,6 +62,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     private static final int IMAGE_PICKER = 100;
     private int audioDuration = 0;
     private String mediaUrl;
+    private CLKeyBoardMoreGridView mKeyboardMoreView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +73,8 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
         findViews();
 
+        initEmoticonsKeyBoardBar();
+
         setupTitleBar();
 
         initListener();
@@ -104,6 +83,94 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
         initAudioRecord();
     }
+
+    private void initEmoticonsKeyBoardBar() {
+        CLEmojiCommonUtils.initEmoticonsEditText(ekBar.getEtChat());
+        ekBar.setAdapter(CLEmojiCommonUtils.getCommonAdapter(this, emoticonClickListener));
+        ekBar.addOnFuncKeyBoardListener(this);
+        mKeyboardMoreView = new CLKeyBoardMoreGridView(this);
+        ekBar.addFuncView(mKeyboardMoreView);
+
+    }
+
+    EmoticonClickListener emoticonClickListener = new EmoticonClickListener() {
+        @Override
+        public void onEmoticonClick(Object o, int actionType, boolean isDelBtn) {
+
+            if (isDelBtn) {
+                CLEmojiCommonUtils.delClick(ekBar.getEtChat());
+            } else {
+                if(o == null){
+                    return;
+                }
+                if(actionType == CLEmojiCommonUtils.EMOTICON_CLICK_BIGIMAGE){
+                    if(o instanceof EmoticonEntity){
+                        OnSendImage(((EmoticonEntity)o).getIconUri());
+                    }
+                } else {
+                    String content = null;
+                    if(o instanceof EmojiBean){
+                        content = ((EmojiBean)o).emoji;
+                    } else if(o instanceof EmoticonEntity){
+                        content = ((EmoticonEntity)o).getContent();
+                    }
+
+                    if(TextUtils.isEmpty(content)){
+                        return;
+                    }
+                    int index = ekBar.getEtChat().getSelectionStart();
+                    Editable editable = ekBar.getEtChat().getText();
+                    editable.insert(index, content);
+                }
+            }
+        }
+    };
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if(EmoticonsKeyboardUtils.isFullScreen(this)){
+            boolean isConsum = ekBar.dispatchKeyEventInFullScreen(event);
+            return isConsum ? isConsum : super.dispatchKeyEvent(event);
+        }
+        return super.dispatchKeyEvent(event);
+    }
+    /// 发送按钮
+    private void OnSendBtnClick(String msg) {
+        if (!TextUtils.isEmpty(msg)) {
+            sendMessage(msg);
+        }
+    }
+    /// 发送图片
+    private void OnSendImage(String image) {
+        if (!TextUtils.isEmpty(image)) {
+            OnSendBtnClick("[img]" + image);
+        }
+    }
+
+    private void scrollToBottom() {
+        mRvSessionView.requestLayout();
+        mRvSessionView.post(new Runnable() {
+            @Override
+            public void run() {
+                mRvSessionView.scrollToPosition(mRvSessionView.getBottom());
+            }
+        });
+    }
+
+    @Override
+    public void OnFuncPop(int height) {
+        scrollToBottom();
+    }
+
+    @Override
+    public void OnFuncClose() { }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ekBar.reset();
+    }
+
     private void initAudioRecord() {
         AudioRecordManager.getInstance(this).setMaxVoiceDuration(CLAPPConst.DEFAULT_MAX_AUDIO_RECORD_TIME_SECOND);
         File mAudioDir = new File(CLAPPConst.AUDIO_SAVE_DIR);
@@ -126,7 +193,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                 mStateTV = (TextView) view.findViewById(R.id.rc_audio_state_text);
                 mTimerTV = (TextView) view.findViewById(R.id.rc_audio_timer);
                 mRecordWindow = new PopupWindow(view, -1, -1);
-                mRecordWindow.showAtLocation(mLlRoot, 17, 0, 0);
+                mRecordWindow.showAtLocation(ekBar, 17, 0, 0);
                 mRecordWindow.setFocusable(true);
                 mRecordWindow.setOutsideTouchable(false);
                 mRecordWindow.setTouchable(false);
@@ -172,7 +239,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                     this.mStateIV.setImageResource(R.mipmap.ic_volume_cancel);
                     this.mStateTV.setVisibility(View.VISIBLE);
                     this.mStateTV.setText(R.string.voice_cancel);
-                    this.mStateTV.setBackgroundResource(R.drawable.corner_voice_style);
                 }
             }
 
@@ -206,7 +272,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                 }
                 mediaUrl = audioPath.getPath();
                 audioDuration = duration;
-                sendMessage();
+                sendMessage("");
             }
 
             @Override
@@ -247,12 +313,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         KeyboardConflictCompat.assistWindow(getWindow());
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mEtContent.clearFocus();
-    }
-
     public void getIntentParams() {
         mUserName = getIntent().getStringExtra("userName");
         mUserId = getIntent().getStringExtra("userId");
@@ -276,27 +336,9 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
     }
 
     private void findViews() {
-        mLlRoot = (LinearLayout) findViewById(R.id.llRoot);
-        mLlContent = (LinearLayout) findViewById(R.id.llContent);
         mRvSessionView = (RecyclerView)findViewById( R.id.rv_sessionView );
-        mIvAudio = (ImageView)findViewById( R.id.ivAudio );
-        mEtContent = (EditText)findViewById( R.id.etContent );
-        mBtnAudio = (Button)findViewById( R.id.btnAudio );
-        mIvEmo = (ImageView)findViewById( R.id.ivEmo );
-        mIvMore = (ImageView)findViewById( R.id.ivMore );
-        mBtnSend = (Button)findViewById( R.id.btnSend );
-        mFlEmotionView = (FrameLayout)findViewById( R.id.flEmotionView );
-        mElEmotion = (EmotionLayout)findViewById( R.id.elEmotion );
-        mLlMore = (LinearLayout)findViewById( R.id.llMore );
         titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
-        mIvAlbum = (ImageView) findViewById(R.id.ivAlbum);
-        mIvShot = (ImageView) findViewById(R.id.ivShot);
-
-        initEmotionKeyboard();
-        /// 实现输入框图文混排
-        mElEmotion.attachEditText(mEtContent);
-        /// 设置键盘发送按钮监听
-        mEtContent.setOnEditorActionListener(this);
+        ekBar = (XhsEmoticonsKeyBoard)findViewById(R.id.ek_bar);
 
         /// 初始化数据源
         messageList = new ArrayList<>();
@@ -310,36 +352,22 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
 
     public void initListener() {
 
-        mElEmotion.setEmotionSelectedListener(this);
-        mLlContent.setOnTouchListener(new View.OnTouchListener() {
+        ekBar.getEtChat().setOnSizeChangedListener(new EmoticonsEditText.OnSizeChangedListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        closeBottomAndKeyboard();
-                        break;
-                }
-                return false;
+            public void onSizeChanged(int w, int h, int oldw, int oldh) {
+                scrollToBottom();
             }
         });
-        mIvAudio.setOnClickListener(new View.OnClickListener() {
+        ekBar.getBtnSend().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mBtnAudio.isShown()) { //展示键盘
-                    hideAudioButton();
-                    mEtContent.requestFocus();
-                    if (mEmotionKeyboard != null) {
-                        mEmotionKeyboard.showSoftInput();
-                    }
-                } else {
-                    showAudioButton();
-                    hideEmotionLayout();
-                    hideMoreLayout();
-                }
+                OnSendBtnClick(ekBar.getEtChat().getText().toString());
+                ekBar.getEtChat().setText("");
             }
         });
+
         // 录音事件
-        mBtnAudio.setOnTouchListener(new View.OnTouchListener() {
+        ekBar.getBtnVoice().setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
@@ -362,58 +390,31 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
             }
         });
 
-
-        mEtContent.addTextChangedListener(new TextWatcher() {
+        mKeyboardMoreView.setMoreItemClickOnListener(new CLKeyBoardMoreGridView.CLMoreItemClickOnListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                LogPrintUtils.eTag("mEtContent","s = " + s);
-                LogPrintUtils.eTag("mEtContent","start = " + start);
-                LogPrintUtils.eTag("mEtContent","count = " + count);
-                LogPrintUtils.eTag("mEtContent","after = " + after);
-            }
+            public void didItem(int postion) {
+                switch (postion){
+                    case 0://相册
+                        gotoAlbum();
+                        break;
+                    case 1://拍摄
+                        Toast.makeText(CLSessionActivity.this,"相机",Toast.LENGTH_SHORT).show();
+                        break;
+                    case 2://位置
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (mEtContent.getText().toString().trim().length() > 0) {
-                    mBtnSend.setVisibility(View.VISIBLE);
-                    mIvMore.setVisibility(View.GONE);
-                } else {
-                    mBtnSend.setVisibility(View.GONE);
-                    mIvMore.setVisibility(View.VISIBLE);
+                        break;
+                    case 3://红包
+
+                        break;
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                LogPrintUtils.eTag("afterTextChanged","s ==" + s);
-            }
         });
+    }
 
-        /// 相册
-        mIvAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(CLSessionActivity.this, ImageGridActivity.class);
-                startActivityForResult(intent, IMAGE_PICKER);
-                Toast.makeText(CLSessionActivity.this,"相册",Toast.LENGTH_SHORT).show();
-            }
-        });
-        /// 相机
-        mIvShot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(CLSessionActivity.this,"相机",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        /// 发送事件
-        mBtnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendMessage();
-            }
-        });
+    /// 相册
+    private void gotoAlbum(){
+        Intent intent = new Intent(CLSessionActivity.this, ImageGridActivity.class);
+        startActivityForResult(intent, IMAGE_PICKER);
     }
 
     /// 图片选择回调
@@ -447,16 +448,16 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         return false;
     }
 
-    private void sendMessage(){
+    private void sendMessage(String message){
         CLMessageBodyType messageBodyType = CLMessageBodyType.MessageBodyType_Text;
         String content = "";
         int duration = 0;
         String url = "";
-        if (mEtContent.getText().toString().length() > 0){
+        if (message.length() > 0){
             messageBodyType = CLMessageBodyType.MessageBodyType_Text;
-            content = mEtContent.getText().toString().trim();
-            mEtContent.setText("");
-        }else if (audioDuration > 0){
+            content = message;
+        }else
+            if (audioDuration > 0){
             messageBodyType = CLMessageBodyType.MessageBodyType_Voice;
             duration = audioDuration;
             audioDuration = 0;
@@ -538,7 +539,7 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
                 System.out.println("Done_content: " + v.getText() );
                 break;
             case EditorInfo.IME_ACTION_SEND:
-                sendMessage();
+                sendMessage("");
                 break;
             case EditorInfo.IME_ACTION_DONE:
                 System.out.println("action done for number_content: "  + v.getText());
@@ -546,119 +547,6 @@ public class CLSessionActivity extends CLBaseActivity implements IEmotionSelecte
         }
 
         return true;
-    }
-
-    private void initEmotionKeyboard() {
-        mEmotionKeyboard = EmotionKeyboard.with(this);
-        mEmotionKeyboard.bindToEditText(mEtContent);
-        mEmotionKeyboard.bindToContent(mLlContent);
-        mEmotionKeyboard.setEmotionLayout(mFlEmotionView);
-        mEmotionKeyboard.bindToEmotionButton(mIvEmo, mIvMore);
-        mEmotionKeyboard.setOnEmotionButtonOnClickListener(new EmotionKeyboard.OnEmotionButtonOnClickListener() {
-            @Override
-            public boolean onEmotionButtonOnClickListener(View view) {
-                switch (view.getId()) {
-                    case R.id.ivEmo:
-                        if (!mElEmotion.isShown()) {
-                            if (mLlMore.isShown()) {
-                                showEmotionLayout();
-                                hideMoreLayout();
-                                hideAudioButton();
-                                return true;
-                            }
-                        } else if (mElEmotion.isShown() && !mLlMore.isShown()) {
-                            mIvEmo.setImageResource(R.mipmap.ic_cheat_emo);
-                            return false;
-                        }
-                        showEmotionLayout();
-                        hideMoreLayout();
-                        hideAudioButton();
-                        break;
-                    case R.id.ivMore:
-                        if (!mLlMore.isShown()) {
-                            if (mElEmotion.isShown()) {
-                                showMoreLayout();
-                                hideEmotionLayout();
-                                hideAudioButton();
-                                return true;
-                            }
-                        }
-                        showMoreLayout();
-                        hideEmotionLayout();
-                        hideAudioButton();
-                        break;
-                }
-                return false;
-            }
-        });
-    }
-
-    private void showAudioButton() {
-        mBtnAudio.setVisibility(View.VISIBLE);
-        mEtContent.setVisibility(View.GONE);
-        mIvAudio.setImageResource(R.mipmap.ic_cheat_keyboard);
-
-        if (mFlEmotionView.isShown()) {
-            if (mEmotionKeyboard != null) {
-                mEmotionKeyboard.interceptBackPress();
-            }
-        } else {
-            if (mEmotionKeyboard != null) {
-                mEmotionKeyboard.hideSoftInput();
-            }
-        }
-    }
-
-    private void hideAudioButton() {
-        mBtnAudio.setVisibility(View.GONE);
-        mEtContent.setVisibility(View.VISIBLE);
-        mIvAudio.setImageResource(R.mipmap.ic_cheat_voice);
-    }
-
-    private void showEmotionLayout() {
-        mElEmotion.setVisibility(View.VISIBLE);
-        mIvEmo.setImageResource(R.mipmap.ic_cheat_keyboard);
-    }
-
-    private void hideEmotionLayout() {
-        mElEmotion.setVisibility(View.GONE);
-        mIvEmo.setImageResource(R.mipmap.ic_cheat_emo);
-    }
-
-    private void showMoreLayout() {
-        mLlMore.setVisibility(View.VISIBLE);
-    }
-
-    private void hideMoreLayout() {
-        mLlMore.setVisibility(View.GONE);
-    }
-
-    private void closeBottomAndKeyboard() {
-        mElEmotion.setVisibility(View.GONE);
-        mLlMore.setVisibility(View.GONE);
-        if (mEmotionKeyboard != null) {
-            mEmotionKeyboard.interceptBackPress();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mElEmotion.isShown() || mLlMore.isShown()) {
-            mEmotionKeyboard.interceptBackPress();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public void onEmojiSelected(String key) {
-        Log.e("CSDN_LQR", "onEmojiSelected : " + key);
-    }
-
-    @Override
-    public void onStickerSelected(String categoryName, String stickerName, String stickerBitmapPath) {
-        Toast.makeText(getApplicationContext(), stickerBitmapPath, Toast.LENGTH_SHORT).show();
-        Log.e("CSDN_LQR", "stickerBitmapPath : " + stickerBitmapPath);
     }
 
 

@@ -1,0 +1,24 @@
+apply plugin: 'com.android.library'
+//apply plugin: 'com.github.dcendents.android-maven'
+
+//group='com.github.w446108264'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.1"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 27
+    }
+    configurations.all {
+
+        resolutionStrategy {
+            force 'com.android.support:support-v4:27.1.1'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:27.1.1'
+}

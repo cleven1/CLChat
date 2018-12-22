@@ -23,6 +23,7 @@ import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
+import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLUtils;
 import com.lqr.audio.AudioPlayManager;
@@ -372,7 +373,8 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         public void setData(final CLMessageBean data) {
 
             name.setText(data.getUserInfo().getName());
-            mContent.setText(data.getContent());
+            /// 过滤出表情,直接展示
+            CLEmojiCommonUtils.spannableEmoticonFilter(mContent,data.getContent());
 
             Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
             // 发送失败
