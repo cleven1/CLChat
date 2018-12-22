@@ -22,6 +22,7 @@ import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
+import com.cleven.clchat.home.CLEmojiCommon.utils.FileUtils;
 import com.cleven.clchat.home.CLEmojiCommon.widget.CLKeyBoardMoreGridView;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
@@ -41,6 +42,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.utils.app.image.BitmapUtils;
 import sj.keyboard.XhsEmoticonsKeyBoard;
 import sj.keyboard.data.EmoticonEntity;
 import sj.keyboard.interfaces.EmoticonClickListener;
@@ -140,10 +142,14 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
             sendMessage(msg);
         }
     }
-    /// 发送图片
+    /// 发送gif图片
     private void OnSendImage(String image) {
         if (!TextUtils.isEmpty(image)) {
-            OnSendBtnClick("[img]" + image);
+            String[] split = image.split("/");
+            /// 分割路径,取出图片最好一部分
+            String path = split[split.length - 2] + "/" + split[split.length - 1];
+            mediaUrl = path;
+            sendMessage("");
         }
     }
 
@@ -352,6 +358,15 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
 
     public void initListener() {
 
+        mRvSessionView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                /// 滚动隐藏键盘
+                ekBar.reset();
+            }
+        });
+
         ekBar.getEtChat().setOnSizeChangedListener(new EmoticonsEditText.OnSizeChangedListener() {
             @Override
             public void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -453,11 +468,11 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
         String content = "";
         int duration = 0;
         String url = "";
+        int size[] = {};
         if (message.length() > 0){
             messageBodyType = CLMessageBodyType.MessageBodyType_Text;
             content = message;
-        }else
-            if (audioDuration > 0){
+        }else if (audioDuration > 0){
             messageBodyType = CLMessageBodyType.MessageBodyType_Voice;
             duration = audioDuration;
             audioDuration = 0;
@@ -466,9 +481,10 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
         }else if (mediaUrl != null){
             messageBodyType = CLMessageBodyType.MessageBodyType_Image;
             url = mediaUrl;
+            size = BitmapUtils.getImageWidthHeight(FileUtils.getFolderPath("/") + url);
             mediaUrl = null;
         }
-        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(content,mUserId,messageBodyType,duration,url);
+        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(content,mUserId,messageBodyType,duration,url,size);
         messageList.add(messageBean);
         /// 插入并刷新
         adapter.notifyItemInserted(messageList.size());

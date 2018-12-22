@@ -38,4 +38,13 @@ public class CLUtils {
         return format;
     }
 
+
+    public static boolean checkStringStartWithHttp(String string){
+        if (string.startsWith("http://") || string.startsWith("https://")){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
 }

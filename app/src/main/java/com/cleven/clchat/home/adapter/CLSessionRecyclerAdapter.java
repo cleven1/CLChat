@@ -24,6 +24,7 @@ import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
+import com.cleven.clchat.home.CLEmojiCommon.utils.FileUtils;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLUtils;
 import com.lqr.audio.AudioPlayManager;
@@ -251,10 +252,14 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             name.setText(data.getUserInfo().getName());
 
             /// 根据图片的size更新布局
-            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(mContent);
+            if (CLUtils.checkStringStartWithHttp(data.getMediaUrl())){
+                Glide.with(mContext).load(data.getMediaUrl()).into(mContent);
+            }else {
+                Glide.with(mContext).load(FileUtils.getFolderPath("/") + data.getMediaUrl()).into(mContent);
+            }
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
-            params.width = SizeUtils.dipConvertPx(data.getWitdh());
-            params.height = SizeUtils.dipConvertPx(data.getHeight());
+            params.width = data.getWitdh();
+            params.height = data.getHeight();
             contentLayout.setLayoutParams(params);
 
             Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
