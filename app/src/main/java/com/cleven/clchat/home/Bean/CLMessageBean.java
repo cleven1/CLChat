@@ -41,6 +41,10 @@ public class CLMessageBean {
      */
     private String mediaUrl;
     /**
+     * 本地录音路径
+     */
+    private String localAudioUrl;
+    /**
      * 视频缩略图
      */
     private String videoThumbnail;
@@ -142,6 +146,14 @@ public class CLMessageBean {
 
     public void setReceivedStatus(CLReceivedStatus receivedStatus) {
         this.receivedStatus = receivedStatus;
+    }
+
+    public String getLocalAudioUrl() {
+        return localAudioUrl;
+    }
+
+    public void setLocalAudioUrl(String localAudioUrl) {
+        this.localAudioUrl = localAudioUrl;
     }
 
     public int getWitdh() {

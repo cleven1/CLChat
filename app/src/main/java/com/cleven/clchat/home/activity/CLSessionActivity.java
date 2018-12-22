@@ -64,7 +64,9 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
     private static final int IMAGE_PICKER = 100;
     private int audioDuration = 0;
     private String mediaUrl;
+    private String localAudioPath;
     private CLKeyBoardMoreGridView mKeyboardMoreView;
+    private CLMessageBodyType messageType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +141,7 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
     /// 发送按钮
     private void OnSendBtnClick(String msg) {
         if (!TextUtils.isEmpty(msg)) {
+            messageType = CLMessageBodyType.MessageBodyType_Text;
             sendMessage(msg);
         }
     }
@@ -149,6 +152,7 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
             /// 分割路径,取出图片最好一部分
             String path = split[split.length - 2] + "/" + split[split.length - 1];
             mediaUrl = path;
+            messageType = CLMessageBodyType.MessageBodyType_Image;
             sendMessage("");
         }
     }
@@ -276,8 +280,9 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
 //                    mPresenter.sendAudioFile(audioPath, duration);
                     Toast.makeText(CLSessionActivity.this,"录制完成 时长 = " + duration,Toast.LENGTH_SHORT).show();
                 }
-                mediaUrl = audioPath.getPath();
+                localAudioPath = audioPath.getPath();
                 audioDuration = duration;
+                messageType = CLMessageBodyType.MessageBodyType_Voice;
                 sendMessage("");
             }
 
@@ -464,27 +469,26 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
     }
 
     private void sendMessage(String message){
-        CLMessageBodyType messageBodyType = CLMessageBodyType.MessageBodyType_Text;
         String content = "";
         int duration = 0;
+        String localUrl = "";
         String url = "";
         int size[] = {};
-        if (message.length() > 0){
-            messageBodyType = CLMessageBodyType.MessageBodyType_Text;
+        if (messageType == CLMessageBodyType.MessageBodyType_Text){
             content = message;
-        }else if (audioDuration > 0){
-            messageBodyType = CLMessageBodyType.MessageBodyType_Voice;
+        }else if (messageType == CLMessageBodyType.MessageBodyType_Voice){
             duration = audioDuration;
             audioDuration = 0;
+            localUrl = localAudioPath;
+            localAudioPath = null;
             url = mediaUrl;
             mediaUrl = null;
-        }else if (mediaUrl != null){
-            messageBodyType = CLMessageBodyType.MessageBodyType_Image;
+        }else if (messageType == CLMessageBodyType.MessageBodyType_Image){
             url = mediaUrl;
             size = BitmapUtils.getImageWidthHeight(FileUtils.getFolderPath("/") + url);
             mediaUrl = null;
         }
-        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(content,mUserId,messageBodyType,duration,url,size);
+        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(content,mUserId, messageType,duration,localUrl,url,size);
         messageList.add(messageBean);
         /// 插入并刷新
         adapter.notifyItemInserted(messageList.size());

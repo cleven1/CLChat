@@ -52,7 +52,7 @@ public class CLMessageManager {
      * 发送文本消息
      * @param text 内容
      */
-    public CLMessageBean sendMessage(String text,String userId,CLMessageBodyType messageBodyType,int duration,String mediaUrl,int[] size){
+    public CLMessageBean sendMessage(String text,String userId,CLMessageBodyType messageBodyType,int duration,String localUrl,String mediaUrl,int[] size){
         CLMessageBean message = new CLMessageBean();
         /// 是否是群聊会话
         message.setGroupSession(false);
@@ -66,6 +66,8 @@ public class CLMessageManager {
         message.setDuration(duration);
         /// 音视频路径
         message.setMediaUrl(mediaUrl);
+        /// 本地url
+        message.setLocalAudioUrl(localUrl);
         /// 设置图片的size
         if (size != null && size.length > 0){
             message.setWitdh(size[0]);

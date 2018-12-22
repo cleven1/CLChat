@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -190,7 +191,14 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                         mAudio_unread.setVisibility(View.GONE);
                     }
 
-                    AudioPlayManager.getInstance().startPlay(mContext,Uri.parse(messageBean.getMediaUrl()), new IAudioPlayListener() {
+                    String url;
+                    if (!TextUtils.isEmpty(messageBean.getLocalAudioUrl())){
+                        url = messageBean.getLocalAudioUrl();
+                    }else {
+                        url = messageBean.getMediaUrl();
+                    }
+                    
+                    AudioPlayManager.getInstance().startPlay(mContext,Uri.parse(url), new IAudioPlayListener() {
                         @Override
                         public void onStart(Uri var1) {
                             //开播（一般是开始语音消息动画）
