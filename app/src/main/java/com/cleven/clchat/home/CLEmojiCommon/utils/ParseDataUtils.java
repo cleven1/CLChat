@@ -89,7 +89,7 @@ public class ParseDataUtils {
         File file = new File(xmlFilePath);
         if (!file.exists()) {
             try {
-                FileUtils.unzip(context.getAssets().open(assetsFileName), filePath);
+                CLEmojiFileUtils.unzip(context.getAssets().open(assetsFileName), filePath);
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;

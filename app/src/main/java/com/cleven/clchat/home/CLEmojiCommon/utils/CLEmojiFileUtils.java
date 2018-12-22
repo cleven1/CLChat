@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class FileUtils {
+public class CLEmojiFileUtils {
 
     public static final String DEF_FILEPATH = "/XhsEmoticonsKeyboard/Emoticons/";
 

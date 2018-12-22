@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
-import com.cleven.clchat.home.CLEmojiCommon.utils.FileUtils;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLUtils;
 import com.lqr.audio.AudioPlayManager;
@@ -191,13 +189,8 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                         mAudio_unread.setVisibility(View.GONE);
                     }
 
-                    String url;
-                    if (!TextUtils.isEmpty(messageBean.getLocalAudioUrl())){
-                        url = messageBean.getLocalAudioUrl();
-                    }else {
-                        url = messageBean.getMediaUrl();
-                    }
-                    
+
+                    String url = CLUtils.checkLocalPath(messageBean);
                     AudioPlayManager.getInstance().startPlay(mContext,Uri.parse(url), new IAudioPlayListener() {
                         @Override
                         public void onStart(Uri var1) {
@@ -260,15 +253,16 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             name.setText(data.getUserInfo().getName());
 
             /// 根据图片的size更新布局
-            if (CLUtils.checkStringStartWithHttp(data.getMediaUrl())){
-                Glide.with(mContext).load(data.getMediaUrl()).into(mContent);
-            }else {
-                Glide.with(mContext).load(FileUtils.getFolderPath("/") + data.getMediaUrl()).into(mContent);
-            }
+            String url = CLUtils.checkLocalPath(data);
+            Glide.with(mContext).load(url).into(mContent);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
             params.width = data.getWitdh();
             params.height = data.getHeight();
             contentLayout.setLayoutParams(params);
+            ViewGroup.LayoutParams imageParams = mContent.getLayoutParams();
+            imageParams.width = data.getWitdh();
+            imageParams.height = data.getHeight();
+            mContent.setLayoutParams(imageParams);
 
             Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
             // 发送失败
@@ -350,6 +344,8 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 pbBar.setVisibility(View.GONE);
                 sendfail.setVisibility(View.GONE);
             }
+
+            String url = CLUtils.checkLocalPath(data);
         }
     }
 

@@ -190,7 +190,7 @@ public class CLEmojiCommonUtils {
             if (i < 10){
                 format = "/ajmd/ajmd00" + i + ".png";
             }
-            EmoticonEntity bean = new EmoticonEntity( "file://" + FileUtils.getFolderPath("assets/sticker") + format, null);
+            EmoticonEntity bean = new EmoticonEntity( "file://" + CLEmojiFileUtils.getFolderPath("assets/sticker") + format, null);
             emojis.add(bean);
         }
 
@@ -200,7 +200,7 @@ public class CLEmojiCommonUtils {
                 .setRow(4)
                 .setEmoticonList(emojis)
                 .setIPageViewInstantiateItem(getEmoticonPageViewInstantiateItem(BigEmoticonsAndTitleAdapter.class, emoticonClickListener))
-                .setIconUri("file://"+FileUtils.getFolderPath("assets/sticker/ajmd.png"))
+                .setIconUri("file://"+ CLEmojiFileUtils.getFolderPath("assets/sticker/ajmd.png"))
                 .build();
         pageSetAdapter.add(xhsPageSetEntity);
     }
@@ -213,8 +213,8 @@ public class CLEmojiCommonUtils {
      * @param emoticonClickListener
      */
     public static void addWechatPageSetEntity(PageSetAdapter pageSetAdapter, Context context, EmoticonClickListener emoticonClickListener) {
-//        String filePath = FileUtils.getFolderPath("wxemoticons");
-        String filePath = FileUtils.getFolderPath("assets");
+//        String filePath = CLEmojiFileUtils.getFolderPath("wxemoticons");
+        String filePath = CLEmojiFileUtils.getFolderPath("assets");
         EmoticonPageSetEntity<EmoticonEntity> emoticonPageSetEntity = ParseDataUtils.parseDataFromFile(context, filePath, "wxemoticons.zip", "wxemoticons.xml");
         if (emoticonPageSetEntity == null) {
             return;
@@ -238,7 +238,7 @@ public class CLEmojiCommonUtils {
      * @param emoticonClickListener
      */
     public static void addGoodGoodStudyPageSetEntity(PageSetAdapter pageSetAdapter, Context context, EmoticonClickListener emoticonClickListener) {
-        String filePath = FileUtils.getFolderPath("goodgoodstudy");
+        String filePath = CLEmojiFileUtils.getFolderPath("goodgoodstudy");
         EmoticonPageSetEntity<EmoticonEntity> emoticonPageSetEntity = ParseDataUtils.parseDataFromFile(context, filePath, "goodgoodstudy.zip", "goodgoodstudy.xml");
         if (emoticonPageSetEntity == null) {
             return;

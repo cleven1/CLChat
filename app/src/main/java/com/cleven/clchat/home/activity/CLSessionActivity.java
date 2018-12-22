@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -22,7 +21,7 @@ import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
-import com.cleven.clchat.home.CLEmojiCommon.utils.FileUtils;
+import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 import com.cleven.clchat.home.CLEmojiCommon.widget.CLKeyBoardMoreGridView;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
@@ -50,7 +49,7 @@ import sj.keyboard.utils.EmoticonsKeyboardUtils;
 import sj.keyboard.widget.EmoticonsEditText;
 import sj.keyboard.widget.FuncLayout;
 
-public class CLSessionActivity extends CLBaseActivity implements TextView.OnEditorActionListener,FuncLayout.OnFuncKeyBoardListener {
+public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFuncKeyBoardListener {
     /// 消息列表
     private RecyclerView mRvSessionView;
     /// 表情管理键盘
@@ -64,7 +63,7 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
     private static final int IMAGE_PICKER = 100;
     private int audioDuration = 0;
     private String mediaUrl;
-    private String localAudioPath;
+    private String localMediaPath;
     private CLKeyBoardMoreGridView mKeyboardMoreView;
     private CLMessageBodyType messageType;
 
@@ -280,7 +279,7 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
 //                    mPresenter.sendAudioFile(audioPath, duration);
                     Toast.makeText(CLSessionActivity.this,"录制完成 时长 = " + duration,Toast.LENGTH_SHORT).show();
                 }
-                localAudioPath = audioPath.getPath();
+                localMediaPath = audioPath.getPath();
                 audioDuration = duration;
                 messageType = CLMessageBodyType.MessageBodyType_Voice;
                 sendMessage("");
@@ -450,6 +449,9 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
                 Log.e("CSDN_LQR", isOrig ? "发原图" : "不发原图");//若不发原图的话，需要在自己在项目中做好压缩图片算法
                 for (ImageItem imageItem : images) {
                     Log.e("CSDN_LQR", imageItem.path);
+                    localMediaPath = imageItem.path;
+                    messageType = CLMessageBodyType.MessageBodyType_Image;
+                    sendMessage("");
                 }
             }
         }
@@ -479,14 +481,20 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
         }else if (messageType == CLMessageBodyType.MessageBodyType_Voice){
             duration = audioDuration;
             audioDuration = 0;
-            localUrl = localAudioPath;
-            localAudioPath = null;
+            localUrl = localMediaPath;
+            localMediaPath = null;
             url = mediaUrl;
+            mediaUrl = null;
+        }else if (messageType == CLMessageBodyType.MessageBodyType_Emoji){
+            url = mediaUrl;
+            size = BitmapUtils.getImageWidthHeight(CLEmojiFileUtils.getFolderPath("/") + url);
             mediaUrl = null;
         }else if (messageType == CLMessageBodyType.MessageBodyType_Image){
             url = mediaUrl;
-            size = BitmapUtils.getImageWidthHeight(FileUtils.getFolderPath("/") + url);
+            localUrl = localMediaPath;
+            size = BitmapUtils.getImageWidthHeight(localUrl);
             mediaUrl = null;
+            localMediaPath = null;
         }
         CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(content,mUserId, messageType,duration,localUrl,url,size);
         messageList.add(messageBean);
@@ -550,25 +558,6 @@ public class CLSessionActivity extends CLBaseActivity implements TextView.OnEdit
             }
         }
     }
-
-    /// 键盘发送键回调
-    @Override
-    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        switch(actionId){
-            case EditorInfo.IME_NULL:
-                System.out.println("Done_content: " + v.getText() );
-                break;
-            case EditorInfo.IME_ACTION_SEND:
-                sendMessage("");
-                break;
-            case EditorInfo.IME_ACTION_DONE:
-                System.out.println("action done for number_content: "  + v.getText());
-                break;
-        }
-
-        return true;
-    }
-
 
     @Override
     protected void onDestroy() {

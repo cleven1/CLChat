@@ -1,9 +1,15 @@
 package com.cleven.clchat.utils;
 
+import com.cleven.clchat.home.Bean.CLMessageBean;
+import com.cleven.clchat.home.Bean.CLMessageBodyType;
+import com.cleven.clchat.manager.CLUserManager;
+import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
+
 import java.util.Date;
 
 import dev.utils.LogPrintUtils;
 import dev.utils.common.DateUtils;
+import dev.utils.common.FileUtils;
 
 /**
  * Created by cleven on 2018/12/16.
@@ -38,13 +44,22 @@ public class CLUtils {
         return format;
     }
 
-
-    public static boolean checkStringStartWithHttp(String string){
-        if (string.startsWith("http://") || string.startsWith("https://")){
-            return true;
-        }else {
-            return false;
+    /// 检查本地文件是否存在
+    public static String checkLocalPath(CLMessageBean message){
+        String currentUserId = CLUserManager.getInstence().getUserInfo().getUserId();
+        if (currentUserId.equals(message.getUserInfo().getUserId())){//判断自己发送的
+            if (CLMessageBodyType.fromTypeName(message.getMessageType())==CLMessageBodyType.MessageBodyType_Emoji){
+                message.setLocalAudioUrl(CLEmojiFileUtils.getFolderPath("assets") + message.getLocalAudioUrl());
+            }
+            if (FileUtils.isFileExists(message.getLocalAudioUrl())){
+                return message.getLocalAudioUrl();
+            }else {
+                return message.getMediaUrl();
+            }
+        }else{
+            return message.getMediaUrl();
         }
+
     }
 
 }

@@ -7,7 +7,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cleven.clchat.base.CLBaseFragment;
-import com.cleven.clchat.home.CLEmojiCommon.utils.FileUtils;
+import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 
 /**
  * Created by cleven on 2018/12/11.
@@ -25,7 +25,7 @@ public class CLDiscoverFragment extends CLBaseFragment {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext,FileUtils.getFolderPath("assets"),Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, CLEmojiFileUtils.getFolderPath("assets"),Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -26,7 +26,9 @@ public enum CLMessageBodyType {
     /// 红包
     MessageBodyType_RedPacket(9),
     /// 系统消息
-    MessageBodyType_System(10);
+    MessageBodyType_System(10),
+    /// 表情
+    MessageBodyType_Emoji(11);
 
     private int typeName;
 
