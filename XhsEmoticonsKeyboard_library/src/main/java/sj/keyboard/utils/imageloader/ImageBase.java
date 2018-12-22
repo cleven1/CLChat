@@ -30,6 +30,7 @@ public interface ImageBase {
         FILE("file"),
         CONTENT("content"),
         ASSETS("assets"),
+        ASSETS_STICKER("assets/sticker"),
         DRAWABLE("drawable"),
         UNKNOWN("");
 

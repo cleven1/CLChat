@@ -95,6 +95,8 @@ public class CLEmojiCommonUtils {
 
         addEmojiPageSetEntity(pageSetAdapter, context, emoticonClickListener);
 
+        addStickerPageSetEntity(pageSetAdapter, context, emoticonClickListener);
+
         addXhsPageSetEntity(pageSetAdapter, context, emoticonClickListener);
 
         addWechatPageSetEntity(pageSetAdapter, context, emoticonClickListener);
@@ -172,6 +174,35 @@ public class CLEmojiCommonUtils {
                 .setIPageViewInstantiateItem(getDefaultEmoticonPageViewInstantiateItem(getCommonEmoticonDisplayListener(emoticonClickListener, EMOTICON_CLICK_TEXT)))
                 .setShowDelBtn(EmoticonPageEntity.DelBtnStatus.LAST)
                 .setIconUri(ImageBase.Scheme.ASSETS.toUri("xhsemoji_19.png"))
+                .build();
+        pageSetAdapter.add(xhsPageSetEntity);
+    }
+
+    /**
+     * 插入微信表情集
+     *
+     * @param pageSetAdapter
+     * @param context
+     * @param emoticonClickListener
+     */
+    public static void addStickerPageSetEntity(PageSetAdapter pageSetAdapter, Context context, EmoticonClickListener emoticonClickListener) {
+        ArrayList<EmoticonEntity> emojis = new ArrayList<>();
+        for (int i = 1;i < 49;i++){
+            String format = "/ajmd/ajmd0" + i + ".png";
+            if (i < 10){
+                format = "/ajmd/ajmd00" + i + ".png";
+            }
+            EmoticonEntity bean = new EmoticonEntity( "file://" + FileUtils.getFolderPath("assets/sticker") + format, null);
+            emojis.add(bean);
+        }
+
+        EmoticonPageSetEntity xhsPageSetEntity
+                = new EmoticonPageSetEntity.Builder()
+                .setLine(2)
+                .setRow(4)
+                .setEmoticonList(emojis)
+                .setIPageViewInstantiateItem(getEmoticonPageViewInstantiateItem(BigEmoticonsAndTitleAdapter.class, emoticonClickListener))
+                .setIconUri("file://"+FileUtils.getFolderPath("assets/sticker/ajmd.png"))
                 .build();
         pageSetAdapter.add(xhsPageSetEntity);
     }
