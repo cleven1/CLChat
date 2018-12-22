@@ -95,8 +95,6 @@ public class CLEmojiCommonUtils {
 
         addEmojiPageSetEntity(pageSetAdapter, context, emoticonClickListener);
 
-        addStickerPageSetEntity(pageSetAdapter, context, emoticonClickListener);
-
         addXhsPageSetEntity(pageSetAdapter, context, emoticonClickListener);
 
         addWechatPageSetEntity(pageSetAdapter, context, emoticonClickListener);
@@ -179,7 +177,7 @@ public class CLEmojiCommonUtils {
     }
 
     /**
-     * 插入微信表情集
+     * 插入自定义表情集
      *
      * @param pageSetAdapter
      * @param context
