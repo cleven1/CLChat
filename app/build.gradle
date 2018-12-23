@@ -63,4 +63,5 @@ dependencies {
     implementation project(':LQRAudioRecord_library')
     implementation project(':LQRImagePicker_library')
     implementation project(':XhsEmoticonsKeyboard_library')
+    implementation files('libs/qingstor-sdk-java-2.2.14.jar')
 }

@@ -25,6 +25,7 @@ import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 import com.cleven.clchat.home.CLEmojiCommon.widget.CLKeyBoardMoreGridView;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
+import com.cleven.clchat.manager.CLUploadManager;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.lqr.audio.AudioPlayManager;
 import com.lqr.audio.AudioRecordManager;
@@ -451,6 +452,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                     Log.e("CSDN_LQR", imageItem.path);
                     localMediaPath = imageItem.path;
                     messageType = CLMessageBodyType.MessageBodyType_Image;
+                    CLUploadManager.getInstance().uploadImage(localMediaPath);
                     sendMessage("");
                 }
             }

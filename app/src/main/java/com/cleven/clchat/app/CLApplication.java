@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.cleven.clchat.manager.CLUploadManager;
 import com.lqr.emoji.IImageLoader;
 import com.lqr.emoji.LQREmotionKit;
 import com.lqr.imagepicker.ImagePicker;
@@ -50,6 +51,8 @@ public class CLApplication extends Application {
         initImagePicker();
 
         initOkGo();
+
+        CLUploadManager.getInstance().init();
 
     }
 

@@ -21,7 +21,6 @@ public class CLAPPConst {
     public static final String LOGOFF = HTTP_SERVER_BASE_URL + "user/logoff";
 
 
-
     /**
      * 代理服务器ip地址
      */
@@ -54,6 +53,10 @@ public class CLAPPConst {
     public static final String MQTT_CONNECT_TOPIC = "connect/user/";
     /// 断开连接 + userId
     public static final String MQTT_DISCONNECT_TOPIC = "disconnect/user/";
+
+    // 青云配置
+    public static final String QINGCLOUD_ACCESS_KEY_ID = "XLEWZHKBQJZBTPXBAWYP";
+    public static final String QINGCLOUD_SECRCT_ACCESS_KEY_ID = "aSHZ6MgrWyqK7oXxffZmpuXmdHY1avlQ9YFJdAcY";
 
 
     //语音存放位置

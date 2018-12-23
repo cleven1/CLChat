@@ -2,10 +2,11 @@ package com.cleven.clchat.utils;
 
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
-import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
+import com.cleven.clchat.manager.CLUserManager;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import dev.utils.LogPrintUtils;
 import dev.utils.common.DateUtils;
@@ -62,4 +63,9 @@ public class CLUtils {
 
     }
 
+    public static Date toGMT() {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
+        Date date = new Date();
+        return date;
+    }
 }
