@@ -17,6 +17,10 @@ public class CLMessageBean {
      */
     private int sendStatus;
     /**
+     * 文件是否上传成功
+     */
+    private boolean isUpload;
+    /**
      * 消息的发送时间
      */
     private String sentTime;
@@ -43,7 +47,7 @@ public class CLMessageBean {
     /**
      * 本地录音路径
      */
-    private String localAudioUrl;
+    private String localUrl;
     /**
      * 视频缩略图
      */
@@ -148,12 +152,20 @@ public class CLMessageBean {
         this.receivedStatus = receivedStatus;
     }
 
-    public String getLocalAudioUrl() {
-        return localAudioUrl;
+    public boolean isUpload() {
+        return isUpload;
     }
 
-    public void setLocalAudioUrl(String localAudioUrl) {
-        this.localAudioUrl = localAudioUrl;
+    public void setUpload(boolean upload) {
+        isUpload = upload;
+    }
+
+    public String getLocalUrl() {
+        return localUrl;
+    }
+
+    public void setLocalUrl(String localUrl) {
+        this.localUrl = localUrl;
     }
 
     public int getWitdh() {

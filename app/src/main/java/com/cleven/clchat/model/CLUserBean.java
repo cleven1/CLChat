@@ -1,5 +1,7 @@
 package com.cleven.clchat.model;
 
+import android.text.TextUtils;
+
 /**
  * Created by cleven on 2018/12/14.
  */
@@ -43,7 +45,7 @@ public class CLUserBean {
 
 
     public String getUserId() {
-        return userId;
+        return TextUtils.isEmpty(userId) ? "" : userId;
     }
 
     public void setUserId(String userId) {

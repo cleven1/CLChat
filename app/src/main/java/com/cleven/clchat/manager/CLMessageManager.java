@@ -67,7 +67,7 @@ public class CLMessageManager {
         /// 音视频路径
         message.setMediaUrl(mediaUrl);
         /// 本地url
-        message.setLocalAudioUrl(localUrl);
+        message.setLocalUrl(localUrl);
         /// 设置图片的size
         if (size != null && size.length > 0){
             message.setWitdh(size[0]);

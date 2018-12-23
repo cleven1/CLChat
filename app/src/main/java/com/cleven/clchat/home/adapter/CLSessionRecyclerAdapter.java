@@ -272,12 +272,21 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 sendfail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if (data.isUpload()){ //上传成功了,只需要发送文本
+
+                        }else{ //上传失败,图片也要重新上传
+
+                        }
                         Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
                     }
                 });
-            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND){
-                // 发送成功
+            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND && data.isUpload()){
+                // 发送成功,图片也上传成功
                 pbBar.setVisibility(View.GONE);
+                sendfail.setVisibility(View.GONE);
+            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND && data.isUpload()){
+                /// 消息发送成功,图片还没上传成功
+                pbBar.setVisibility(View.VISIBLE);
                 sendfail.setVisibility(View.GONE);
             }
         }

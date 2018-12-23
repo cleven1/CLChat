@@ -49,10 +49,10 @@ public class CLUtils {
         String currentUserId = CLUserManager.getInstence().getUserInfo().getUserId();
         if (currentUserId.equals(message.getUserInfo().getUserId())){//判断自己发送的
             if (CLMessageBodyType.fromTypeName(message.getMessageType())==CLMessageBodyType.MessageBodyType_Emoji){
-                message.setLocalAudioUrl(CLEmojiFileUtils.getFolderPath("assets") + message.getLocalAudioUrl());
+                message.setLocalUrl(CLEmojiFileUtils.getFolderPath("assets") + message.getLocalUrl());
             }
-            if (FileUtils.isFileExists(message.getLocalAudioUrl())){
-                return message.getLocalAudioUrl();
+            if (FileUtils.isFileExists(message.getLocalUrl())){
+                return message.getLocalUrl();
             }else {
                 return message.getMediaUrl();
             }
