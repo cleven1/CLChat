@@ -1,12 +1,9 @@
 package com.cleven.clchat.manager;
 
 import android.os.Looper;
-import android.widget.Toast;
 
-import com.cleven.clchat.app.CLApplication;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLFileUtils;
-import com.cleven.clchat.utils.CLUtils;
 import com.qingstor.sdk.config.EnvContext;
 import com.qingstor.sdk.constants.QSConstant;
 import com.qingstor.sdk.exception.QSException;
@@ -30,13 +27,23 @@ import dev.utils.app.assist.manager.ThreadManager;
 
 public class CLUploadManager {
     private static CLUploadManager instance = new CLUploadManager();
-    private Bucket bucket;
-    private boolean isCancelled;
-    private UploadManager manager;
+    private static Bucket bucket;
+    private static boolean isCancelled;
 
-    private CLUploadManager(){}
+    public CLUploadManager(){}
     public static CLUploadManager getInstance(){
         return instance;
+    }
+    /// 上传回调接口
+    private CLUploadOnLitenser uploadOnLitenser;
+    public void setUploadOnLitenser(CLUploadOnLitenser uploadOnLitenser) {
+        this.uploadOnLitenser = uploadOnLitenser;
+    }
+    public interface CLUploadOnLitenser {
+        void uploadSuccess(String fileName);
+        void uploadError(String fileName);
+        void uploadProgress(int progress);
+        void uploadCancel(String fileName);
     }
 
 
@@ -45,59 +52,66 @@ public class CLUploadManager {
         bucket = new Bucket(evn,"sh1a","cleven-chat-shanghai");
     }
 
-    public void uploadAudio(final String filePath){
+    public void uploadAudio(final String filePath,String fileName,CLUploadOnLitenser litenser){
         final File file = new File(filePath);
         if (!file.exists() || file.isDirectory()) {
             LogPrintUtils.eTag("青云", "文件不存在");
             return;
         }
         /// 上传音频
-        upload("audios/",file);
+        upload("audios/",file,fileName,litenser);
     }
 
-    public void uploadVideo(final String filePath){
+    public void uploadVideo(final String filePath,String fileName,CLUploadOnLitenser litenser){
         final File file = new File(filePath);
         if (!file.exists() || file.isDirectory()) {
             LogPrintUtils.eTag("青云", "文件不存在");
             return;
         }
         /// 上传视频
-        upload("videos/",file);
+        upload("videos/",file,fileName,litenser);
     }
 
-    public void uploadAvatar(final String filePath){
+    public void uploadAvatar(final String filePath,String fileName,CLUploadOnLitenser litenser){
         final File file = new File(filePath);
         if (!file.exists() || file.isDirectory()) {
             LogPrintUtils.eTag("青云", "文件不存在");
             return;
         }
         /// 上传头像
-        upload("avatars/",file);
+        upload("avatars/",file,fileName,litenser);
     }
 
-    public void uploadImage(final String filePath){
+    public void uploadImage(final String filePath,String fileName,CLUploadOnLitenser litenser){
         final File file = new File(filePath);
         if (!file.exists() || file.isDirectory()) {
             LogPrintUtils.eTag("青云", "文件不存在");
             return;
         }
         /// 上传图片
-        upload("images/",file);
+        upload("images/",file,fileName,litenser);
     }
 
 
-    private void upload(final String objectKey, final File file){
+    private void upload(final String objectKey, final File file, final String fileName, final CLUploadOnLitenser litenser){
 
         FileRecorder recorder = null;
         try {
             recorder = new FileRecorder(CLFileUtils.getDownloadDir());
         } catch (IOException e) {
             e.printStackTrace();
+            if (litenser != null){
+                litenser.uploadError(fileName);
+            }
+            return;
         }
 
         CancellationHandler cancellationHandler = new CancellationHandler() {
             @Override
             public boolean isCancelled() {
+                if (litenser != null){
+                    litenser.uploadCancel(fileName);
+                }
                 return isCancelled;
             }
         };
@@ -107,7 +121,9 @@ public class CLUploadManager {
             public void onProgress(final long len, final long size) {
                 int progress = (int) ((len * 100) / size);
                 LogPrintUtils.eTag("青云","progress =" + progress);
-                Toast.makeText(CLApplication.mContext,"progress = " + progress,Toast.LENGTH_SHORT).show();
+                if (litenser != null){
+                    litenser.uploadProgress(progress);
+                }
             }
         };
 
@@ -122,28 +138,34 @@ public class CLUploadManager {
                 LogPrintUtils.eTag(TAG, "message = " + output.getMessage());
                 LogPrintUtils.eTag(TAG, "request ID = " + output.getRequestId());
                 LogPrintUtils.eTag(TAG, "url = " + output.getUrl());
+                LogPrintUtils.eTag(TAG, "fileName = " + fileName);
 
                 if (output.getStatueCode() == 200 || output.getStatueCode() == 201) {
                     LogPrintUtils.eTag(TAG, "Upload success.");
-                    Toast.makeText(CLApplication.mContext," 上传成功",Toast.LENGTH_SHORT).show();
+                    if (litenser != null){
+                        litenser.uploadSuccess(fileName);
+                    }
                 } else if (output.getStatueCode() == QSConstant.REQUEST_ERROR_CANCELLED) {
                     LogPrintUtils.eTag(TAG, "Stopped.");
+                    if (litenser != null){
+                        litenser.uploadCancel(fileName);
+                    }
                 } else {
                     LogPrintUtils.eTag(TAG, "Error: " + output.getMessage());
-                    Toast.makeText(CLApplication.mContext,"上传失败",Toast.LENGTH_SHORT).show();
+                    if (litenser != null){
+                        litenser.uploadError(fileName);
+                    }
                 }
             }
         };
 
-        manager = new UploadManager(bucket, recorder, listener, cancellationHandler, callback);
+        final UploadManager manager = new UploadManager(bucket, recorder, listener, cancellationHandler, callback);
         ThreadManager.getInstance().addTask(new Runnable() {
             @Override
             public void run() {
                 try {
                     Looper.prepare();
-//                    manager.put(file);
-                    String imageName = CLUtils.timeStamp + ".png";
-                    manager.put(file,objectKey + imageName, imageName, "");
+                    manager.put(file,objectKey + fileName, fileName, "");
                     Looper.loop();
                 } catch (QSException e) {
                     e.printStackTrace();

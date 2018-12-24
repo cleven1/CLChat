@@ -51,6 +51,15 @@ public class MainActivity extends CLBaseActivity {
 
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+       if (CLMQTTManager.getInstance().getCurrentStatus() != CLMQTTManager.CLMQTTStatus.connect_succss) {
+            CLMQTTManager.getInstance().connectMQTT(this);
+        }
+    }
+
     /// 连接MQTT
     private void initMqtt() {
         CLMQTTManager.getInstance().connectMQTT(this);

@@ -418,7 +418,10 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         CLMessageBean messageBean = mMessages.get(i);
         CLMessageBodyType messageBodyType = CLMessageBodyType.fromTypeName(messageBean.getMessageType());
-        String currentUserId = CLUserManager.getInstence().getUserInfo().getUserId();
+        String currentUserId = "";
+        if (CLUserManager.getInstence().getUserInfo() != null){
+            currentUserId = CLUserManager.getInstence().getUserInfo().getUserId();
+        }
 
         if (messageBodyType == MessageBodyType_Text){
             View baseView;

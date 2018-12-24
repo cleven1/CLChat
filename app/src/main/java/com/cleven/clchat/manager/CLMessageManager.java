@@ -5,9 +5,11 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
+import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 import com.cleven.clchat.utils.CLUtils;
 
 import dev.utils.LogPrintUtils;
+import dev.utils.app.image.BitmapUtils;
 
 import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_FAILED;
 import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_SEND;
@@ -48,31 +50,126 @@ public class CLMessageManager {
         this.receiveMessageOnListener = receiveMessageOnListener;
     }
 
+
     /**
-     * 发送文本消息
-     * @param text 内容
+     * 发送emoji
+     * @param filePath
      */
-    public CLMessageBean sendMessage(String text,String userId,CLMessageBodyType messageBodyType,int duration,String localUrl,String mediaUrl,int[] size){
+    public CLMessageBean sendEmojiMessage(String filePath,String userId,boolean isGroup){
         CLMessageBean message = new CLMessageBean();
         /// 是否是群聊会话
-        message.setGroupSession(false);
+        message.setGroupSession(isGroup);
         /// 消息内容
-        message.setContent(text);
-        /// 发送者信息
-        message.setUserInfo(CLUserManager.getInstence().getUserInfo());
+        message.setContent("");
         /// 消息类型
-        message.setMessageType(messageBodyType.getTypeName());
-        /// 时长
-        message.setDuration(duration);
-        /// 音视频路径
-        message.setMediaUrl(mediaUrl);
-        /// 本地url
-        message.setLocalUrl(localUrl);
+        message.setMessageType(CLMessageBodyType.MessageBodyType_Emoji.getTypeName());
+        message.setLocalUrl(filePath);
+        int[] size = BitmapUtils.getImageWidthHeight(CLEmojiFileUtils.getFolderPath("/") + filePath);
         /// 设置图片的size
         if (size != null && size.length > 0){
             message.setWitdh(size[0]);
             message.setHeight(size[1]);
         }
+        String imageName = CLUtils.timeStamp + ".png";
+        message.setMediaUrl(imageName);
+        sendMessage(message,userId);
+        return message;
+    }
+
+    /**
+     * 发送图片
+     * @param filePath
+     */
+    public CLMessageBean sendImageMessage(String filePath,String fileName,int w,int h,String userId,boolean isGroup){
+        CLMessageBean message = new CLMessageBean();
+        /// 是否是群聊会话
+        message.setGroupSession(isGroup);
+        /// 消息内容
+        message.setContent("");
+        /// 消息类型
+        message.setMessageType(CLMessageBodyType.MessageBodyType_Image.getTypeName());
+        message.setLocalUrl(filePath);
+        int[] size = BitmapUtils.getImageWidthHeight(filePath);
+        /// 设置图片的size
+        message.setWitdh(w);
+        message.setHeight(h);
+        message.setMediaUrl(fileName);
+        sendMessage(message,userId);
+
+        return message;
+    }
+
+    /**
+     * 发送音频
+     * @param filePath
+     */
+    public CLMessageBean sendAudioMessage(String filePath,int duration,String userId,boolean isGroup){
+        CLMessageBean message = new CLMessageBean();
+        /// 是否是群聊会话
+        message.setGroupSession(isGroup);
+        /// 消息内容
+        message.setContent("");
+        /// 消息类型
+        message.setMessageType(CLMessageBodyType.MessageBodyType_Voice.getTypeName());
+        message.setLocalUrl(filePath);
+        String imageName = CLUtils.timeStamp + ".mp3";
+        message.setMediaUrl(imageName);
+        message.setDuration(duration);
+        sendMessage(message,userId);
+        return message;
+    }
+
+    /**
+     * 发送视频
+     * @param filePath
+     */
+    public CLMessageBean sendVideoMessage(String filePath,String thumnailPath,int duration,String userId,boolean isGroup){
+        CLMessageBean message = new CLMessageBean();
+        /// 是否是群聊会话
+        message.setGroupSession(isGroup);
+        /// 消息内容
+        message.setContent("");
+        /// 消息类型
+        message.setMessageType(CLMessageBodyType.MessageBodyType_Video.getTypeName());
+        message.setLocalUrl(filePath);
+        String videoName = CLUtils.timeStamp + ".mp4";
+        message.setMediaUrl(videoName);
+        int[] size = BitmapUtils.getImageWidthHeight(CLEmojiFileUtils.getFolderPath("/") + thumnailPath);
+        /// 设置图片的size
+        if (size != null && size.length > 0){
+            message.setWitdh(size[0]);
+            message.setHeight(size[1]);
+        }
+        message.setVideoThumbnail(thumnailPath);
+        message.setDuration(duration);
+        sendMessage(message,userId);
+        return message;
+    }
+
+    /**
+     * 发送文本消息
+     * @param text 内容
+     */
+    public CLMessageBean sendTextMessage(String text,String userId,boolean isGroup){
+        CLMessageBean message = new CLMessageBean();
+        /// 是否是群聊会话
+        message.setGroupSession(isGroup);
+        /// 消息内容
+        message.setContent(text);
+        /// 消息类型
+        message.setMessageType(CLMessageBodyType.MessageBodyType_Text.getTypeName());
+
+        sendMessage(message,userId);
+
+        return message;
+    }
+
+    private CLMessageBean sendMessage(CLMessageBean message, String userId){
+        /// 是否是群聊会话
+        message.setGroupSession(false);
+        /// 发送者信息
+        message.setUserInfo(CLUserManager.getInstence().getUserInfo());
+
         long timeStamp = CLUtils.timeStamp;
         /// 消息id
         message.setMessageId("" + timeStamp);
@@ -118,7 +215,6 @@ public class CLMessageManager {
                 }
             }
         });
-
         return message;
     }
 

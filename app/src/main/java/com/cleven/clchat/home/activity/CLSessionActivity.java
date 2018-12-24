@@ -19,9 +19,7 @@ import android.widget.Toast;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
-import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
-import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 import com.cleven.clchat.home.CLEmojiCommon.widget.CLKeyBoardMoreGridView;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
@@ -42,7 +40,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.utils.app.image.BitmapUtils;
+import dev.utils.LogPrintUtils;
 import sj.keyboard.XhsEmoticonsKeyBoard;
 import sj.keyboard.data.EmoticonEntity;
 import sj.keyboard.interfaces.EmoticonClickListener;
@@ -61,12 +59,9 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
     private CLSessionRecyclerAdapter adapter;
     private String mUserName;
     private String mUserId;
+    private boolean mIsGroup;
     private static final int IMAGE_PICKER = 100;
-    private int audioDuration = 0;
-    private String mediaUrl;
-    private String localMediaPath;
     private CLKeyBoardMoreGridView mKeyboardMoreView;
-    private CLMessageBodyType messageType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,8 +136,8 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
     /// 发送按钮
     private void OnSendBtnClick(String msg) {
         if (!TextUtils.isEmpty(msg)) {
-            messageType = CLMessageBodyType.MessageBodyType_Text;
-            sendMessage(msg);
+            CLMessageBean messageBean = CLMessageManager.getInstance().sendTextMessage(msg, mUserId, mIsGroup);
+            sendMessage(messageBean);
         }
     }
     /// 发送gif图片
@@ -151,9 +146,8 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
             String[] split = image.split("/");
             /// 分割路径,取出图片最好一部分
             String path = split[split.length - 2] + "/" + split[split.length - 1];
-            mediaUrl = path;
-            messageType = CLMessageBodyType.MessageBodyType_Image;
-            sendMessage("");
+            CLMessageBean messageBean = CLMessageManager.getInstance().sendEmojiMessage(path, mUserId, mIsGroup);
+            sendMessage(messageBean);
         }
     }
 
@@ -280,10 +274,8 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
 //                    mPresenter.sendAudioFile(audioPath, duration);
                     Toast.makeText(CLSessionActivity.this,"录制完成 时长 = " + duration,Toast.LENGTH_SHORT).show();
                 }
-                localMediaPath = audioPath.getPath();
-                audioDuration = duration;
-                messageType = CLMessageBodyType.MessageBodyType_Voice;
-                sendMessage("");
+                CLMessageBean messageBean = CLMessageManager.getInstance().sendAudioMessage(audioPath.getPath(), duration, mUserId, mIsGroup);
+                sendMessage(messageBean);
             }
 
             @Override
@@ -450,10 +442,41 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 Log.e("CSDN_LQR", isOrig ? "发原图" : "不发原图");//若不发原图的话，需要在自己在项目中做好压缩图片算法
                 for (ImageItem imageItem : images) {
                     Log.e("CSDN_LQR", imageItem.path);
-                    localMediaPath = imageItem.path;
-                    messageType = CLMessageBodyType.MessageBodyType_Image;
-                    CLUploadManager.getInstance().uploadImage(localMediaPath);
-                    sendMessage("");
+                    final CLMessageBean messageBean = CLMessageManager.getInstance().sendImageMessage(imageItem.path,imageItem.name,imageItem.width,imageItem.height,mUserId,mIsGroup);
+                    sendMessage(messageBean);
+                    CLUploadManager.getInstance().uploadImage(imageItem.path, messageBean.getMediaUrl(), new CLUploadManager.CLUploadOnLitenser() {
+                        @Override
+                        public void uploadSuccess(String fileName) {
+                            LogPrintUtils.eTag("图片上传",fileName);
+                            for (final CLMessageBean bean : messageList) {
+                                if (bean.getMediaUrl().equals(fileName)) {
+                                    bean.setUpload(true);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateMessageStatus(bean);
+                                        }
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void uploadError(String fileName) {
+
+                        }
+
+                        @Override
+                        public void uploadProgress(int progress) {
+
+                        }
+
+                        @Override
+                        public void uploadCancel(String fileName) {
+
+                        }
+                    });
                 }
             }
         }
@@ -472,33 +495,8 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         return false;
     }
 
-    private void sendMessage(String message){
-        String content = "";
-        int duration = 0;
-        String localUrl = "";
-        String url = "";
-        int size[] = {};
-        if (messageType == CLMessageBodyType.MessageBodyType_Text){
-            content = message;
-        }else if (messageType == CLMessageBodyType.MessageBodyType_Voice){
-            duration = audioDuration;
-            audioDuration = 0;
-            localUrl = localMediaPath;
-            localMediaPath = null;
-            url = mediaUrl;
-            mediaUrl = null;
-        }else if (messageType == CLMessageBodyType.MessageBodyType_Emoji){
-            url = mediaUrl;
-            size = BitmapUtils.getImageWidthHeight(CLEmojiFileUtils.getFolderPath("/") + url);
-            mediaUrl = null;
-        }else if (messageType == CLMessageBodyType.MessageBodyType_Image){
-            url = mediaUrl;
-            localUrl = localMediaPath;
-            size = BitmapUtils.getImageWidthHeight(localUrl);
-            mediaUrl = null;
-            localMediaPath = null;
-        }
-        CLMessageBean messageBean = CLMessageManager.getInstance().sendMessage(content,mUserId, messageType,duration,localUrl,url,size);
+    private void sendMessage(CLMessageBean messageBean){
+
         messageList.add(messageBean);
         /// 插入并刷新
         adapter.notifyItemInserted(messageList.size());
@@ -554,6 +552,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 CLMessageBean bean = messageList.get(i);
                 if (bean.getMessageId().equals(message.getMessageId())){
                     bean.setSendStatus(message.getSendStatus());
+                    bean.setUpload(message.isUpload());
                     adapter.notifyItemChanged(i);
                     break;
                 }

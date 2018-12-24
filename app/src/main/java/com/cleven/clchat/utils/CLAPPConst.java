@@ -57,6 +57,11 @@ public class CLAPPConst {
     // 青云配置
     public static final String QINGCLOUD_ACCESS_KEY_ID = "XLEWZHKBQJZBTPXBAWYP";
     public static final String QINGCLOUD_SECRCT_ACCESS_KEY_ID = "aSHZ6MgrWyqK7oXxffZmpuXmdHY1avlQ9YFJdAcY";
+    private static final String QINGCLOUD_BASE_URL = "http://cleven-chat-shanghai.sh1a.qingstor.com/";
+    public static final String QINGCLOUD_IMAGE_URL = QINGCLOUD_BASE_URL + "images/";
+    public static final String QINGCLOUD_VIDEOS_URL = QINGCLOUD_BASE_URL + "videos/";
+    public static final String QINGCLOUD_AUDIOS_URL = QINGCLOUD_BASE_URL + "audios/";
+    public static final String QINGCLOUD_AVATARS_URL = QINGCLOUD_BASE_URL + "avatars/";
 
 
     //语音存放位置
