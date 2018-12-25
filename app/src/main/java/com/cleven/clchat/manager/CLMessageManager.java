@@ -120,29 +120,8 @@ public class CLMessageManager {
         long timeStamp = CLUtils.timeStamp;
         /// 消息id
         message.setMessageId("" + timeStamp);
-        CLUploadManager.getInstance().uploadImage(filePath, fileName, new CLUploadManager.CLUploadOnLitenser() {
-            @Override
-            public void uploadSuccess(String fileName) {
-                LogPrintUtils.eTag("图片上传",fileName);
-                if (uploadStatusOnListener != null){
-                    uploadStatusOnListener.onSuccess(fileName);
-                }
-            }
-            @Override
-            public void uploadError(String fileName) {
-                if (uploadStatusOnListener != null){
-                    uploadStatusOnListener.onFailure(fileName);
-                }
-            }
-            @Override
-            public void uploadProgress(int progress) {
-
-            }
-            @Override
-            public void uploadCancel(String fileName) {
-
-            }
-        });
+        /// 上传
+        CLUploadManager.getInstance().uploadImage(filePath,fileName,new MyUploadListener());
         return message;
     }
 
@@ -159,8 +138,8 @@ public class CLMessageManager {
         /// 消息类型
         message.setMessageType(CLMessageBodyType.MessageBodyType_Voice.getTypeName());
         message.setLocalUrl(filePath);
-        String imageName = CLUtils.timeStamp + ".mp3";
-        message.setMediaUrl(imageName);
+        String fileName = CLUtils.timeStamp + ".mp3";
+        message.setMediaUrl(fileName);
         message.setDuration(duration);
         /// 发送者信息
         message.setUserInfo(CLUserManager.getInstence().getUserInfo());
@@ -169,6 +148,8 @@ public class CLMessageManager {
         long timeStamp = CLUtils.timeStamp;
         /// 消息id
         message.setMessageId("" + timeStamp);
+        /// 上传
+        CLUploadManager.getInstance().uploadAudio(filePath,fileName,new MyUploadListener());
         return message;
     }
 
@@ -286,5 +267,28 @@ public class CLMessageManager {
         }
     }
 
+    private class MyUploadListener implements CLUploadManager.CLUploadOnLitenser {
+        @Override
+        public void uploadSuccess(String fileName) {
+            LogPrintUtils.eTag("上传成功",fileName);
+            if (uploadStatusOnListener != null){
+                uploadStatusOnListener.onSuccess(fileName);
+            }
+        }
+        @Override
+        public void uploadError(String fileName) {
+            if (uploadStatusOnListener != null){
+                uploadStatusOnListener.onFailure(fileName);
+            }
+        }
+        @Override
+        public void uploadProgress(int progress) {
+
+        }
+        @Override
+        public void uploadCancel(String fileName) {
+
+        }
+    }
 
 }

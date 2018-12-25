@@ -1,5 +1,6 @@
 package com.cleven.clchat.home.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.utils.app.image.BitmapUtils;
+import pub.devrel.easypermissions.EasyPermissions;
 import sj.keyboard.XhsEmoticonsKeyBoard;
 import sj.keyboard.data.EmoticonEntity;
 import sj.keyboard.interfaces.EmoticonClickListener;
@@ -179,6 +181,9 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
     }
 
     private void initAudioRecord() {
+        if (!EasyPermissions.hasPermissions(this,Manifest.permission.RECORD_AUDIO)){
+            EasyPermissions.requestPermissions(this,"需要麦克风权限",0,Manifest.permission.RECORD_AUDIO);
+        }
         AudioRecordManager.getInstance(this).setMaxVoiceDuration(CLAPPConst.DEFAULT_MAX_AUDIO_RECORD_TIME_SECOND);
         File mAudioDir = new File(CLAPPConst.AUDIO_SAVE_DIR);
         /// 判断文件夹是否存在,不存在创建
