@@ -1,1 +1,1 @@
-include ':app', ':chatkit_sample', ':chatkit', ':chat-message-view', ':ChatMessageView_example', ':LQREmojiLibrary_library', ':LQREmojiLibrary_app', ':easypermissions', ':LQRAudioRecord_library', ':LQRImagePicker_library', ':XhsEmoticonsKeyboard_library'
+include ':app', ':chatkit_sample', ':chatkit', ':chat-message-view', ':ChatMessageView_example', ':LQREmojiLibrary_library', ':LQREmojiLibrary_app', ':easypermissions', ':LQRAudioRecord_library', ':LQRImagePicker_library', ':XhsEmoticonsKeyboard_library', ':WaveSideBar_library', ':WaveSideBar_app'
