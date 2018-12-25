@@ -40,6 +40,18 @@ public class CLMessageManager {
     }
 
     /**
+     * 定义上传回调接口
+     */
+    public interface CLUploadStatusOnListener {
+        void onSuccess(String fileName);
+        void onFailure(String fileName);
+    }
+    private CLUploadStatusOnListener uploadStatusOnListener;
+    public void setUploadStatusOnListener(CLUploadStatusOnListener uploadStatusOnListener) {
+        this.uploadStatusOnListener = uploadStatusOnListener;
+    }
+
+    /**
      * 定义收到消息的接口
      */
     public interface CLReceiveMessageOnListener{
@@ -70,9 +82,16 @@ public class CLMessageManager {
             message.setWitdh(size[0]);
             message.setHeight(size[1]);
         }
+
         String imageName = CLUtils.timeStamp + ".png";
         message.setMediaUrl(imageName);
-        sendMessage(message,userId);
+        /// 发送者信息
+        message.setUserInfo(CLUserManager.getInstence().getUserInfo());
+        /// 目标id
+        message.setTargetId(userId);
+        long timeStamp = CLUtils.timeStamp;
+        /// 消息id
+        message.setMessageId("" + timeStamp);
         return message;
     }
 
@@ -94,8 +113,36 @@ public class CLMessageManager {
         message.setWitdh(w);
         message.setHeight(h);
         message.setMediaUrl(fileName);
-        sendMessage(message,userId);
+        /// 发送者信息
+        message.setUserInfo(CLUserManager.getInstence().getUserInfo());
+        /// 目标id
+        message.setTargetId(userId);
+        long timeStamp = CLUtils.timeStamp;
+        /// 消息id
+        message.setMessageId("" + timeStamp);
+        CLUploadManager.getInstance().uploadImage(filePath, fileName, new CLUploadManager.CLUploadOnLitenser() {
+            @Override
+            public void uploadSuccess(String fileName) {
+                LogPrintUtils.eTag("图片上传",fileName);
+                if (uploadStatusOnListener != null){
+                    uploadStatusOnListener.onSuccess(fileName);
+                }
+            }
+            @Override
+            public void uploadError(String fileName) {
+                if (uploadStatusOnListener != null){
+                    uploadStatusOnListener.onFailure(fileName);
+                }
+            }
+            @Override
+            public void uploadProgress(int progress) {
 
+            }
+            @Override
+            public void uploadCancel(String fileName) {
+
+            }
+        });
         return message;
     }
 
@@ -115,7 +162,13 @@ public class CLMessageManager {
         String imageName = CLUtils.timeStamp + ".mp3";
         message.setMediaUrl(imageName);
         message.setDuration(duration);
-        sendMessage(message,userId);
+        /// 发送者信息
+        message.setUserInfo(CLUserManager.getInstence().getUserInfo());
+        /// 目标id
+        message.setTargetId(userId);
+        long timeStamp = CLUtils.timeStamp;
+        /// 消息id
+        message.setMessageId("" + timeStamp);
         return message;
     }
 
@@ -142,7 +195,15 @@ public class CLMessageManager {
         }
         message.setVideoThumbnail(thumnailPath);
         message.setDuration(duration);
-        sendMessage(message,userId);
+        /// 发送者信息
+        message.setUserInfo(CLUserManager.getInstence().getUserInfo());
+        /// 目标id
+        message.setTargetId(userId);
+
+        long timeStamp = CLUtils.timeStamp;
+        /// 消息id
+        message.setMessageId("" + timeStamp);
+
         return message;
     }
 
@@ -158,21 +219,22 @@ public class CLMessageManager {
         message.setContent(text);
         /// 消息类型
         message.setMessageType(CLMessageBodyType.MessageBodyType_Text.getTypeName());
-
+        /// 发送者信息
+        message.setUserInfo(CLUserManager.getInstence().getUserInfo());
+        /// 目标id
+        message.setTargetId(userId);
+        long timeStamp = CLUtils.timeStamp;
+        /// 消息id
+        message.setMessageId("" + timeStamp);
         sendMessage(message,userId);
 
         return message;
     }
 
-    private CLMessageBean sendMessage(CLMessageBean message, String userId){
+    public CLMessageBean sendMessage(CLMessageBean message, String userId){
         /// 是否是群聊会话
         message.setGroupSession(false);
-        /// 发送者信息
-        message.setUserInfo(CLUserManager.getInstence().getUserInfo());
 
-        long timeStamp = CLUtils.timeStamp;
-        /// 消息id
-        message.setMessageId("" + timeStamp);
         /// 发送状态
         if (CLMQTTManager.getInstance().getCurrentStatus() != CLMQTTManager.CLMQTTStatus.connect_succss){
             message.setSendStatus(SendStatus_FAILED.getTypeName());
@@ -180,9 +242,7 @@ public class CLMessageManager {
             message.setSendStatus(SendStatus_SENDING.getTypeName());
         }
         /// 发送时间
-        message.setSentTime("" + timeStamp);
-        /// 目标id
-        message.setTargetId(userId);
+        message.setSentTime("" + CLUtils.timeStamp);
 
         String jsonString = JSON.toJSONString(message);
 

@@ -1,6 +1,7 @@
 package com.cleven.clchat.home.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,12 +20,14 @@ import android.widget.Toast;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
+import com.cleven.clchat.home.Bean.CLSendStatus;
+import com.cleven.clchat.home.Bean.CLUploadStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
 import com.cleven.clchat.home.CLEmojiCommon.widget.CLKeyBoardMoreGridView;
 import com.cleven.clchat.home.adapter.CLSessionRecyclerAdapter;
 import com.cleven.clchat.manager.CLMessageManager;
-import com.cleven.clchat.manager.CLUploadManager;
 import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLFileUtils;
 import com.lqr.audio.AudioPlayManager;
 import com.lqr.audio.AudioRecordManager;
 import com.lqr.audio.IAudioRecordListener;
@@ -40,7 +43,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.utils.LogPrintUtils;
+import dev.utils.app.image.BitmapUtils;
 import sj.keyboard.XhsEmoticonsKeyBoard;
 import sj.keyboard.data.EmoticonEntity;
 import sj.keyboard.interfaces.EmoticonClickListener;
@@ -442,41 +445,18 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 Log.e("CSDN_LQR", isOrig ? "发原图" : "不发原图");//若不发原图的话，需要在自己在项目中做好压缩图片算法
                 for (ImageItem imageItem : images) {
                     Log.e("CSDN_LQR", imageItem.path);
-                    final CLMessageBean messageBean = CLMessageManager.getInstance().sendImageMessage(imageItem.path,imageItem.name,imageItem.width,imageItem.height,mUserId,mIsGroup);
+                    String imagePath = "";
+                    if (isOrig != true){ //压缩
+                        if (CLFileUtils.isSDCardAvailable()){
+                            imagePath = CLFileUtils.getCachePath() + imageItem.name;
+                        }
+                        Bitmap bitmapFile = BitmapUtils.getSDCardBitmapFile(imageItem.path);
+                        BitmapUtils.saveBitmapToSDCardJPEG(bitmapFile,imagePath,80);
+                    }else {
+                        imagePath = imageItem.path;
+                    }
+                    CLMessageBean messageBean = CLMessageManager.getInstance().sendImageMessage(imageItem.path,imageItem.name,imageItem.width,imageItem.height,mUserId,mIsGroup);
                     sendMessage(messageBean);
-                    CLUploadManager.getInstance().uploadImage(imageItem.path, messageBean.getMediaUrl(), new CLUploadManager.CLUploadOnLitenser() {
-                        @Override
-                        public void uploadSuccess(String fileName) {
-                            LogPrintUtils.eTag("图片上传",fileName);
-                            for (final CLMessageBean bean : messageList) {
-                                if (bean.getMediaUrl().equals(fileName)) {
-                                    bean.setUpload(true);
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            updateMessageStatus(bean);
-                                        }
-                                    });
-                                    break;
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void uploadError(String fileName) {
-
-                        }
-
-                        @Override
-                        public void uploadProgress(int progress) {
-
-                        }
-
-                        @Override
-                        public void uploadCancel(String fileName) {
-
-                        }
-                    });
                 }
             }
         }
@@ -503,22 +483,11 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         /// 滚到最后一个位置
         mRvSessionView.scrollToPosition(messageList.size() - 1);
 
-        /// 发送回调
-        CLMessageManager.getInstance().setMessageStatusOnListener(new CLMessageManager.CLSendMessageStatusOnListener() {
-            @Override
-            public void onSuccess(CLMessageBean message) {
-                updateMessageStatus(message);
-            }
-            @Override
-            public void onFailure(CLMessageBean message) {
-                updateMessageStatus(message);
-            }
-        });
-
     }
 
     // 监听新消息的到来
     private void obseverReceiveMessage(){
+        /// 新消息回调
         CLMessageManager.getInstance().setReceiveMessageOnListener(new CLMessageManager.CLReceiveMessageOnListener() {
             @Override
             public void onMessage(final CLMessageBean message) {
@@ -539,23 +508,70 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 });
             }
         });
+
+        /// 发送回调
+        CLMessageManager.getInstance().setMessageStatusOnListener(new CLMessageManager.CLSendMessageStatusOnListener() {
+            @Override
+            public void onSuccess(CLMessageBean message) {
+                updateMessageStatus(message);
+            }
+            @Override
+            public void onFailure(CLMessageBean message) {
+                updateMessageStatus(message);
+            }
+        });
+
+        /// 监听上传状态
+        CLMessageManager.getInstance().setUploadStatusOnListener(new CLMessageManager.CLUploadStatusOnListener() {
+            @Override
+            public void onSuccess(String fileName) {
+                uploadFinishUpdateMessage(fileName,CLUploadStatus.UploadStatus_success);
+            }
+            @Override
+            public void onFailure(String fileName) {
+                uploadFinishUpdateMessage(fileName,CLUploadStatus.UploadStatus_fail);
+            }
+        });
     }
 
     /// 发送成功后更新状态
     private void updateMessageStatus(CLMessageBean message){
-        if (messageList.size() == 1){
-            CLMessageBean bean = messageList.get(0);
-            bean.setSendStatus(message.getSendStatus());
-            adapter.notifyItemChanged(0);
-        }else {
-            for (int i = messageList.size() - 1; i > 0; i--) {
-                CLMessageBean bean = messageList.get(i);
-                if (bean.getMessageId().equals(message.getMessageId())){
-                    bean.setSendStatus(message.getSendStatus());
-                    bean.setUpload(message.isUpload());
-                    adapter.notifyItemChanged(i);
-                    break;
+        for (int i = messageList.size(); i > 0; i--) {
+            CLMessageBean bean = messageList.get(i - 1);
+            if (bean.getMessageId().equals(message.getMessageId())){
+                bean.setSendStatus(message.getSendStatus());
+                bean.setUploadStatus(message.getUploadStatus());
+                final int finalI = i;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.notifyItemChanged(finalI - 1);
+                    }
+                });
+                break;
+            }
+        }
+    }
+
+    private void uploadFinishUpdateMessage(String fileName,CLUploadStatus status){
+        for (int i = messageList.size(); i > 0; i--){
+            final CLMessageBean bean = messageList.get(i - 1);
+            if (bean.getMediaUrl().equals(fileName)) {
+                bean.setUploadStatus(status);
+                if (status == CLUploadStatus.UploadStatus_success){
+                    bean.setSendStatus(CLSendStatus.SendStatus_SEND.getTypeName());
+                    CLMessageManager.getInstance().sendMessage(bean,mUserId);
+                }else {
+                    bean.setSendStatus(CLSendStatus.SendStatus_FAILED.getTypeName());
+                    final int finalI = i;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyItemChanged(finalI - 1);
+                        }
+                    });
                 }
+                break;
             }
         }
     }

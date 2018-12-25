@@ -74,6 +74,7 @@ public class CLUploadManager {
 
     public void uploadAvatar(final String filePath,String fileName,CLUploadOnLitenser litenser){
         final File file = new File(filePath);
+
         if (!file.exists() || file.isDirectory()) {
             LogPrintUtils.eTag("青云", "文件不存在");
             return;
@@ -88,6 +89,7 @@ public class CLUploadManager {
             LogPrintUtils.eTag("青云", "文件不存在");
             return;
         }
+        init();
         /// 上传图片
         upload("images/",file,fileName,litenser);
     }

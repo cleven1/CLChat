@@ -17,9 +17,9 @@ public class CLMessageBean {
      */
     private int sendStatus;
     /**
-     * 文件是否上传成功
+     * 文件上传状态
      */
-    private boolean isUpload;
+    private CLUploadStatus uploadStatus;
     /**
      * 消息的发送时间
      */
@@ -152,12 +152,12 @@ public class CLMessageBean {
         this.receivedStatus = receivedStatus;
     }
 
-    public boolean isUpload() {
-        return isUpload;
+    public CLUploadStatus getUploadStatus() {
+        return uploadStatus;
     }
 
-    public void setUpload(boolean upload) {
-        isUpload = upload;
+    public void setUploadStatus(CLUploadStatus uploadStatus) {
+        this.uploadStatus = uploadStatus;
     }
 
     public String getLocalUrl() {

@@ -23,6 +23,7 @@ import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
+import com.cleven.clchat.home.Bean.CLUploadStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLUtils;
@@ -267,12 +268,12 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
             // 发送失败
             if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
-                sendfail.setVisibility(View.VISIBLE);
-                pbBar.setVisibility(View.GONE);
+                pbBar.setAlpha(1);
+                sendfail.setAlpha(1);
                 sendfail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (data.isUpload()){ //上传成功了,只需要发送文本
+                        if (data.getUploadStatus() == CLUploadStatus.UploadStatus_success){ //上传成功了,只需要发送文本
 
                         }else{ //上传失败,图片也要重新上传
 
@@ -280,14 +281,10 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                         Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
                     }
                 });
-            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND && data.isUpload()){
+            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND){
                 // 发送成功,图片也上传成功
-                pbBar.setVisibility(View.GONE);
-                sendfail.setVisibility(View.GONE);
-            }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND && data.isUpload()){
-                /// 消息发送成功,图片还没上传成功
-                pbBar.setVisibility(View.VISIBLE);
-                sendfail.setVisibility(View.GONE);
+                pbBar.setAlpha(0);
+                sendfail.setAlpha(0);
             }
         }
     }
