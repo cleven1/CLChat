@@ -385,6 +385,15 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 ekBar.getEtChat().setText("");
             }
         });
+        /// 监听键盘弹出或者隐藏
+        ekBar.setKeyBoardShowOrHiddenListener(new XhsEmoticonsKeyBoard.EmoticonsKeyBoardShowOrHiddenListener() {
+            @Override
+            public void onKeyBoardIsShow(Boolean isShow) {
+                if (isShow){ //键盘弹出,更改recyclerView
+                    scrollToBottom();
+                }
+            }
+        });
 
         // 录音事件
         ekBar.getBtnVoice().setOnTouchListener(new View.OnTouchListener() {

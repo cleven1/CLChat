@@ -53,6 +53,15 @@ public class XhsEmoticonsKeyBoard extends AutoHeightLayout implements View.OnCli
 
     protected boolean mDispatchKeyEventPreImeLock = false;
 
+    /// 键盘弹出或者隐藏回调
+    private EmoticonsKeyBoardShowOrHiddenListener keyBoardShowOrHiddenListener;
+    public void setKeyBoardShowOrHiddenListener(EmoticonsKeyBoardShowOrHiddenListener keyBoardShowOrHiddenListener) {
+        this.keyBoardShowOrHiddenListener = keyBoardShowOrHiddenListener;
+    }
+    public interface EmoticonsKeyBoardShowOrHiddenListener{
+        void onKeyBoardIsShow(Boolean isShow);
+    }
+
     public XhsEmoticonsKeyBoard(Context context, AttributeSet attrs) {
         super(context, attrs);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -208,6 +217,9 @@ public class XhsEmoticonsKeyBoard extends AutoHeightLayout implements View.OnCli
         super.OnSoftPop(height);
         mLyKvml.setVisibility(true);
         onFuncChange(mLyKvml.DEF_KEY);
+        if (keyBoardShowOrHiddenListener != null){
+            keyBoardShowOrHiddenListener.onKeyBoardIsShow(true);
+        }
     }
 
     @Override
@@ -217,6 +229,9 @@ public class XhsEmoticonsKeyBoard extends AutoHeightLayout implements View.OnCli
             reset();
         } else {
             onFuncChange(mLyKvml.getCurrentFuncKey());
+        }
+        if (keyBoardShowOrHiddenListener != null){
+            keyBoardShowOrHiddenListener.onKeyBoardIsShow(false);
         }
     }
 
