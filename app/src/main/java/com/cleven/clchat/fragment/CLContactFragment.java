@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseFragment;
@@ -14,6 +16,7 @@ import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
 import com.nanchen.wavesidebar.SearchEditText;
 import com.nanchen.wavesidebar.Trans2PinYinUtil;
 import com.nanchen.wavesidebar.WaveSideBarView;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,7 @@ public class CLContactFragment extends CLBaseFragment {
     private WaveSideBarView mWaveSideBarView;
     private SearchEditText mSearchEditText;
     private ContactsAdapter mAdapter;
+    private CommonTitleBar titleBar;
 
     @Override
     public View initView() {
@@ -38,6 +42,18 @@ public class CLContactFragment extends CLBaseFragment {
         bindView(view);
 
         return view;
+    }
+    ///设置titleBar
+    public void setTitleBar(CommonTitleBar titleBar) {
+        this.titleBar = titleBar;
+        TextView rightTextView = titleBar.getRightTextView();
+        rightTextView.setText("➕");
+        rightTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(mContext,"添加",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void bindView(View view) {

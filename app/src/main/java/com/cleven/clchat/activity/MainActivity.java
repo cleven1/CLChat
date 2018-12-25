@@ -33,6 +33,8 @@ public class MainActivity extends CLBaseActivity {
     private CLBaseFragment preFragment;
     private List<CLBaseFragment> fragments;
     private TextView centerTextView;
+    private CommonTitleBar titleBar;
+    private TextView rightTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,13 +93,17 @@ public class MainActivity extends CLBaseActivity {
     }
 
     private void setupTitleBar(){
-        CommonTitleBar titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
+        titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
         ImageButton leftImageButton = titleBar.getLeftImageButton();
         leftImageButton.setVisibility(View.GONE);
-        TextView rightTextView = titleBar.getRightTextView();
+        rightTextView = titleBar.getRightTextView();
         rightTextView.setVisibility(View.GONE);
         centerTextView = titleBar.getCenterTextView();
         centerTextView.setText("首页");
+    }
+
+    private void setRightBarShowOrHidden(Boolean isShow){
+        rightTextView.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
     private class MyOnClickListener implements RadioGroup.OnCheckedChangeListener {
@@ -108,18 +114,22 @@ public class MainActivity extends CLBaseActivity {
                 case R.id.rb_main_home:
                     currentSelectIndex = 0;
                     centerTextView.setText("首页");
+                    setRightBarShowOrHidden(false);
                     break;
                 case R.id.rb_main_contact:
                     currentSelectIndex = 1;
                     centerTextView.setText("联系人");
+                    setRightBarShowOrHidden(true);
                     break;
                 case R.id.rb_main_discover:
                     currentSelectIndex = 2;
                     centerTextView.setText("发现");
+                    setRightBarShowOrHidden(false);
                     break;
                 case R.id.rb_main_profile:
                     currentSelectIndex = 3;
                     centerTextView.setText("我");
+                    setRightBarShowOrHidden(false);
                     break;
             }
             /// 获取Fragment
@@ -168,7 +178,9 @@ public class MainActivity extends CLBaseActivity {
     private void initFragments() {
         fragments = new ArrayList<>();
         fragments.add(new CLHomeFragment());
-        fragments.add(new CLContactFragment());
+        CLContactFragment contactFragment = new CLContactFragment();
+        contactFragment.setTitleBar(titleBar);
+        fragments.add(contactFragment);
         fragments.add(new CLDiscoverFragment());
         fragments.add(new CLProfileFragment());
     }

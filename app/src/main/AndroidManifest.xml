@@ -34,9 +34,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.MainActivity"  android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activity.CLLoginActivity" />
-        <activity android:name=".home.activity.CLSessionActivity" />
+        <activity android:name=".home.activity.CLSessionActivity" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".base.CLBaseActivity" />
 
         <meta-data
