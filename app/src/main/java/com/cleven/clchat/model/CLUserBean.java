@@ -2,6 +2,8 @@ package com.cleven.clchat.model;
 
 import android.text.TextUtils;
 
+import com.nanchen.wavesidebar.FirstLetterUtil;
+
 /**
  * Created by cleven on 2018/12/14.
  */
@@ -42,7 +44,18 @@ public class CLUserBean {
      * 城市
      */
     private String city;
+    /**
+     * 消息未读数
+     */
+    private int unreadNum;
 
+    /**
+     * 昵称首字母
+     */
+    private String index;
+    public String getIndex() {
+        return FirstLetterUtil.getFirstLetter(name);
+    }
 
     public String getUserId() {
         return TextUtils.isEmpty(userId) ? "" : userId;
@@ -106,6 +119,14 @@ public class CLUserBean {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public int getUnreadNum() {
+        return unreadNum;
+    }
+
+    public void setUnreadNum(int unreadNum) {
+        this.unreadNum = unreadNum;
     }
 
     @Override

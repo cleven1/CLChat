@@ -6,7 +6,6 @@ import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 import com.cleven.clchat.manager.CLUserManager;
 
 import java.util.Date;
-import java.util.TimeZone;
 
 import dev.utils.LogPrintUtils;
 import dev.utils.common.DateUtils;
@@ -63,9 +62,13 @@ public class CLUtils {
 
     }
 
-    public static Date toGMT() {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
-        Date date = new Date();
-        return date;
+    /// 格式化消息未读数
+    public static String formatUnreadNumber(int num){
+        if (num > 99){
+            return "99+";
+        }else {
+            return "" + num;
+        }
     }
+
 }

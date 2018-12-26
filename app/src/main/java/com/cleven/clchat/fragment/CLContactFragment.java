@@ -12,8 +12,8 @@ import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseFragment;
 import com.cleven.clchat.contack.activity.CLAddFriendActivity;
 import com.cleven.clchat.fragment.contack.adpater.ContactsAdapter;
-import com.cleven.clchat.fragment.contack.model.ContactModel;
 import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
+import com.cleven.clchat.model.CLUserBean;
 import com.nanchen.wavesidebar.SearchEditText;
 import com.nanchen.wavesidebar.Trans2PinYinUtil;
 import com.nanchen.wavesidebar.WaveSideBarView;
@@ -28,8 +28,8 @@ import java.util.List;
 
 public class CLContactFragment extends CLBaseFragment {
 
-    private List<ContactModel> mContactModels;
-    private List<ContactModel> mShowModels;
+    private List<CLUserBean> mContactModels;
+    private List<CLUserBean> mShowModels;
     private RecyclerView mRecyclerView;
     private WaveSideBarView mWaveSideBarView;
     private SearchEditText mSearchEditText;
@@ -106,7 +106,7 @@ public class CLContactFragment extends CLBaseFragment {
             @Override
             public void afterTextChanged(Editable s) {
                 mShowModels.clear();
-                for (ContactModel model : mContactModels) {
+                for (CLUserBean model : mContactModels) {
                     String str = Trans2PinYinUtil.trans2PinYin(model.getName());
                     if (str.contains(s.toString()) || model.getName().contains(s.toString())) {
                         mShowModels.add(model);
@@ -122,9 +122,13 @@ public class CLContactFragment extends CLBaseFragment {
         super.initData();
         mContactModels = new ArrayList<>();
         mShowModels = new ArrayList<>();
-        mContactModels.addAll(ContactModel.getContacts());
+        CLUserBean userBean = new CLUserBean();
+        userBean.setName("a");
+        userBean.setUnreadNum(0);
+        mContactModels.add(userBean);
+
         mShowModels.addAll(mContactModels);
-        mAdapter = new ContactsAdapter(mShowModels);
+        mAdapter = new ContactsAdapter(mContext,mShowModels);
         mRecyclerView.setAdapter(mAdapter);
     }
 

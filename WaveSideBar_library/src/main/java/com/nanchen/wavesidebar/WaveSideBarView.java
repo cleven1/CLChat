@@ -24,7 +24,7 @@ import java.util.Arrays;
  */
 
 public class WaveSideBarView extends View {
-    private final static int DEFAULT_TEXT_SIZE = 14; // sp
+    private final static int DEFAULT_TEXT_SIZE = 12; // sp
     private final static int DEFAULT_MAX_OFFSET = 80; //dp
 
     private final static String[] DEFAULT_INDEX_ITEMS = {"#","A", "B", "C", "D", "E", "F", "G", "H", "I",
