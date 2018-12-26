@@ -3,6 +3,8 @@ package com.cleven.clchat.manager;
 import android.content.Context;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -147,6 +149,19 @@ public class CLMQTTManager {
      * @param msg 文本
      */
     public void sendSingleMessage(final String msg, String userId){
+        sendMessage(msg,MQTT_SINLE_CHAT_TOPIC,userId);
+    }
+
+    /**
+     * 添加好友
+     * @param userId
+     */
+    public void sendAddFriendMessage(String userId){
+        String msg = JSON.toJSONString(CLUserManager.getInstence().getUserInfo());
+        sendMessage(msg,MQTT_ADD_FRIEND_TOPIC,userId);
+    }
+
+    public void sendMessage(final String msg, String topic, String userId){
         if (client != null && client.isConnected()){
             final MqttMessage message = new MqttMessage();
             message.setQos(1);
@@ -154,7 +169,7 @@ public class CLMQTTManager {
             message.setPayload(msg.getBytes());
 
             try {
-                client.publish(MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + userId,message,null, new IMqttActionListener() {
+                client.publish(MQTT_BASE_TOPIC + topic + userId,message,null, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
                         if (messageStatusOnListener != null){
@@ -164,9 +179,9 @@ public class CLMQTTManager {
 
                     @Override
                     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                         if (messageStatusOnListener != null) {
-                             messageStatusOnListener.onFailure(msg);
-                         }
+                        if (messageStatusOnListener != null) {
+                            messageStatusOnListener.onFailure(msg);
+                        }
                     }
                 });
             } catch (MqttException e) {

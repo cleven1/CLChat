@@ -107,4 +107,18 @@ public class CLUserBean {
     public void setCity(String city) {
         this.city = city;
     }
+
+    @Override
+    public String toString() {
+        return "CLUserBean{" +
+                "userId='" + userId + '\'' +
+                ", name='" + name + '\'' +
+                ", gender=" + gender +
+                ", birthday='" + birthday + '\'' +
+                ", aliasName='" + aliasName + '\'' +
+                ", description='" + description + '\'' +
+                ", avatarUrl='" + avatarUrl + '\'' +
+                ", city='" + city + '\'' +
+                '}';
+    }
 }

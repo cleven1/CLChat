@@ -10,14 +10,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.alibaba.fastjson.JSON;
+import com.cleven.clchat.API.OkGoUtil;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
+import com.cleven.clchat.manager.CLMQTTManager;
 import com.cleven.clchat.model.CLUserBean;
+import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLImageLoadUtil;
+import com.lzy.okgo.model.HttpParams;
 import com.nanchen.wavesidebar.SearchEditText;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import dev.utils.LogPrintUtils;
 
@@ -28,6 +35,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
     private SearchEditText mSearchEditText;
     private ListView mListView;
     private ArrayList<CLUserBean> userList = new ArrayList<>();
+    private MyFriendListViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +70,40 @@ public class CLAddFriendActivity extends CLBaseActivity {
             @Override
             public void onSearchClick(View view, String keyword) {
                 LogPrintUtils.eTag("keyword",keyword);
+                HttpParams params = new HttpParams();
+                params.put("user_id",keyword);
+                OkGoUtil.getRequets(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/queryFriend", "addFriend", params, new OkGoUtil.CLNetworkCallBack() {
+                    @Override
+                    public void onSuccess(Map response) {
+                        LogPrintUtils.eTag("查询好友",response.toString());
+                        List<Map> users = (List) response.get("data");
+                        for (int i = 0; i < users.size(); i++){
+                            userList.add(JSON.parseObject(String.valueOf(users.get(i)),CLUserBean.class));
+                            CLAddFriendActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(final Map error) {
+                        LogPrintUtils.eTag("查询好友 error",error.toString());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(CLAddFriendActivity.this, String.valueOf(error.get("error_msg")),Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
             }
         });
         mListView = findViewById(R.id.listView);
+        adapter = new MyFriendListViewAdapter();
+        mListView.setAdapter(adapter);
     }
 
     private class MyFriendListViewAdapter extends BaseAdapter {
@@ -86,7 +125,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
 
         @Override
         public View getView(int position, android.view.View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
+            final ViewHolder viewHolder;
             if (convertView == null){
                 viewHolder = new ViewHolder();
                 convertView = View.inflate(CLAddFriendActivity.this,R.layout.friend_item_layout,null);
@@ -97,13 +136,16 @@ public class CLAddFriendActivity extends CLBaseActivity {
             }else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            CLUserBean userBean = userList.get(position);
-            Glide.with(CLAddFriendActivity.this).load(userBean.getAvatarUrl()).into(viewHolder.avatar);
+            final CLUserBean userBean = userList.get(position);
+            CLImageLoadUtil.loadRoundImg(viewHolder.avatar,userBean.getAvatarUrl(),R.drawable.avatar,15);
             viewHolder.name.setText(userBean.getName());
             viewHolder.addFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(CLAddFriendActivity.this,"添加好友",Toast.LENGTH_SHORT).show();
+                    /// 通过MQTT发送添加好友
+                    CLMQTTManager.getInstance().sendAddFriendMessage(userBean.getUserId());
+                    viewHolder.addFriend.setText("已发送");
+                    viewHolder.addFriend.setBackgroundResource(R.drawable.addfriend_text_add_shape);
                 }
             });
 
