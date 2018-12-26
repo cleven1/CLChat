@@ -1,4 +1,4 @@
-package com.cleven.clchat.activity;
+package com.cleven.clchat.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.cleven.clchat.R;
+import com.cleven.clchat.activity.MainActivity;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.model.CLUserBean;

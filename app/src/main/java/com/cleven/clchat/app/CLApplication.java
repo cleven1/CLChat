@@ -8,8 +8,6 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.cleven.clchat.manager.CLUploadManager;
-import com.lqr.emoji.IImageLoader;
-import com.lqr.emoji.LQREmotionKit;
 import com.lqr.imagepicker.ImagePicker;
 import com.lqr.imagepicker.view.CropImageView;
 import com.lzy.okgo.OkGo;
@@ -45,8 +43,6 @@ public class CLApplication extends Application {
         this.mContext = this;
 
         initDevUtil();
-
-        initLQREmtion();
 
         initImagePicker();
 
@@ -119,17 +115,6 @@ public class CLApplication extends Application {
                 .addCommonHeaders(headers);
 //                .addCommonParams(params);
 
-    }
-
-    /// 初始化表情功能
-    private void initLQREmtion() {
-
-        LQREmotionKit.init(this, new IImageLoader() {
-            @Override
-            public void displayImage(Context context, String path, ImageView imageView) {
-                Glide.with(context).load(path).into(imageView);
-            }
-        });
     }
 
     private void initDevUtil() {

@@ -1,4 +1,4 @@
-package com.cleven.clchat.activity;
+package com.cleven.clchat.login;
 
 import android.os.Bundle;
 import android.os.Handler;

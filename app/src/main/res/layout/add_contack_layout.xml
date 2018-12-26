@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
+    <include layout="@layout/titlebar_layout"/>
     <!--搜索框-->
     <com.nanchen.wavesidebar.SearchEditText
         android:id="@+id/friend_search"

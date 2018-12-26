@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -14,13 +15,16 @@ import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.model.CLUserBean;
 import com.nanchen.wavesidebar.SearchEditText;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.ArrayList;
 
 import dev.utils.LogPrintUtils;
 
 public class CLAddFriendActivity extends CLBaseActivity {
-
+    private TextView centerTextView;
+    private CommonTitleBar titleBar;
+    private TextView rightTextView;
     private SearchEditText mSearchEditText;
     private ListView mListView;
     private ArrayList<CLUserBean> userList = new ArrayList<>();
@@ -29,11 +33,27 @@ public class CLAddFriendActivity extends CLBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contack_layout);
-
+        setupTitleBar();
         findView();
 
     }
-
+    private void setupTitleBar(){
+        titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
+        ImageButton leftImageButton = titleBar.getLeftImageButton();
+        leftImageButton.setVisibility(View.VISIBLE);
+        rightTextView = titleBar.getRightTextView();
+        rightTextView.setVisibility(View.GONE);
+        centerTextView = titleBar.getCenterTextView();
+        centerTextView.setText("添加好友");
+        titleBar.setListener(new CommonTitleBar.OnTitleBarListener() {
+            @Override
+            public void onClicked(View v, int action, String extra) {
+                if (action == CommonTitleBar.ACTION_LEFT_BUTTON){
+                    onBackPressed();
+                }
+            }
+        });
+    }
     private void findView(){
         // 搜索按钮相关
         mSearchEditText = (SearchEditText) findViewById(R.id.friend_search);

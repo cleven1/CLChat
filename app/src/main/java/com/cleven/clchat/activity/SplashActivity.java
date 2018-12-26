@@ -10,6 +10,7 @@ import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 
 import com.cleven.clchat.R;
+import com.cleven.clchat.login.CLLoginActivity;
 import com.cleven.clchat.manager.CLUserManager;
 
 public class SplashActivity extends AppCompatActivity {
