@@ -18,6 +18,7 @@ import com.cleven.clchat.manager.CLMQTTManager;
 import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLImageLoadUtil;
+import com.github.nukc.stateview.StateView;
 import com.lzy.okgo.model.HttpParams;
 import com.nanchen.wavesidebar.SearchEditText;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
@@ -36,6 +37,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
     private ListView mListView;
     private ArrayList<CLUserBean> userList = new ArrayList<>();
     private MyFriendListViewAdapter adapter;
+    private StateView mStateView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,9 @@ public class CLAddFriendActivity extends CLBaseActivity {
         });
     }
     private void findView(){
+        /// 空界面
+        mStateView = StateView.inject(this);
+
         // 搜索按钮相关
         mSearchEditText = (SearchEditText) findViewById(R.id.friend_search);
         mSearchEditText.setPressed(true);
@@ -94,6 +99,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                mStateView.showEmpty();
                                 Toast.makeText(CLAddFriendActivity.this, String.valueOf(error.get("error_msg")),Toast.LENGTH_SHORT).show();
                             }
                         });
