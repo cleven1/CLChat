@@ -1,15 +1,16 @@
 package com.cleven.clchat.fragment;
 
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseFragment;
+import com.cleven.clchat.contack.activity.CLAddFriendActivity;
 import com.cleven.clchat.fragment.contack.adpater.ContactsAdapter;
 import com.cleven.clchat.fragment.contack.model.ContactModel;
 import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
@@ -48,10 +49,13 @@ public class CLContactFragment extends CLBaseFragment {
         this.titleBar = titleBar;
         TextView rightTextView = titleBar.getRightTextView();
         rightTextView.setText("➕");
-        rightTextView.setOnClickListener(new View.OnClickListener() {
+        titleBar.setListener(new CommonTitleBar.OnTitleBarListener() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(mContext,"添加",Toast.LENGTH_SHORT).show();
+            public void onClicked(View v, int action, String extra) {
+                if (action == CommonTitleBar.ACTION_RIGHT_TEXT){
+                    Intent intent = new Intent(mContext,CLAddFriendActivity.class);
+                    mContext.startActivity(intent);
+                }
             }
         });
     }

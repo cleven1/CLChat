@@ -6,6 +6,8 @@
 
     <com.wuhenzhizao.titlebar.widget.CommonTitleBar
         android:id="@+id/titlebar"
+        titlebar:statusBarMode="dark"
+        titlebar:fillStatusBar="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         titlebar:centerText="标题栏"
