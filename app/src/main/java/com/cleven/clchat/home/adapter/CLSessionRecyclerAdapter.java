@@ -102,7 +102,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             if (isGroup == false){
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                params.topMargin = SizeUtils.dipConvertPx(15);
+                params.topMargin = SizeUtils.dipConvertPx(8);
                 contentLayout.setLayoutParams(params);
                 name.setVisibility(View.GONE);
             }else {
@@ -142,7 +142,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
 
         public void setAudioData(final CLMessageBean messageBean) {
             mAudio_duration.setText(messageBean.getDuration() + "″");
-            CLImageLoadUtil.loadRoundImg(ivAvatar,messageBean.getUserInfo().getAvatarUrl(),R.drawable.avatar,15);
+            CLImageLoadUtil.loadRoundImg(ivAvatar,messageBean.getUserInfo().getAvatarUrl(),R.drawable.avatar,20);
             // 发送失败
             if (CLSendStatus.fromTypeName(messageBean.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 sendfail.setVisibility(View.VISIBLE);
@@ -240,7 +240,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             if (isGroup == false){
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                params.topMargin = SizeUtils.dipConvertPx(15);
+                params.topMargin = SizeUtils.dipConvertPx(8);
                 contentLayout.setLayoutParams(params);
                 name.setVisibility(View.GONE);
             }else {
@@ -265,7 +265,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             imageParams.height = data.getHeight();
             mContent.setLayoutParams(imageParams);
 
-            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,15);
+            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,20);
             // 发送失败
             if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 pbBar.setAlpha(1);
@@ -315,7 +315,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             if (isGroup == false){
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                params.topMargin = SizeUtils.dipConvertPx(15);
+                params.topMargin = SizeUtils.dipConvertPx(8);
                 contentLayout.setLayoutParams(params);
                 name.setVisibility(View.GONE);
             }else {
@@ -327,7 +327,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         public void setVideoData(final CLMessageBean data) {
 
             name.setText(data.getUserInfo().getName());
-            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,0);
+            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,20);
             CLImageLoadUtil.loadRoundImg(mVideo_thumbnail,data.getVideoThumbnail(),R.drawable.avatar,0);
 
             /// 根据图片的size更新布局
@@ -377,7 +377,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             if (isGroup == false){
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                params.topMargin = SizeUtils.dipConvertPx(15);
+                params.topMargin = SizeUtils.dipConvertPx(8);
                 contentLayout.setLayoutParams(params);
                 name.setVisibility(View.GONE);
             }else {
@@ -391,8 +391,8 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             name.setText(data.getUserInfo().getName());
             /// 过滤出表情,直接展示
             CLEmojiCommonUtils.spannableEmoticonFilter(mContent,data.getContent());
-            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,15);
-            
+            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,20);
+
             // 发送失败
             if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 sendfail.setVisibility(View.VISIBLE);

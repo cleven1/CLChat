@@ -137,7 +137,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             final CLUserBean userBean = userList.get(position);
-            CLImageLoadUtil.loadRoundImg(viewHolder.avatar,userBean.getAvatarUrl(),R.drawable.avatar,15);
+            CLImageLoadUtil.loadRoundImg(viewHolder.avatar,userBean.getAvatarUrl(),R.drawable.avatar,20);
             viewHolder.name.setText(userBean.getName());
             viewHolder.addFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
