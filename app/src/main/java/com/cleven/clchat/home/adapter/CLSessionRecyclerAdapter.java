@@ -17,7 +17,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.cleven.clchat.R;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
@@ -26,6 +25,7 @@ import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.home.Bean.CLUploadStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
 import com.cleven.clchat.manager.CLUserManager;
+import com.cleven.clchat.utils.CLImageLoadUtil;
 import com.cleven.clchat.utils.CLUtils;
 import com.lqr.audio.AudioPlayManager;
 import com.lqr.audio.IAudioPlayListener;
@@ -142,7 +142,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
 
         public void setAudioData(final CLMessageBean messageBean) {
             mAudio_duration.setText(messageBean.getDuration() + "″");
-            Glide.with(mContext).load(messageBean.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            CLImageLoadUtil.loadRoundImg(ivAvatar,messageBean.getUserInfo().getAvatarUrl(),R.drawable.avatar,15);
             // 发送失败
             if (CLSendStatus.fromTypeName(messageBean.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 sendfail.setVisibility(View.VISIBLE);
@@ -255,7 +255,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
 
             /// 根据图片的size更新布局
             String url = CLUtils.checkLocalPath(data);
-            Glide.with(mContext).load(url).into(mContent);
+            CLImageLoadUtil.loadRoundImg(mContent,url,R.mipmap.default_image,0);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
             params.width = data.getWitdh();
             params.height = data.getHeight();
@@ -265,7 +265,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             imageParams.height = data.getHeight();
             mContent.setLayoutParams(imageParams);
 
-            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,15);
             // 发送失败
             if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 pbBar.setAlpha(1);
@@ -327,8 +327,9 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         public void setVideoData(final CLMessageBean data) {
 
             name.setText(data.getUserInfo().getName());
-            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
-            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(mVideo_thumbnail);
+            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,0);
+            CLImageLoadUtil.loadRoundImg(mVideo_thumbnail,data.getVideoThumbnail(),R.drawable.avatar,0);
+
             /// 根据图片的size更新布局
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
             params.width = SizeUtils.dipConvertPx(data.getWitdh());
@@ -390,8 +391,8 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             name.setText(data.getUserInfo().getName());
             /// 过滤出表情,直接展示
             CLEmojiCommonUtils.spannableEmoticonFilter(mContent,data.getContent());
-
-            Glide.with(mContext).load(data.getUserInfo().getAvatarUrl()).into(ivAvatar);
+            CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,15);
+            
             // 发送失败
             if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_FAILED){
                 sendfail.setVisibility(View.VISIBLE);
