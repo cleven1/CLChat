@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CLChat.iml" filepath="$PROJECT_DIR$/CLChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/CLChat-Android.iml" filepath="$PROJECT_DIR$/CLChat-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/LQRAudioRecord_library/LQRAudioRecord_library.iml" filepath="$PROJECT_DIR$/LQRAudioRecord_library/LQRAudioRecord_library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/LQREmojiLibrary_app/LQREmojiLibrary_app.iml" filepath="$PROJECT_DIR$/LQREmojiLibrary_app/LQREmojiLibrary_app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/LQREmojiLibrary_library/LQREmojiLibrary_library.iml" filepath="$PROJECT_DIR$/LQREmojiLibrary_library/LQREmojiLibrary_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/LQRImagePicker_library/LQRImagePicker_library.iml" filepath="$PROJECT_DIR$/LQRImagePicker_library/LQRImagePicker_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/WaveSideBar_app/WaveSideBar_app.iml" filepath="$PROJECT_DIR$/WaveSideBar_app/WaveSideBar_app.iml" />
       <module fileurl="file://$PROJECT_DIR$/WaveSideBar_library/WaveSideBar_library.iml" filepath="$PROJECT_DIR$/WaveSideBar_library/WaveSideBar_library.iml" />

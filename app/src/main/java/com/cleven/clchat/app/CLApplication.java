@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.cleven.clchat.manager.CLRealmConfig;
 import com.cleven.clchat.manager.CLUploadManager;
 import com.lqr.imagepicker.ImagePicker;
 import com.lqr.imagepicker.view.CropImageView;
@@ -50,6 +51,15 @@ public class CLApplication extends Application {
 
         CLUploadManager.getInstance().init();
 
+        initRealm();
+
+    }
+
+    /**
+     * 初始化Realm数据库
+     */
+    private void initRealm() {
+        CLRealmConfig.setupRealm(this);
     }
 
     /**
