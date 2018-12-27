@@ -13,8 +13,11 @@ import android.widget.Toast;
 import com.cleven.clchat.API.OkGoUtil;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
+import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.contack.bean.CLNewFriendBean;
 import com.cleven.clchat.manager.CLMQTTManager;
+import com.cleven.clchat.manager.CLMessageManager;
+import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 import com.cleven.clchat.utils.CLJsonUtil;
@@ -50,7 +53,23 @@ public class CLAddFriendActivity extends CLBaseActivity {
         setupTitleBar();
         findView();
 
+        if (isAddFriend){
+            initData();
+        }
+
     }
+
+    private void initData() {
+        List<CLNewFriendBean> allNewFriendData = CLNewFriendBean.getAllNewFriendData();
+        userList.addAll(allNewFriendData);
+        adapter.notifyDataSetChanged();
+        /// 更新所有的状态
+        for (CLNewFriendBean friendBean : allNewFriendData){
+            friendBean.setGotoDetail(true);
+            CLNewFriendBean.updateData(friendBean);
+        }
+    }
+
     private void setupTitleBar(){
         titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
         ImageButton leftImageButton = titleBar.getLeftImageButton();
@@ -176,7 +195,20 @@ public class CLAddFriendActivity extends CLBaseActivity {
                             public void onSuccess(Map response) {
                                 friendBean.setFriend(true);
                                 adapter.notifyDataSetChanged();
+                                viewHolder.addFriend.setText("已添加");
+                                viewHolder.addFriend.setBackgroundResource(R.drawable.addfriend_text_add_shape);
                                 viewHolder.addFriend.setEnabled(false);
+                                /// 更新数据库
+                                CLNewFriendBean.updateData(friendBean);
+                                /// 发送消息通知好友
+                                String name = CLUserManager.getInstence().getUserInfo().getName();
+                                CLMessageManager.getInstance().sendTextMessage(name + "已经和你成为好友了",friendBean.getUserId(),false);
+
+                                /// 插入好友数据库
+                                String json = CLJsonUtil.parseObjToJson(friendBean);
+                                CLFriendBean bean = CLJsonUtil.parseJsonToObj(json, CLFriendBean.class);
+                                CLFriendBean.updateData(bean);
+
                             }
 
                             @Override

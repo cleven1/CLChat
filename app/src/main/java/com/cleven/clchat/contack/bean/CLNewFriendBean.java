@@ -2,12 +2,27 @@ package com.cleven.clchat.contack.bean;
 
 import android.text.TextUtils;
 
-public class CLNewFriendBean {
+import java.util.ArrayList;
+import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmModel;
+import io.realm.RealmResults;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.RealmClass;
+
+@RealmClass
+public class CLNewFriendBean implements RealmModel{
 
     /**
      * 用户id
      */
+    @PrimaryKey
     private String userId;
+    /**
+     * 后续扩展跟微信一样的加好友方式使用
+     */
+    private String payload;
     /**
      * 用户昵称
      */
@@ -46,6 +61,65 @@ public class CLNewFriendBean {
      * 是否是好友
      */
     private boolean isFriend;
+    /**
+     * 是否进入过好友通知界面
+     */
+    private boolean isGotoDetail;
+
+    /// 插入数据
+    public static void updateData(CLNewFriendBean newFriendBean){
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.copyToRealmOrUpdate(newFriendBean);
+            }
+        });
+    }
+
+    /// 查询所有
+    public static List<CLNewFriendBean> getAllNewFriendData(){
+        List<CLNewFriendBean> list = new ArrayList<>();
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLNewFriendBean> all = realm.where(CLNewFriendBean.class).findAll();
+        list.addAll(realm.copyFromRealm(all));
+        return list;
+    }
+
+    /// 查询所有未进入详情页的条数
+    public static int getAllNewFriendUnReadData(){
+        List<CLNewFriendBean> list = new ArrayList<>();
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLNewFriendBean> all = realm.where(CLNewFriendBean.class)
+                .equalTo("isGotoDetail",false)
+                .findAll();
+        list.addAll(realm.copyFromRealm(all));
+        return list.size();
+    }
+
+    /// 根据用户删除
+    public static void deleteUser(CLNewFriendBean friendBean){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLNewFriendBean> beans = realm.where(CLNewFriendBean.class).equalTo("userId", friendBean.getUserId()).findAll();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                beans.deleteAllFromRealm();
+            }
+        });
+    }
+    /// 删除所有
+    public static void deleteAllUser(){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLNewFriendBean> all = realm.where(CLNewFriendBean.class).findAll();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                all.deleteAllFromRealm();
+            }
+        });
+    }
+
 
     public String getUserId() {
         return TextUtils.isEmpty(userId) ? "" : userId;
@@ -125,5 +199,21 @@ public class CLNewFriendBean {
 
     public void setFriend(boolean friend) {
         isFriend = friend;
+    }
+
+    public String getPayload() {
+        return payload;
+    }
+
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
+
+    public boolean isGotoDetail() {
+        return isGotoDetail;
+    }
+
+    public void setGotoDetail(boolean gotoDetail) {
+        isGotoDetail = gotoDetail;
     }
 }

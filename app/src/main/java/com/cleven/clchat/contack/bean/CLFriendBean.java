@@ -4,7 +4,16 @@ import android.text.TextUtils;
 
 import com.nanchen.wavesidebar.FirstLetterUtil;
 
-public class CLFriendBean {
+import java.util.ArrayList;
+import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmModel;
+import io.realm.RealmResults;
+import io.realm.annotations.RealmClass;
+
+@RealmClass
+public class CLFriendBean implements RealmModel {
 
     /**
      * 用户id
@@ -58,6 +67,50 @@ public class CLFriendBean {
      * 其它:表示内容
      */
     private int itemType;
+
+    /// 插入数据
+    public static void updateData(CLFriendBean friendBean){
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.copyToRealmOrUpdate(friendBean);
+            }
+        });
+
+    }
+
+    /// 查询所有
+    public static List<CLFriendBean> getAllFriendData(){
+        List<CLFriendBean> list = new ArrayList<>();
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLFriendBean> all = realm.where(CLFriendBean.class).findAll();
+        list.addAll(realm.copyFromRealm(all));
+        return list;
+    }
+
+    /// 根据用户删除
+    public static void deleteUser(CLFriendBean friendBean){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLFriendBean> results = realm.where(CLFriendBean.class).equalTo("userId", friendBean.getUserId()).findAll();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                results.deleteAllFromRealm();
+            }
+        });
+    }
+    /// 删除所有
+    public static void deleteAllUser(){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLFriendBean> all = realm.where(CLFriendBean.class).findAll();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                all.deleteAllFromRealm();
+            }
+        });
+    }
 
     public String getUserId() {
         return TextUtils.isEmpty(userId) ? "" : userId;

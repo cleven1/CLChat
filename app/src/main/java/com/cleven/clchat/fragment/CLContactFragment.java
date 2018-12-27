@@ -35,6 +35,8 @@ import java.util.Map;
 
 public class CLContactFragment extends CLBaseFragment {
 
+    private static int NEWFRIENDNOTIFAICATIONNUMBER = 0;
+
     private List<CLFriendBean> mContactModels;
     private List<CLFriendBean> mShowModels;
     private RecyclerView mRecyclerView;
@@ -58,11 +60,17 @@ public class CLContactFragment extends CLBaseFragment {
         CLMessageManager.getInstance().setReceiveFriendOnListener(new CLMessageManager.CLReceiveFriendOnListener() {
             @Override
             public void onMessage(CLNewFriendBean friendBean) {
-                CLFriendBean userBean = mContactModels.get(1);
-                userBean.setUnreadNum(userBean.getUnreadNum() + 1);
-                mAdapter.notifyItemChanged(1);
+                NEWFRIENDNOTIFAICATIONNUMBER += 1;
+                refreshFriendNotication();
             }
         });
+    }
+
+    /// 刷新好友通知cell
+    private void refreshFriendNotication(){
+        CLFriendBean userBean = mContactModels.get(1);
+        userBean.setUnreadNum(NEWFRIENDNOTIFAICATIONNUMBER);
+        mAdapter.notifyItemChanged(1);
     }
 
     ///设置titleBar
@@ -144,6 +152,9 @@ public class CLContactFragment extends CLBaseFragment {
     @Override
     public void initData() {
         super.initData();
+        /// 查询未查看的好友条数
+        NEWFRIENDNOTIFAICATIONNUMBER = CLNewFriendBean.getAllNewFriendUnReadData();
+
         mContactModels = new ArrayList<>();
         mShowModels = new ArrayList<>();
         CLFriendBean messageBean = new CLFriendBean();
@@ -154,14 +165,33 @@ public class CLContactFragment extends CLBaseFragment {
         CLFriendBean friendBean = new CLFriendBean();
         friendBean.setName("好友通知");
         friendBean.setItemType(10000);
-        messageBean.setUnreadNum(0);
+        friendBean.setUnreadNum(NEWFRIENDNOTIFAICATIONNUMBER);
         mContactModels.add(friendBean);
 
         mShowModels.addAll(mContactModels);
-        mAdapter = new ContactsAdapter(mContext,mShowModels);
+        mAdapter = new ContactsAdapter(mContext, mShowModels, new ContactsAdapter.onClickItemListener() {
+            @Override
+            public void onItem(int postion) {
+                if (postion == 1){ // 好友通知
+                    Intent intent = new Intent(mContext,CLAddFriendActivity.class);
+                    intent.putExtra("title","好友通知");
+                    mContext.startActivity(intent);
+                    NEWFRIENDNOTIFAICATIONNUMBER = 0;
+                    refreshFriendNotication();
+                }
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
 
-        getFriendList();
+        List<CLFriendBean> allFriendData = CLFriendBean.getAllFriendData();
+        if (allFriendData.size() <= 0){
+            getFriendList();
+        }else {
+            mContactModels.addAll(allFriendData);
+            mShowModels.addAll(allFriendData);
+            mAdapter.notifyDataSetChanged();
+        }
+
     }
 
     private void getFriendList(){

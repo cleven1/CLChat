@@ -16,6 +16,7 @@ import dev.utils.app.image.BitmapUtils;
 import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_FAILED;
 import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_SEND;
 import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_SENDING;
+import static dev.DevUtils.runOnUiThread;
 
 /**
  * Created by cleven on 2018/12/16.
@@ -283,7 +284,14 @@ public class CLMessageManager {
     public void receiveFriendHandler(String msg){
         CLNewFriendBean friendBean = CLJsonUtil.parseJsonToObj(msg, CLNewFriendBean.class);
         if (receiveFriendOnListener != null){
-            receiveFriendOnListener.onMessage(friendBean);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ///
+                    CLNewFriendBean.updateData(friendBean);
+                    receiveFriendOnListener.onMessage(friendBean);
+                }
+            });
         }
     }
 

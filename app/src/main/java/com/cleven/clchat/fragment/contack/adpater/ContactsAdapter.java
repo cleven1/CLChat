@@ -1,7 +1,6 @@
 package com.cleven.clchat.fragment.contack.adpater;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cleven.clchat.R;
-import com.cleven.clchat.contack.activity.CLAddFriendActivity;
 import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 import com.cleven.clchat.utils.CLUtils;
@@ -32,6 +30,16 @@ import java.util.List;
 
 public class ContactsAdapter extends RecyclerView.Adapter{
 
+    private final onClickItemListener itemListener;
+    /// 点击item回调
+    private onClickItemListener onClickItemListener;
+    public void setOnClickItemListener(onClickItemListener onClickItemListener) {
+        this.onClickItemListener = onClickItemListener;
+    }
+    public interface onClickItemListener {
+        void onItem(int postion);
+    }
+
     private final Context mContext;
 
     private int headViewCount = 2;
@@ -39,10 +47,11 @@ public class ContactsAdapter extends RecyclerView.Adapter{
     private static final String TAG = "ContactsAdapter";
     private final LayoutInflater inflater;
 
-    public ContactsAdapter(Context context, List<CLFriendBean> contacts) {
+    public ContactsAdapter(Context context, List<CLFriendBean> contacts,onClickItemListener itemListener) {
         this.contacts = contacts;
         this.mContext = context;
         inflater = LayoutInflater.from(mContext);
+        this.itemListener = itemListener;
     }
 
     @Override
@@ -50,7 +59,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
         CLFriendBean friendBean = contacts.get(viewType);
         if (10000 == friendBean.getItemType()){
             View headerView = inflater.inflate(R.layout.custom_cell_layuot,null);
-            return new HeaderViewHolder(headerView);
+            return new HeaderViewHolder(headerView,itemListener);
         }else {
             View view = inflater.inflate(R.layout.layaout_item_contacts, null);
             return new ContactsViewHolder(view);
@@ -92,16 +101,17 @@ public class ContactsAdapter extends RecyclerView.Adapter{
         private final TextView unread_text;
         private final ImageView iv_avatar;
         private final TextView name;
+        private final onClickItemListener listener;
         private CLFriendBean data;
         private final LinearLayout contentView;
 
-        public HeaderViewHolder(View itemView) {
+        public HeaderViewHolder(View itemView,onClickItemListener listener) {
             super(itemView);
             contentView = (LinearLayout) itemView.findViewById(R.id.contentView);
             unread_text = (TextView) itemView.findViewById(R.id.unread_count);
             iv_avatar = (ImageView) itemView.findViewById(R.id.iv_avatar);
             name = (TextView) itemView.findViewById(R.id.name);
-
+            this.listener = listener;
         }
 
         public void setData(CLFriendBean data, final int postion) {
@@ -123,10 +133,8 @@ public class ContactsAdapter extends RecyclerView.Adapter{
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(mContext,"postion = "+postion,Toast.LENGTH_SHORT).show();
-                    if (postion == 1){ // 好友通知
-                        Intent intent = new Intent(mContext,CLAddFriendActivity.class);
-                        intent.putExtra("title","好友通知");
-                        mContext.startActivity(intent);
+                    if (listener!=null){
+                        listener.onItem(postion);
                     }
                 }
             });
