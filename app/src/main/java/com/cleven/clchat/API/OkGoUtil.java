@@ -1,13 +1,15 @@
 package com.cleven.clchat.API;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import static com.lzy.okgo.utils.HttpUtils.runOnUiThread;
 
 public class OkGoUtil {
     private CLNetworkCallBack callBack;
@@ -30,14 +32,24 @@ public class OkGoUtil {
                 .execute(new StringCallback(){
                     @Override
                     public void onSuccess(Response<String> response) {
-                        Map parseMap = (Map)JSON.parse(response.body());
+                        final JSONObject parseMap = (JSONObject)JSON.parse(response.body());
                         if (parseMap.get("error_code").equals("0")){ //请求成功
                             if (callback != null){
-                                callback.onSuccess(parseMap);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callback.onSuccess(parseMap);
+                                    }
+                                });
                             }
                         }else {
                             if (callback != null){
-                                callback.onFailure(parseMap);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callback.onFailure(parseMap);
+                                    }
+                                });
                             }
                         }
                     }
@@ -45,11 +57,16 @@ public class OkGoUtil {
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        HashMap parseMap = new HashMap();
+                        final JSONObject parseMap = new JSONObject();
                         parseMap.put("error_code","4500");
                         parseMap.put("error_msg","请求失败");
                         if (callback != null){
-                            callback.onFailure(parseMap);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    callback.onFailure(parseMap);
+                                }
+                            });
                         }
                     }
                 });
@@ -63,7 +80,7 @@ public class OkGoUtil {
                 .execute(new StringCallback(){
                     @Override
                     public void onSuccess(Response<String> response) {
-                        Map parseMap = (Map)JSON.parse(response.body());
+                        JSONObject parseMap = (JSONObject)JSON.parse(response.body());
                         if (parseMap.get("error_code").equals("0")){ //请求成功
                             if (callback != null){
                                 callback.onSuccess(parseMap);
@@ -78,7 +95,7 @@ public class OkGoUtil {
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        HashMap parseMap = new HashMap();
+                        JSONObject parseMap = new JSONObject();
                         parseMap.put("error_code","4500");
                         parseMap.put("error_msg","请求失败");
                         if (callback != null){

@@ -234,7 +234,7 @@ public class CLMQTTManager {
                         }else if (topic.equals(baseTopic + MQTT_GROUP_CHAT_TOPIC + userId)){ //群聊
 
                         }else if (topic.equals(baseTopic + MQTT_ADD_FRIEND_TOPIC + userId)){ //添加好友
-
+                            CLMessageManager.getInstance().receiveFriendHandler(message.toString());
                         }else if (topic.equals(baseTopic + MQTT_DELETE_FRIEND_TOPIC + userId)){ //删除好友
 
                         }else if (topic.equals(baseTopic + MQTT_SYSTEM_TOPIC)){ //系统通知

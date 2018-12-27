@@ -11,8 +11,10 @@ import android.widget.TextView;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseFragment;
 import com.cleven.clchat.contack.activity.CLAddFriendActivity;
+import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.fragment.contack.adpater.ContactsAdapter;
 import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
+import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.model.CLUserBean;
 import com.nanchen.wavesidebar.SearchEditText;
 import com.nanchen.wavesidebar.Trans2PinYinUtil;
@@ -42,8 +44,22 @@ public class CLContactFragment extends CLBaseFragment {
 
         bindView(view);
 
+        observerReceiveFriendHandler();
         return view;
     }
+
+    private void observerReceiveFriendHandler() {
+        /// 监听收到好友请求
+        CLMessageManager.getInstance().setReceiveFriendOnListener(new CLMessageManager.CLReceiveFriendOnListener() {
+            @Override
+            public void onMessage(CLFriendBean friendBean) {
+                CLUserBean userBean = mContactModels.get(1);
+                userBean.setUnreadNum(userBean.getUnreadNum() + 1);
+                mAdapter.notifyItemChanged(1);
+            }
+        });
+    }
+
     ///设置titleBar
     public void setTitleBar(CommonTitleBar titleBar) {
         this.titleBar = titleBar;
@@ -54,6 +70,7 @@ public class CLContactFragment extends CLBaseFragment {
             public void onClicked(View v, int action, String extra) {
                 if (action == CommonTitleBar.ACTION_RIGHT_TEXT){
                     Intent intent = new Intent(mContext,CLAddFriendActivity.class);
+                    intent.putExtra("title","查询好友");
                     mContext.startActivity(intent);
                 }
             }
@@ -134,6 +151,7 @@ public class CLContactFragment extends CLBaseFragment {
         mShowModels.addAll(mContactModels);
         mAdapter = new ContactsAdapter(mContext,mShowModels);
         mRecyclerView.setAdapter(mAdapter);
+
     }
 
 

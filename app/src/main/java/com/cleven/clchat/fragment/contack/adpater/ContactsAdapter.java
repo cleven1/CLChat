@@ -1,15 +1,19 @@
 package com.cleven.clchat.fragment.contack.adpater;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cleven.clchat.R;
+import com.cleven.clchat.contack.activity.CLAddFriendActivity;
 import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 import com.cleven.clchat.utils.CLUtils;
@@ -46,7 +50,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == HEADVIEWTYPE){
-            View headerView = inflater.inflate(R.layout.contact_headview_layuot,null);
+            View headerView = inflater.inflate(R.layout.custom_cell_layuot,null);
             return new HeaderViewHolder(headerView);
         }else {
             View view = inflater.inflate(R.layout.layaout_item_contacts, null);
@@ -97,16 +101,18 @@ public class ContactsAdapter extends RecyclerView.Adapter{
         private final ImageView iv_avatar;
         private final TextView name;
         private CLUserBean data;
+        private final LinearLayout contentView;
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
+            contentView = (LinearLayout) itemView.findViewById(R.id.contentView);
             unread_text = (TextView) itemView.findViewById(R.id.unread_count);
             iv_avatar = (ImageView) itemView.findViewById(R.id.iv_avatar);
             name = (TextView) itemView.findViewById(R.id.name);
 
         }
 
-        public void setData(CLUserBean data,int postion) {
+        public void setData(CLUserBean data, final int postion) {
             this.data = data;
             if (data.getUnreadNum() > 0){
                 unread_text.setVisibility(View.VISIBLE);
@@ -120,6 +126,18 @@ public class ContactsAdapter extends RecyclerView.Adapter{
             }else {
                 iv_avatar.setImageResource(R.mipmap.ic_around_blue);
             }
+
+            contentView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext,"postion = "+postion,Toast.LENGTH_SHORT).show();
+                    if (postion == 1){ // 好友通知
+                        Intent intent = new Intent(mContext,CLAddFriendActivity.class);
+                        intent.putExtra("title","好友通知");
+                        mContext.startActivity(intent);
+                    }
+                }
+            });
         }
     }
 

@@ -3,9 +3,12 @@ package com.cleven.clchat.manager;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
+import com.cleven.clchat.model.CLUserBean;
+import com.cleven.clchat.utils.CLJsonUtil;
 import com.cleven.clchat.utils.CLUtils;
 
 import dev.utils.LogPrintUtils;
@@ -62,6 +65,16 @@ public class CLMessageManager {
         this.receiveMessageOnListener = receiveMessageOnListener;
     }
 
+    /**
+     * 定义收到好友请求接口
+     */
+    public interface CLReceiveFriendOnListener{
+        void onMessage(CLFriendBean friendBean);
+    }
+    private CLReceiveFriendOnListener receiveFriendOnListener;
+    public void setReceiveFriendOnListener(CLReceiveFriendOnListener receiveFriendOnListener) {
+        this.receiveFriendOnListener = receiveFriendOnListener;
+    }
 
     /**
      * 发送emoji
@@ -259,11 +272,22 @@ public class CLMessageManager {
         return message;
     }
 
-
+    /// 收到聊天消息
     public void receiveMessageHandler(String msg){
         CLMessageBean messageBean = JSON.parseObject(msg, CLMessageBean.class);
         if (receiveMessageOnListener != null){
             receiveMessageOnListener.onMessage(messageBean);
+        }
+    }
+
+    /// 收到好友请求
+    public void receiveFriendHandler(String msg){
+        CLUserBean userBean = CLJsonUtil.parseJsonToObj(msg, CLUserBean.class);
+        CLFriendBean friendBean = new CLFriendBean();
+        friendBean.setFriend(false);
+        friendBean.setUserInfo(userBean);
+        if (receiveFriendOnListener != null){
+            receiveFriendOnListener.onMessage(friendBean);
         }
     }
 
