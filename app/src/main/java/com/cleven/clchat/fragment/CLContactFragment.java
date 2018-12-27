@@ -8,6 +8,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
 
+import com.cleven.clchat.API.OkGoUtil;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseFragment;
 import com.cleven.clchat.contack.activity.CLAddFriendActivity;
@@ -16,6 +17,9 @@ import com.cleven.clchat.fragment.contack.adpater.ContactsAdapter;
 import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.model.CLUserBean;
+import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLHUDUtil;
+import com.cleven.clchat.utils.CLJsonUtil;
 import com.nanchen.wavesidebar.SearchEditText;
 import com.nanchen.wavesidebar.Trans2PinYinUtil;
 import com.nanchen.wavesidebar.WaveSideBarView;
@@ -23,6 +27,7 @@ import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cleven on 2018/12/11.
@@ -152,8 +157,31 @@ public class CLContactFragment extends CLBaseFragment {
         mAdapter = new ContactsAdapter(mContext,mShowModels);
         mRecyclerView.setAdapter(mAdapter);
 
+        getFriendList();
     }
 
+    private void getFriendList(){
+        CLHUDUtil.showLoading(mContext,"正在加载好友...");
+        OkGoUtil.getRequets(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/friendList", "friendList", null, new OkGoUtil.CLNetworkCallBack() {
+            @Override
+            public void onSuccess(Map response) {
+                List list = (List) response.get("data");
+                for (int i = 0; i< list.size(); i++){
+                    CLUserBean userBean = CLJsonUtil.parseJsonToObj(list.get(i).toString(), CLUserBean.class);
+                    mContactModels.add(userBean);
+                    mShowModels.add(userBean);
+                }
+                mAdapter.notifyDataSetChanged();
+                CLHUDUtil.hideHUD();
+            }
+
+            @Override
+            public void onFailure(Map error) {
+                CLHUDUtil.showErrorHUD(mContext,"获取好友失败");
+            }
+        });
+
+    }
 
     @Override
     public void onDestroyView() {

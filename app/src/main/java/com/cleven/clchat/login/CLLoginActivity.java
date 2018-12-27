@@ -94,8 +94,8 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
                             CLUserManager.getInstence().setUserInfo(userBean);
                             Intent intent = new Intent(CLLoginActivity.this,MainActivity.class);
                             startActivity(intent);
-                            finish();
                             CLHUDUtil.hideHUD();
+                            finish();
                         }else {
                             LogPrintUtils.eTag("LOGIN","转模型失败");
                             CLHUDUtil.showErrorHUD(CLLoginActivity.this,parseMap.get("error_msg").toString());
