@@ -17,6 +17,7 @@ import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLHUDUtil;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.HttpParams;
@@ -82,6 +83,7 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
             params.put("mobile", mEtMobile.getText().toString().trim());
             params.put("pwd", mEtPassword.getText().toString().trim());
             params.put("identifier","Android");
+            CLHUDUtil.showLoading(this);
             OkGo.<String>post(CLAPPConst.LOGIN).params(params).execute(new StringCallback(){
                 @Override
                 public void onSuccess(Response<String> response) {
@@ -90,25 +92,23 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
                         CLUserBean userBean = JSON.parseObject(parseMap.get("data").toString(), CLUserBean.class);
                         if (userBean.getUserId() != null){
                             CLUserManager.getInstence().setUserInfo(userBean);
-
                             Intent intent = new Intent(CLLoginActivity.this,MainActivity.class);
-
                             startActivity(intent);
-
                             finish();
+                            CLHUDUtil.hideHUD();
                         }else {
                             LogPrintUtils.eTag("LOGIN","转模型失败");
-                            Toast.makeText(CLLoginActivity.this,parseMap.get("error_msg").toString(),Toast.LENGTH_LONG).show();
+                            CLHUDUtil.showErrorHUD(CLLoginActivity.this,parseMap.get("error_msg").toString());
                         }
                     }else {
-                        Toast.makeText(CLLoginActivity.this,parseMap.get("error_msg").toString(),Toast.LENGTH_LONG).show();
+                        CLHUDUtil.showErrorHUD(CLLoginActivity.this,parseMap.get("error_msg").toString());
                     }
                 }
 
                 @Override
                 public void onError(Response<String> response) {
                     super.onError(response);
-                    Toast.makeText(CLLoginActivity.this,"登录失败",Toast.LENGTH_LONG).show();
+                    CLHUDUtil.showErrorHUD(CLLoginActivity.this,"登录失败");
                 }
             });
 
@@ -117,11 +117,11 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
 
             startActivity(intent);
         }else if (v == mIb_qq){
-
+            CLHUDUtil.showSuccessHUD(this,"QQ");
         }else if (v == mIb_wx){
-
+            CLHUDUtil.showErrorHUD(this,"微信");
         }else if (v == mIb_wb){
-
+            CLHUDUtil.showTextHUD(this,"微博");
         }
     }
 

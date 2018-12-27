@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSON;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLHUDUtil;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.HttpParams;
@@ -94,6 +95,7 @@ public class CLRegisgerActivity extends CLBaseActivity implements View.OnClickLi
             public void onError(Response<String> response) {
                 super.onError(response);
                 LogPrintUtils.eTag("SMS",response.body());
+                CLHUDUtil.showErrorHUD(CLRegisgerActivity.this,"验证码发送失败");
             }
         });
 
@@ -124,6 +126,7 @@ public class CLRegisgerActivity extends CLBaseActivity implements View.OnClickLi
             params.put("sms_code",etVerifyCode.getText().toString().trim());
             params.put("pwd",etPassword.getText().toString().trim());
             params.put("identifier","Android");
+            CLHUDUtil.showLoading(this,"正在注册账号...");
             OkGo.<String>post(CLAPPConst.REGISTER).params(params).execute(new StringCallback(){
                 @Override
                 public void onSuccess(Response<String> response) {
@@ -133,16 +136,16 @@ public class CLRegisgerActivity extends CLBaseActivity implements View.OnClickLi
                     }else {
                         Toast.makeText(CLRegisgerActivity.this,parse.get("error_msg").toString(),Toast.LENGTH_LONG).show();
                     }
+                    CLHUDUtil.hideHUD();
                 }
 
                 @Override
                 public void onError(Response<String> response) {
                     super.onError(response);
+                    CLHUDUtil.hideHUD();
                     Toast.makeText(CLRegisgerActivity.this,"注册失败",Toast.LENGTH_SHORT).show();
                 }
             });
-
-
         }
     }
 }

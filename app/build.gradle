@@ -49,6 +49,8 @@ dependencies {
     /// 图片加载
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
+    /// HUD
+    implementation 'com.kaopiz:kprogresshud:1.2.0'
     /// json解析
     compile 'com.alibaba:fastjson:1.1.70.android'
     /// titleBar
