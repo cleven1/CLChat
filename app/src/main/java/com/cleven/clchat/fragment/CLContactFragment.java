@@ -13,10 +13,10 @@ import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseFragment;
 import com.cleven.clchat.contack.activity.CLAddFriendActivity;
 import com.cleven.clchat.contack.bean.CLFriendBean;
+import com.cleven.clchat.contack.bean.CLNewFriendBean;
 import com.cleven.clchat.fragment.contack.adpater.ContactsAdapter;
 import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
 import com.cleven.clchat.manager.CLMessageManager;
-import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLHUDUtil;
 import com.cleven.clchat.utils.CLJsonUtil;
@@ -35,8 +35,8 @@ import java.util.Map;
 
 public class CLContactFragment extends CLBaseFragment {
 
-    private List<CLUserBean> mContactModels;
-    private List<CLUserBean> mShowModels;
+    private List<CLFriendBean> mContactModels;
+    private List<CLFriendBean> mShowModels;
     private RecyclerView mRecyclerView;
     private WaveSideBarView mWaveSideBarView;
     private SearchEditText mSearchEditText;
@@ -57,8 +57,8 @@ public class CLContactFragment extends CLBaseFragment {
         /// 监听收到好友请求
         CLMessageManager.getInstance().setReceiveFriendOnListener(new CLMessageManager.CLReceiveFriendOnListener() {
             @Override
-            public void onMessage(CLFriendBean friendBean) {
-                CLUserBean userBean = mContactModels.get(1);
+            public void onMessage(CLNewFriendBean friendBean) {
+                CLFriendBean userBean = mContactModels.get(1);
                 userBean.setUnreadNum(userBean.getUnreadNum() + 1);
                 mAdapter.notifyItemChanged(1);
             }
@@ -128,7 +128,7 @@ public class CLContactFragment extends CLBaseFragment {
             @Override
             public void afterTextChanged(Editable s) {
                 mShowModels.clear();
-                for (CLUserBean model : mContactModels) {
+                for (CLFriendBean model : mContactModels) {
                     String str = Trans2PinYinUtil.trans2PinYin(model.getName());
                     if (str.contains(s.toString()) || model.getName().contains(s.toString())) {
                         mShowModels.add(model);
@@ -144,11 +144,11 @@ public class CLContactFragment extends CLBaseFragment {
         super.initData();
         mContactModels = new ArrayList<>();
         mShowModels = new ArrayList<>();
-        CLUserBean messageBean = new CLUserBean();
+        CLFriendBean messageBean = new CLFriendBean();
         messageBean.setName("消息通知");
         messageBean.setUnreadNum(0);
         mContactModels.add(messageBean);
-        CLUserBean friendBean = new CLUserBean();
+        CLFriendBean friendBean = new CLFriendBean();
         friendBean.setName("好友通知");
         messageBean.setUnreadNum(0);
         mContactModels.add(friendBean);
@@ -167,7 +167,7 @@ public class CLContactFragment extends CLBaseFragment {
             public void onSuccess(Map response) {
                 List list = (List) response.get("data");
                 for (int i = 0; i< list.size(); i++){
-                    CLUserBean userBean = CLJsonUtil.parseJsonToObj(list.get(i).toString(), CLUserBean.class);
+                    CLFriendBean userBean = CLJsonUtil.parseJsonToObj(list.get(i).toString(), CLFriendBean.class);
                     mContactModels.add(userBean);
                     mShowModels.add(userBean);
                 }

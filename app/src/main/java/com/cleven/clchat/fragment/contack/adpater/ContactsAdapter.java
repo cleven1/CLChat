@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.cleven.clchat.R;
 import com.cleven.clchat.contack.activity.CLAddFriendActivity;
-import com.cleven.clchat.model.CLUserBean;
+import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 import com.cleven.clchat.utils.CLUtils;
 
@@ -37,11 +37,11 @@ public class ContactsAdapter extends RecyclerView.Adapter{
     private final Context mContext;
 
     private int headViewCount = 2;
-    private List<CLUserBean> contacts;
+    private List<CLFriendBean> contacts;
     private static final String TAG = "ContactsAdapter";
     private final LayoutInflater inflater;
 
-    public ContactsAdapter(Context context, List<CLUserBean> contacts) {
+    public ContactsAdapter(Context context, List<CLFriendBean> contacts) {
         this.contacts = contacts;
         this.mContext = context;
         inflater = LayoutInflater.from(mContext);
@@ -62,11 +62,11 @@ public class ContactsAdapter extends RecyclerView.Adapter{
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder){
-            CLUserBean contact = contacts.get(position);
+            CLFriendBean contact = contacts.get(position);
             HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
             headerViewHolder.setData(contact,position);
         }else {
-            CLUserBean contact = contacts.get(getRealPostion(position));
+            CLFriendBean contact = contacts.get(getRealPostion(position));
             ContactsViewHolder contactsViewHolder = (ContactsViewHolder) holder;
             Log.e(TAG, "onBindViewHolder: index:" + contact.getIndex());
             contactsViewHolder.setData(contact,getRealPostion(position));
@@ -100,7 +100,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
         private final TextView unread_text;
         private final ImageView iv_avatar;
         private final TextView name;
-        private CLUserBean data;
+        private CLFriendBean data;
         private final LinearLayout contentView;
 
         public HeaderViewHolder(View itemView) {
@@ -112,7 +112,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
 
         }
 
-        public void setData(CLUserBean data, final int postion) {
+        public void setData(CLFriendBean data, final int postion) {
             this.data = data;
             if (data.getUnreadNum() > 0){
                 unread_text.setVisibility(View.VISIBLE);
@@ -145,7 +145,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
         TextView tvIndex;
         ImageView ivAvatar;
         TextView tvName;
-        private CLUserBean data;
+        private CLFriendBean data;
 
         ContactsViewHolder(View itemView) {
             super(itemView);
@@ -154,8 +154,8 @@ public class ContactsAdapter extends RecyclerView.Adapter{
             tvName = (TextView) itemView.findViewById(R.id.tv_name);
         }
 
-        public void setData(CLUserBean contact,int position) {
-            this.data = data;
+        public void setData(CLFriendBean contact,int position) {
+            this.data = contact;
             if (position == 0 || !contacts.get(position - 1).getIndex().equals(contact.getIndex())) {
                 tvIndex.setVisibility(View.VISIBLE);
                 tvIndex.setText(contact.getIndex());

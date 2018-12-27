@@ -1,6 +1,6 @@
 package com.cleven.clchat.fragment.contack.views;
 
-import com.cleven.clchat.model.CLUserBean;
+import com.cleven.clchat.contack.bean.CLFriendBean;
 
 import java.util.Comparator;
 
@@ -14,10 +14,10 @@ import java.util.Comparator;
  * @github https://github.com/nanchen2251
  */
 
-public class LetterComparator implements Comparator<CLUserBean>{
+public class LetterComparator implements Comparator<CLFriendBean>{
 
     @Override
-    public int compare(CLUserBean contactModel, CLUserBean t1) {
+    public int compare(CLFriendBean contactModel, CLFriendBean t1) {
         if (contactModel == null || t1 == null){
             return 0;
         }

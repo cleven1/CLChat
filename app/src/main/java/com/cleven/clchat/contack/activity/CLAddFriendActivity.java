@@ -13,9 +13,8 @@ import android.widget.Toast;
 import com.cleven.clchat.API.OkGoUtil;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
-import com.cleven.clchat.contack.bean.CLFriendBean;
+import com.cleven.clchat.contack.bean.CLNewFriendBean;
 import com.cleven.clchat.manager.CLMQTTManager;
-import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 import com.cleven.clchat.utils.CLJsonUtil;
@@ -35,7 +34,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
     private TextView rightTextView;
     private SearchEditText mSearchEditText;
     private ListView mListView;
-    private ArrayList<CLFriendBean> userList = new ArrayList<>();
+    private ArrayList<CLNewFriendBean> userList = new ArrayList<>();
     private MyFriendListViewAdapter adapter;
     private String title;
     private boolean isAddFriend = false;
@@ -86,10 +85,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                         LogPrintUtils.eTag("查询好友",response.toString());
                         List<Map> users = (List) response.get("data");
                         for (int i = 0; i < users.size(); i++){
-                            CLUserBean userBean = CLJsonUtil.parseJsonToObj(String.valueOf(users.get(i)),CLUserBean.class);
-                            CLFriendBean friendBean = new CLFriendBean();
-                            friendBean.setUserInfo(userBean);
-                            friendBean.setFriend(false);
+                            CLNewFriendBean friendBean = CLJsonUtil.parseJsonToObj(String.valueOf(users.get(i)),CLNewFriendBean.class);
                             userList.add(friendBean);
                             CLAddFriendActivity.this.runOnUiThread(new Runnable() {
                                 @Override
@@ -155,9 +151,9 @@ public class CLAddFriendActivity extends CLBaseActivity {
             }else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            final CLFriendBean friendBean = userList.get(position);
-            CLImageLoadUtil.loadRoundImg(viewHolder.avatar,friendBean.getUserInfo().getAvatarUrl(),R.drawable.avatar,20);
-            viewHolder.name.setText(friendBean.getUserInfo().getName());
+            final CLNewFriendBean friendBean = userList.get(position);
+            CLImageLoadUtil.loadRoundImg(viewHolder.avatar,friendBean.getAvatarUrl(),R.drawable.avatar,20);
+            viewHolder.name.setText(friendBean.getName());
             if (isAddFriend && friendBean.isFriend()){
                 viewHolder.addFriend.setText("已添加");
                 viewHolder.addFriend.setBackgroundResource(R.drawable.addfriend_text_add_shape);
@@ -174,7 +170,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                 public void onClick(View v) {
                     if (isAddFriend){
                         HttpParams params = new HttpParams();
-                        params.put("user_id",friendBean.getUserInfo().getUserId());
+                        params.put("user_id",friendBean.getUserId());
                         OkGoUtil.postRequest(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/addFriend", "addFriend", params, new OkGoUtil.CLNetworkCallBack() {
                             @Override
                             public void onSuccess(Map response) {
@@ -190,7 +186,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                         });
                     }else {
                         /// 通过MQTT发送添加好友
-                        CLMQTTManager.getInstance().sendAddFriendMessage(friendBean.getUserInfo().getUserId());
+                        CLMQTTManager.getInstance().sendAddFriendMessage(friendBean.getUserId());
                         viewHolder.addFriend.setText("已发送");
                         viewHolder.addFriend.setBackgroundResource(R.drawable.addfriend_text_add_shape);
                         viewHolder.addFriend.setEnabled(false);

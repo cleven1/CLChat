@@ -3,11 +3,10 @@ package com.cleven.clchat.manager;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
-import com.cleven.clchat.contack.bean.CLFriendBean;
+import com.cleven.clchat.contack.bean.CLNewFriendBean;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
-import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLJsonUtil;
 import com.cleven.clchat.utils.CLUtils;
 
@@ -69,7 +68,7 @@ public class CLMessageManager {
      * 定义收到好友请求接口
      */
     public interface CLReceiveFriendOnListener{
-        void onMessage(CLFriendBean friendBean);
+        void onMessage(CLNewFriendBean friendBean);
     }
     private CLReceiveFriendOnListener receiveFriendOnListener;
     public void setReceiveFriendOnListener(CLReceiveFriendOnListener receiveFriendOnListener) {
@@ -282,10 +281,7 @@ public class CLMessageManager {
 
     /// 收到好友请求
     public void receiveFriendHandler(String msg){
-        CLUserBean userBean = CLJsonUtil.parseJsonToObj(msg, CLUserBean.class);
-        CLFriendBean friendBean = new CLFriendBean();
-        friendBean.setFriend(false);
-        friendBean.setUserInfo(userBean);
+        CLNewFriendBean friendBean = CLJsonUtil.parseJsonToObj(msg, CLNewFriendBean.class);
         if (receiveFriendOnListener != null){
             receiveFriendOnListener.onMessage(friendBean);
         }

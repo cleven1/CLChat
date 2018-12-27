@@ -1,12 +1,8 @@
-package com.cleven.clchat.model;
+package com.cleven.clchat.contack.bean;
 
 import android.text.TextUtils;
 
-/**
- * Created by cleven on 2018/12/14.
- */
-
-public class CLUserBean {
+public class CLNewFriendBean {
 
     /**
      * 用户id
@@ -42,7 +38,14 @@ public class CLUserBean {
      * 城市
      */
     private String city;
-
+    /**
+     * 消息未读数
+     */
+    private int unreadNum;
+    /**
+     * 是否是好友
+     */
+    private boolean isFriend;
 
     public String getUserId() {
         return TextUtils.isEmpty(userId) ? "" : userId;
@@ -58,14 +61,6 @@ public class CLUserBean {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
     }
 
     public int getGender() {
@@ -100,6 +95,14 @@ public class CLUserBean {
         this.description = description;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
     public String getCity() {
         return city;
     }
@@ -108,18 +111,19 @@ public class CLUserBean {
         this.city = city;
     }
 
+    public int getUnreadNum() {
+        return unreadNum;
+    }
 
-    @Override
-    public String toString() {
-        return "CLUserBean{" +
-                "userId='" + userId + '\'' +
-                ", name='" + name + '\'' +
-                ", gender=" + gender +
-                ", birthday='" + birthday + '\'' +
-                ", aliasName='" + aliasName + '\'' +
-                ", description='" + description + '\'' +
-                ", avatarUrl='" + avatarUrl + '\'' +
-                ", city='" + city + '\'' +
-                '}';
+    public void setUnreadNum(int unreadNum) {
+        this.unreadNum = unreadNum;
+    }
+
+    public boolean isFriend() {
+        return isFriend;
+    }
+
+    public void setFriend(boolean friend) {
+        isFriend = friend;
     }
 }
