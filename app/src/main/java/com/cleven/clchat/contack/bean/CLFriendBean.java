@@ -53,6 +53,11 @@ public class CLFriendBean {
      * 是否是好友
      */
     private boolean isFriend;
+    /**
+     * 10000:表示headView
+     * 其它:表示内容
+     */
+    private int itemType;
 
     public String getUserId() {
         return TextUtils.isEmpty(userId) ? "" : userId;
@@ -128,6 +133,14 @@ public class CLFriendBean {
 
     public String getIndex() {
         return TextUtils.isEmpty(name) ? "" : FirstLetterUtil.getFirstLetter(name);
+    }
+
+    public int getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(int itemType) {
+        this.itemType = itemType;
     }
 
     public void setIndex(String index) {

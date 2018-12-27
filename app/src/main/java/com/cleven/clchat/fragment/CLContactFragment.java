@@ -131,7 +131,9 @@ public class CLContactFragment extends CLBaseFragment {
                 for (CLFriendBean model : mContactModels) {
                     String str = Trans2PinYinUtil.trans2PinYin(model.getName());
                     if (str.contains(s.toString()) || model.getName().contains(s.toString())) {
-                        mShowModels.add(model);
+                        if (model.getItemType() != 10000 || s.toString().length() == 0){
+                            mShowModels.add(model);
+                        }
                     }
                 }
                 mAdapter.notifyDataSetChanged();
@@ -146,10 +148,12 @@ public class CLContactFragment extends CLBaseFragment {
         mShowModels = new ArrayList<>();
         CLFriendBean messageBean = new CLFriendBean();
         messageBean.setName("消息通知");
+        messageBean.setItemType(10000);
         messageBean.setUnreadNum(0);
         mContactModels.add(messageBean);
         CLFriendBean friendBean = new CLFriendBean();
         friendBean.setName("好友通知");
+        friendBean.setItemType(10000);
         messageBean.setUnreadNum(0);
         mContactModels.add(friendBean);
 

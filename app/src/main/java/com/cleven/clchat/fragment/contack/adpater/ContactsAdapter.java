@@ -32,8 +32,6 @@ import java.util.List;
 
 public class ContactsAdapter extends RecyclerView.Adapter{
 
-    private static final int HEADVIEWTYPE = 10000;
-    private static final int NORMAL = 11111;
     private final Context mContext;
 
     private int headViewCount = 2;
@@ -49,7 +47,8 @@ public class ContactsAdapter extends RecyclerView.Adapter{
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == HEADVIEWTYPE){
+        CLFriendBean friendBean = contacts.get(viewType);
+        if (10000 == friendBean.getItemType()){
             View headerView = inflater.inflate(R.layout.custom_cell_layuot,null);
             return new HeaderViewHolder(headerView);
         }else {
@@ -66,28 +65,21 @@ public class ContactsAdapter extends RecyclerView.Adapter{
             HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
             headerViewHolder.setData(contact,position);
         }else {
-            CLFriendBean contact = contacts.get(getRealPostion(position));
+            CLFriendBean contact = contacts.get(position);
             ContactsViewHolder contactsViewHolder = (ContactsViewHolder) holder;
             Log.e(TAG, "onBindViewHolder: index:" + contact.getIndex());
-            contactsViewHolder.setData(contact,getRealPostion(position));
+            contactsViewHolder.setData(contact,position);
         }
 
     }
 
     @Override
     public int getItemViewType(int position) {
-        return getRealViewType(position);
+        return position;
     }
 
-    private int getRealViewType(int postion){
-        if (postion < headViewCount){
-            return HEADVIEWTYPE;
-        }else {
-            return NORMAL;
-        }
-    }
     private int getRealPostion(int postion){
-        return postion;
+        return postion - headViewCount;
     }
 
     @Override
