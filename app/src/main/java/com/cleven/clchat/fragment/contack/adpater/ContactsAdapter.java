@@ -32,7 +32,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
     private static final int NORMAL = 11111;
     private final Context mContext;
 
-    private int headViewCount = 1;
+    private int headViewCount = 2;
     private List<CLUserBean> contacts;
     private static final String TAG = "ContactsAdapter";
     private final LayoutInflater inflater;
@@ -60,7 +60,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
         if (holder instanceof HeaderViewHolder){
             CLUserBean contact = contacts.get(position);
             HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
-            headerViewHolder.setData(contact);
+            headerViewHolder.setData(contact,position);
         }else {
             CLUserBean contact = contacts.get(getRealPostion(position));
             ContactsViewHolder contactsViewHolder = (ContactsViewHolder) holder;
@@ -76,7 +76,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
     }
 
     private int getRealViewType(int postion){
-        if (postion == headViewCount - 1){
+        if (postion < headViewCount){
             return HEADVIEWTYPE;
         }else {
             return NORMAL;
@@ -94,15 +94,19 @@ public class ContactsAdapter extends RecyclerView.Adapter{
     class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView unread_text;
+        private final ImageView iv_avatar;
+        private final TextView name;
         private CLUserBean data;
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
             unread_text = (TextView) itemView.findViewById(R.id.unread_count);
+            iv_avatar = (ImageView) itemView.findViewById(R.id.iv_avatar);
+            name = (TextView) itemView.findViewById(R.id.name);
 
         }
 
-        public void setData(CLUserBean data) {
+        public void setData(CLUserBean data,int postion) {
             this.data = data;
             if (data.getUnreadNum() > 0){
                 unread_text.setVisibility(View.VISIBLE);
@@ -110,6 +114,12 @@ public class ContactsAdapter extends RecyclerView.Adapter{
                 unread_text.setVisibility(View.GONE);
             }
             unread_text.setText(CLUtils.formatUnreadNumber(data.getUnreadNum()));
+            name.setText(data.getName());
+            if (postion == 0){
+                iv_avatar.setImageResource(R.drawable.cl_message_noti);
+            }else {
+                iv_avatar.setImageResource(R.mipmap.ic_around_blue);
+            }
         }
     }
 

@@ -122,10 +122,14 @@ public class CLContactFragment extends CLBaseFragment {
         super.initData();
         mContactModels = new ArrayList<>();
         mShowModels = new ArrayList<>();
-        CLUserBean userBean = new CLUserBean();
-        userBean.setName("a");
-        userBean.setUnreadNum(0);
-        mContactModels.add(userBean);
+        CLUserBean messageBean = new CLUserBean();
+        messageBean.setName("消息通知");
+        messageBean.setUnreadNum(0);
+        mContactModels.add(messageBean);
+        CLUserBean friendBean = new CLUserBean();
+        friendBean.setName("好友通知");
+        messageBean.setUnreadNum(0);
+        mContactModels.add(friendBean);
 
         mShowModels.addAll(mContactModels);
         mAdapter = new ContactsAdapter(mContext,mShowModels);
