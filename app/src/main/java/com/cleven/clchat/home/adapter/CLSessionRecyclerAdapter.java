@@ -444,7 +444,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 baseView = layoutInflater.inflate(R.layout.message_left_audio_item,null);
             }
             return new CLAudioViewHolder(mContext,baseView,messageBean.isGroupSession());
-        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Image){
+        }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Image || messageBodyType == CLMessageBodyType.MessageBodyType_Emoji){
             View baseView;
             /// 发送
             if (messageBean.getUserInfo().getUserId().equals(currentUserId)){
