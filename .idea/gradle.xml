@@ -8,18 +8,12 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/ChatMessageView_example" />
             <option value="$PROJECT_DIR$/LQRAudioRecord_library" />
-            <option value="$PROJECT_DIR$/LQREmojiLibrary_app" />
-            <option value="$PROJECT_DIR$/LQREmojiLibrary_library" />
             <option value="$PROJECT_DIR$/LQRImagePicker_library" />
             <option value="$PROJECT_DIR$/WaveSideBar_app" />
             <option value="$PROJECT_DIR$/WaveSideBar_library" />
             <option value="$PROJECT_DIR$/XhsEmoticonsKeyboard_library" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/chat-message-view" />
-            <option value="$PROJECT_DIR$/chatkit" />
-            <option value="$PROJECT_DIR$/chatkit_sample" />
             <option value="$PROJECT_DIR$/easypermissions" />
           </set>
         </option>
