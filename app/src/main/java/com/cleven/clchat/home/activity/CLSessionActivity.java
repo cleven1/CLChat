@@ -473,9 +473,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                     Log.e("CSDN_LQR", imageItem.path);
                     String imagePath = "";
                     if (isOrig != true){ //压缩
-                        if (CLFileUtils.isSDCardAvailable()){
-                            imagePath = CLFileUtils.getCachePath() + imageItem.name;
-                        }
+                        imagePath = CLFileUtils.getCachePath() + imageItem.name;
                         Bitmap bitmapFile = BitmapUtils.getSDCardBitmapFile(imageItem.path);
                         BitmapUtils.saveBitmapToSDCardJPEG(bitmapFile,imagePath,80);
                     }else {

@@ -2,6 +2,7 @@ package com.cleven.clchat.login;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.manager.CLUploadManager;
 import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLFileUtils;
 import com.cleven.clchat.utils.CLHUDUtil;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 import com.lqr.imagepicker.ImagePicker;
@@ -36,7 +38,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import dev.utils.LogPrintUtils;
-import dev.utils.app.ADBUtils;
+import dev.utils.app.PhoneUtils;
+import dev.utils.app.image.BitmapUtils;
 import dev.utils.common.validator.ValiToPhoneUtils;
 
 public class CLRegisgerActivity extends CLBaseActivity implements View.OnClickListener {
@@ -191,9 +194,13 @@ public class CLRegisgerActivity extends CLBaseActivity implements View.OnClickLi
                 return;
             }
 
+            ///压缩图片
+            String imagePath = CLFileUtils.getCachePath() + imageItem.name;
+            Bitmap bitmapFile = BitmapUtils.getSDCardBitmapFile(imageItem.path);
+            BitmapUtils.saveBitmapToSDCardJPEG(bitmapFile,imagePath,80);
             // 先上传头像
             CLHUDUtil.showLoading(this,"正在注册账号...");
-            CLUploadManager.getInstance().uploadAvatar(imageItem.path, imageItem.name, new CLUploadManager.CLUploadOnLitenser() {
+            CLUploadManager.getInstance().uploadAvatar(imagePath, imageItem.name, new CLUploadManager.CLUploadOnLitenser() {
                 @Override
                 public void uploadSuccess(String fileName) {
                     registerHandler(fileName);
@@ -224,12 +231,13 @@ public class CLRegisgerActivity extends CLBaseActivity implements View.OnClickLi
         params.put("sms_code",etVerifyCode.getText().toString().trim());
         params.put("pwd",etPassword.getText().toString().trim());
         params.put("avatar",avatarPath);
-        params.put("identifier",TextUtils.isEmpty(ADBUtils.getIMEI()) ? "" : ADBUtils.getIMEI());
+        params.put("identifier",TextUtils.isEmpty(PhoneUtils.getUUID()) ? "" : PhoneUtils.getUUID());
         OkGo.<String>post(CLAPPConst.REGISTER).params(params).execute(new StringCallback(){
             @Override
             public void onSuccess(Response<String> response) {
                 Map parse = (Map) JSON.parse(response.body());
                 if (parse.get("error_code").equals("0")){
+                    CLHUDUtil.showSuccessHUD(CLRegisgerActivity.this,"注册成功");
                     onBackPressed();
                 }else {
                     Toast.makeText(CLRegisgerActivity.this,parse.get("error_msg").toString(),Toast.LENGTH_LONG).show();
