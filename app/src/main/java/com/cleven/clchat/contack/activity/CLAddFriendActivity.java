@@ -19,6 +19,7 @@ import com.cleven.clchat.manager.CLMQTTManager;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLHUDUtil;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 import com.cleven.clchat.utils.CLJsonUtil;
 import com.lzy.okgo.model.HttpParams;
@@ -209,6 +210,9 @@ public class CLAddFriendActivity extends CLBaseActivity {
                                 CLFriendBean bean = CLJsonUtil.parseJsonToObj(json, CLFriendBean.class);
                                 CLFriendBean.updateData(bean);
 
+                                /// 回调
+                                setResult(100);
+
                             }
 
                             @Override
@@ -217,11 +221,27 @@ public class CLAddFriendActivity extends CLBaseActivity {
                             }
                         });
                     }else {
-                        /// 通过MQTT发送添加好友
-                        CLMQTTManager.getInstance().sendAddFriendMessage(friendBean.getUserId());
-                        viewHolder.addFriend.setText("已发送");
-                        viewHolder.addFriend.setBackgroundResource(R.drawable.addfriend_text_add_shape);
-                        viewHolder.addFriend.setEnabled(false);
+                        HttpParams params = new HttpParams();
+                        params.put("user_id",friendBean.getUserId());
+                        OkGoUtil.getRequets(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/checkFriend", "checkFriend", params, new OkGoUtil.CLNetworkCallBack() {
+                            @Override
+                            public void onSuccess(Map response) {
+                                CLHUDUtil.showErrorHUD(CLAddFriendActivity.this,response.get("error_msg").toString());
+                            }
+                            @Override
+                            public void onFailure(Map error) {
+                                /// 不是好友
+                                if (error.get("error_code").equals("4002")){
+                                    /// 通过MQTT发送添加好友
+                                    CLMQTTManager.getInstance().sendAddFriendMessage(friendBean.getUserId());
+                                    viewHolder.addFriend.setText("已发送");
+                                    viewHolder.addFriend.setBackgroundResource(R.drawable.addfriend_text_add_shape);
+                                    viewHolder.addFriend.setEnabled(false);
+                                }else {
+                                    CLHUDUtil.showErrorHUD(CLAddFriendActivity.this,error.get("error_msg").toString());
+                                }
+                            }
+                        });
                     }
                 }
             });

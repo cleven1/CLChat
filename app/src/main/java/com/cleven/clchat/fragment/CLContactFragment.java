@@ -157,16 +157,8 @@ public class CLContactFragment extends CLBaseFragment {
 
         mContactModels = new ArrayList<>();
         mShowModels = new ArrayList<>();
-        CLFriendBean messageBean = new CLFriendBean();
-        messageBean.setName("消息通知");
-        messageBean.setItemType(10000);
-        messageBean.setUnreadNum(0);
-        mContactModels.add(messageBean);
-        CLFriendBean friendBean = new CLFriendBean();
-        friendBean.setName("好友通知");
-        friendBean.setItemType(10000);
-        friendBean.setUnreadNum(NEWFRIENDNOTIFAICATIONNUMBER);
-        mContactModels.add(friendBean);
+
+        initDefaultData();
 
         mShowModels.addAll(mContactModels);
         mAdapter = new ContactsAdapter(mContext, mShowModels, new ContactsAdapter.onClickItemListener() {
@@ -175,7 +167,7 @@ public class CLContactFragment extends CLBaseFragment {
                 if (postion == 1){ // 好友通知
                     Intent intent = new Intent(mContext,CLAddFriendActivity.class);
                     intent.putExtra("title","好友通知");
-                    mContext.startActivity(intent);
+                    startActivityForResult(intent,100);
                     NEWFRIENDNOTIFAICATIONNUMBER = 0;
                     refreshFriendNotication();
                 }
@@ -192,6 +184,19 @@ public class CLContactFragment extends CLBaseFragment {
             mAdapter.notifyDataSetChanged();
         }
 
+    }
+
+    private void initDefaultData(){
+        CLFriendBean messageBean = new CLFriendBean();
+        messageBean.setName("消息通知");
+        messageBean.setItemType(10000);
+        messageBean.setUnreadNum(0);
+        mContactModels.add(messageBean);
+        CLFriendBean friendBean = new CLFriendBean();
+        friendBean.setName("好友通知");
+        friendBean.setItemType(10000);
+        friendBean.setUnreadNum(NEWFRIENDNOTIFAICATIONNUMBER);
+        mContactModels.add(friendBean);
     }
 
     private void getFriendList(){
@@ -226,5 +231,21 @@ public class CLContactFragment extends CLBaseFragment {
             mContactModels.clear();
             mContactModels = null;
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100){ // 好友通知
+            /// 同意好友请求回调,刷新数据
+            List<CLFriendBean> allFriendData = CLFriendBean.getAllFriendData();
+            mContactModels.clear();
+            mShowModels.clear();
+            initDefaultData();
+            mContactModels.addAll(allFriendData);
+            mShowModels.addAll(mContactModels);
+            mAdapter.notifyDataSetChanged();
+        }
+
     }
 }
