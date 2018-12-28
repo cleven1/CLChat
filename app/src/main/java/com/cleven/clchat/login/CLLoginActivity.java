@@ -26,6 +26,7 @@ import com.lzy.okgo.model.Response;
 import java.util.Map;
 
 import dev.utils.LogPrintUtils;
+import dev.utils.app.ADBUtils;
 import dev.utils.common.validator.ValiToPhoneUtils;
 
 /**
@@ -82,7 +83,7 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
             HttpParams params = new HttpParams();
             params.put("mobile", mEtMobile.getText().toString().trim());
             params.put("pwd", mEtPassword.getText().toString().trim());
-            params.put("identifier","Android");
+            params.put("identifier",TextUtils.isEmpty(ADBUtils.getIMEI()) ? "" : ADBUtils.getIMEI());
             CLHUDUtil.showLoading(this);
             OkGo.<String>post(CLAPPConst.LOGIN).params(params).execute(new StringCallback(){
                 @Override
