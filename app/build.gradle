@@ -5,7 +5,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.cleven.clchat"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -75,4 +75,5 @@ dependencies {
     implementation project(':XhsEmoticonsKeyboard_library')
     implementation files('libs/qingstor-sdk-java-2.2.14.jar')
     implementation project(':WaveSideBar_library')
+    implementation project(':AndroidAudioConverter_lib')
 }

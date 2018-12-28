@@ -99,17 +99,28 @@ public class CLMessageBean implements RealmModel {
             }
         });
     }
+    /// 更新消息已读未读状态
+    public static void updateRecviveMessageStatus(String targetId){
+        Realm realm = Realm.getDefaultInstance();
+        List<CLMessageBean> unReadMessageData = getUserUnReadMessageData(targetId);
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (CLMessageBean messageBean : unReadMessageData){
+                    messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
+                    realm.copyToRealmOrUpdate(messageBean);
+                }
+            }
+        });
+    }
 
-    /// 更新状态
-    public static void updateMessageStatus(List<CLMessageBean> messageBeans){
+    public static void updateAudioPlayStatus(CLMessageBean messageBean){
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                for (CLMessageBean messageBean : messageBeans){
-                    messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
-                    realm.copyToRealmOrUpdate(messageBean);
-                }
+                messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_LISTENED.getTypeName());
+                realm.copyToRealmOrUpdate(messageBean);
             }
         });
     }

@@ -2,6 +2,7 @@ package com.cleven.clchat.manager;
 
 import android.os.Looper;
 
+import com.cleven.clchat.app.CLApplication;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLFileUtils;
 import com.qingstor.sdk.config.EnvContext;
@@ -18,6 +19,9 @@ import com.qingstor.sdk.upload.impl.FileRecorder;
 import java.io.File;
 import java.io.IOException;
 
+import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
+import cafe.adriel.androidaudioconverter.callback.IConvertCallback;
+import cafe.adriel.androidaudioconverter.model.AudioFormat;
 import dev.utils.LogPrintUtils;
 import dev.utils.app.assist.manager.ThreadManager;
 
@@ -58,8 +62,28 @@ public class CLUploadManager {
             LogPrintUtils.eTag("青云", "文件不存在");
             return;
         }
-        /// 上传音频
-        upload("audios/",file,fileName,litenser);
+        /// 转发音频格式
+        IConvertCallback callback = new IConvertCallback() {
+            @Override
+            public void onSuccess(File convertedFile) {
+                // So fast? Love it!
+                /// 上传音频
+                upload("audios/",convertedFile,fileName,litenser);
+            }
+            @Override
+            public void onFailure(Exception error) {
+                // Oops! Something went wrong
+            }
+        };
+        AndroidAudioConverter.with(CLApplication.mContext)
+                // Your current audio file
+                .setFile(file)
+                // Your desired audio format
+                .setFormat(AudioFormat.MP3)
+                // An callback to know when conversion is finished
+                .setCallback(callback)
+                // Start conversion
+                .convert();
     }
 
     public void uploadVideo(final String filePath,String fileName,CLUploadOnLitenser litenser){

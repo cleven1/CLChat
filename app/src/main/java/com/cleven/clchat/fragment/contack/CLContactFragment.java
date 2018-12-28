@@ -19,10 +19,12 @@ import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.activity.CLSessionActivity;
 import com.cleven.clchat.manager.CLMessageManager;
+import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLHUDUtil;
 import com.cleven.clchat.utils.CLJsonUtil;
+import com.lzy.okgo.model.HttpParams;
 import com.nanchen.wavesidebar.SearchEditText;
 import com.nanchen.wavesidebar.Trans2PinYinUtil;
 import com.nanchen.wavesidebar.WaveSideBarView;
@@ -223,7 +225,9 @@ public class CLContactFragment extends CLBaseFragment {
 
     private void getFriendList(){
         CLHUDUtil.showLoading(mContext,"正在加载好友...");
-        OkGoUtil.getRequets(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/friendList", "friendList", null, new OkGoUtil.CLNetworkCallBack() {
+        HttpParams params = new HttpParams();
+        params.put("user_id", CLUserManager.getInstence().getUserInfo().getUserId());
+        OkGoUtil.getRequets(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/friendList", "friendList", params, new OkGoUtil.CLNetworkCallBack() {
             @Override
             public void onSuccess(Map response) {
                 List list = (List) response.get("data");

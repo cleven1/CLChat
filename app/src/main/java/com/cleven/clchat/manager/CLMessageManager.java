@@ -308,9 +308,13 @@ public class CLMessageManager {
         sessionBean.setTargetId(messageBean.getTargetId());
         sessionBean.setSendTime(messageBean.getSendTime());
 
-        /// 插入数据库
-        CLSessionBean.updateData(sessionBean);
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // 插入数据库
+                CLSessionBean.updateData(sessionBean);
+            }
+        });
     }
 
     /// 收到好友请求

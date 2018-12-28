@@ -1,1 +1,1 @@
-include ':app', ':easypermissions', ':LQRAudioRecord_library', ':LQRImagePicker_library', ':XhsEmoticonsKeyboard_library', ':WaveSideBar_library', ':WaveSideBar_app'
+include ':app', ':easypermissions', ':LQRAudioRecord_library', ':LQRImagePicker_library', ':XhsEmoticonsKeyboard_library', ':WaveSideBar_library', ':WaveSideBar_app', ':AndroidAudioConverter_lib'

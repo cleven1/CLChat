@@ -8,6 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/AndroidAudioConverter_lib" />
             <option value="$PROJECT_DIR$/LQRAudioRecord_library" />
             <option value="$PROJECT_DIR$/LQRImagePicker_library" />
             <option value="$PROJECT_DIR$/WaveSideBar_app" />

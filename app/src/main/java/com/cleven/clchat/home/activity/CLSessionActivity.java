@@ -74,6 +74,8 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session);
 
+        initPickImage();
+
         getIntentParams();
 
         findViews();
@@ -101,9 +103,14 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         mRvSessionView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         scrollToBottom();
         /// 更新状态
-        CLMessageBean.updateMessageStatus(messageList);
+        CLMessageBean.updateRecviveMessageStatus(mUserId);
         /// 回调
         setResult(CLAPPConst.SESSIONMESSAGERESULTCODE);
+    }
+
+    private void initPickImage() {
+        ImagePicker imagePicker = ImagePicker.getInstance();
+        imagePicker.setSelectLimit(9);    //选中数量限制
     }
 
     private void initEmoticonsKeyBoardBar() {

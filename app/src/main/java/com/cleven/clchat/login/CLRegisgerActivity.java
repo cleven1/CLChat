@@ -1,9 +1,7 @@
 package com.cleven.clchat.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.bumptech.glide.Glide;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.manager.CLUploadManager;
@@ -64,16 +61,6 @@ public class CLRegisgerActivity extends CLBaseActivity implements View.OnClickLi
 
     private void initPickImage() {
         ImagePicker imagePicker = ImagePicker.getInstance();
-        imagePicker.setImageLoader(new com.lqr.imagepicker.loader.ImageLoader() {
-            @Override
-            public void displayImage(Activity activity, String path, ImageView imageView, int width, int height) {
-                Glide.with(CLRegisgerActivity.this).load(Uri.parse("file://" + path).toString()).into(imageView);
-            }
-            @Override
-            public void clearMemoryCache() {
-
-            }
-        });   //设置图片加载器
         imagePicker.setShowCamera(true);  //显示拍照按钮
         imagePicker.setCrop(true);        //允许裁剪（单选才有效）
         imagePicker.setSaveRectangle(true); //是否按矩形区域保存

@@ -22,6 +22,8 @@ import com.lzy.okgo.model.HttpHeaders;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
+import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 import dev.DevUtils;
 import dev.utils.app.logger.DevLogger;
 import dev.utils.app.logger.LogConfig;
@@ -53,6 +55,21 @@ public class CLApplication extends Application {
 
         initRealm();
 
+        initAudioConvert();
+
+    }
+
+    private void initAudioConvert() {
+        AndroidAudioConverter.load(this, new ILoadCallback() {
+            @Override
+            public void onSuccess() {
+                // Great!
+            }
+            @Override
+            public void onFailure(Exception error) {
+                // FFmpeg is not supported by device
+            }
+        });
     }
 
     /**

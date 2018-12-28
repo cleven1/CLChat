@@ -212,6 +212,8 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                     });
                     /// 状态改为已听
                     messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_LISTENED.getTypeName());
+                    /// 更新数据库
+                    CLMessageBean.updateAudioPlayStatus(messageBean);
                 }
             });
 

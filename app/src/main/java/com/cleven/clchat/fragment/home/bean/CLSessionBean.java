@@ -150,7 +150,17 @@ public class CLSessionBean implements RealmModel {
     }
 
     public String getContent() {
-        return TextUtils.isEmpty(content) ? "" : content;
+        if (getMessageType() == CLMessageBodyType.MessageBodyType_Image){
+            return "图片消息";
+        }else if (getMessageType() == CLMessageBodyType.MessageBodyType_Video){
+            return "短视频消息";
+        }else if (getMessageType() == CLMessageBodyType.MessageBodyType_Voice){
+            return "语音消息";
+        }else if (getMessageType() == CLMessageBodyType.MessageBodyType_RedPacket){
+            return "红包消息";
+        }else {
+            return TextUtils.isEmpty(content) ? "" : content;
+        }
     }
 
     public void setContent(String content) {
