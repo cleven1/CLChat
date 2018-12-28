@@ -60,7 +60,7 @@ public class CLUserBean implements RealmModel {
     }
 
     public String getName() {
-        return name;
+        return TextUtils.isEmpty(name) ? "" : name;
     }
 
     public void setName(String name) {
@@ -84,7 +84,7 @@ public class CLUserBean implements RealmModel {
     }
 
     public String getBirthday() {
-        return birthday;
+        return TextUtils.isEmpty(birthday) ? "" : birthday;
     }
 
     public void setBirthday(String birthday) {
@@ -92,7 +92,7 @@ public class CLUserBean implements RealmModel {
     }
 
     public String getAliasName() {
-        return aliasName;
+        return TextUtils.isEmpty(aliasName) ? "" : aliasName;
     }
 
     public void setAliasName(String aliasName) {
@@ -100,7 +100,7 @@ public class CLUserBean implements RealmModel {
     }
 
     public String getDescription() {
-        return description;
+        return TextUtils.isEmpty(description) ? "" : description;
     }
 
     public void setDescription(String description) {
@@ -108,7 +108,7 @@ public class CLUserBean implements RealmModel {
     }
 
     public String getCity() {
-        return city;
+        return TextUtils.isEmpty(city) ? "" : city;
     }
 
     public void setCity(String city) {

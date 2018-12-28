@@ -100,6 +100,10 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         mRvSessionView.setAdapter(adapter);
         mRvSessionView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         scrollToBottom();
+        /// 更新状态
+        CLMessageBean.updateMessageStatus(messageList);
+        /// 回调
+        setResult(CLAPPConst.SESSIONMESSAGERESULTCODE);
     }
 
     private void initEmoticonsKeyBoardBar() {

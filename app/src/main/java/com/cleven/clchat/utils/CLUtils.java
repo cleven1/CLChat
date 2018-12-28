@@ -18,7 +18,9 @@ import dev.utils.common.FileUtils;
 
 public class CLUtils {
     /// 时间戳,毫秒级
-    public static long timeStamp  = (long) (System.currentTimeMillis());
+    public static long getTimeStamp(){
+        return (long) (System.currentTimeMillis());
+    };
 
     /// 获取UUID
     public static String getUUID() {
@@ -28,8 +30,12 @@ public class CLUtils {
     }
 
     public static String formatTime(String time){
-        long parseLong = Long.parseLong(time) / 1000;
-        long currentTime = timeStamp/1000;
+        long parseLong = Long.parseLong(time);
+        if (parseLong == 0){
+            return "";
+        }
+        parseLong = parseLong  / 1000;
+        long currentTime = getTimeStamp() /1000;
         long marginTime = currentTime - parseLong;
 
         String formatTime = DateUtils.formatTime(Long.parseLong(time), "yyyy-MM-dd HH:mm:ss");

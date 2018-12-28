@@ -1,6 +1,7 @@
 package com.cleven.clchat.fragment.home;
 
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -13,13 +14,12 @@ import android.widget.TextView;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseFragment;
 import com.cleven.clchat.fragment.home.bean.CLSessionBean;
+import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
 import com.cleven.clchat.home.activity.CLSessionActivity;
-import com.cleven.clchat.manager.CLMessageManager;
+import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static dev.DevUtils.runOnUiThread;
@@ -32,6 +32,7 @@ public class CLHomeFragment extends CLBaseFragment {
 
     private ListView listView;
     private List<CLSessionBean> dataArray;
+    private MyAdapter adapter;
 
     @Override
     public View initView() {
@@ -52,21 +53,16 @@ public class CLHomeFragment extends CLBaseFragment {
         dataArray = CLSessionBean.getAllSessionData();
 
         //设置适配器
-        MyAdapter adapter = new MyAdapter();
+        adapter = new MyAdapter();
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new MyOnItemClickListener());
 
-        CLMessageManager.getInstance().setReceiveSessionOnListener(new CLMessageManager.CLReceiveSessionOnListener() {
+        /// 监听数据插入数据库成功后回调
+        CLSessionBean.setReceiveSessionOnListener(new CLSessionBean.CLReceiveSessionOnListener() {
             @Override
-            public void onMessage(CLSessionBean sessionBean) {
-                dataArray.add(sessionBean);
-                Collections.sort(dataArray, new Comparator<CLSessionBean>() {
-                    @Override
-                    public int compare(CLSessionBean o1, CLSessionBean o2) {
-                        return o1.getSendTime().compareTo(o2.getSendTime());
-                    }
-                });
+            public void onMessage() {
+                dataArray = CLSessionBean.getAllSessionData();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -85,7 +81,15 @@ public class CLHomeFragment extends CLBaseFragment {
             Intent intent = new Intent(mContext,CLSessionActivity.class);
             intent.putExtra("userName", sessionBean.getName());
             intent.putExtra("userId", sessionBean.getTargetId());
-            mContext.startActivity(intent);
+            startActivityForResult(intent,CLAPPConst.SESSIONMESSAGERESULTCODE);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == CLAPPConst.SESSIONMESSAGERESULTCODE){
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -126,11 +130,24 @@ public class CLHomeFragment extends CLBaseFragment {
             }
 
             CLSessionBean sessionBean = dataArray.get(i);
-            viewHolder.content.setText(sessionBean.getContent());
+            if (TextUtils.isEmpty(sessionBean.getContent())){
+                viewHolder.content.setVisibility(View.GONE);
+            }else {
+                viewHolder.content.setVisibility(View.VISIBLE);
+                /// 过滤出表情,直接展示
+                CLEmojiCommonUtils.spannableEmoticonFilter(viewHolder.content,sessionBean.getContent());
+            }
             CLImageLoadUtil.loadRoundImg(viewHolder.avatar,sessionBean.getAvatarUrl(),R.drawable.avatar,20);
             viewHolder.nickName.setText(sessionBean.getName());
             viewHolder.time.setText(sessionBean.getSendTime());
-            viewHolder.unread_count.setText(sessionBean.getUnreadNumber());
+
+            if (sessionBean.getUnreadNumber() > 0){
+                viewHolder.unread_count.setText("" + sessionBean.getUnreadNumber());
+                viewHolder.unread_count.setVisibility(View.VISIBLE);
+            }else {
+                viewHolder.unread_count.setVisibility(View.GONE);
+            }
+
 
             return view;
         }

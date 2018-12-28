@@ -1,5 +1,7 @@
 package com.cleven.clchat.fragment.home.bean;
 
+import android.text.TextUtils;
+
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLSendStatus;
@@ -60,6 +62,18 @@ public class CLSessionBean implements RealmModel {
      */
     private int messageType;
 
+
+    /**
+     * 定义消息会话回调的接口
+     */
+    public interface CLReceiveSessionOnListener{
+        void onMessage();
+    }
+    private static CLReceiveSessionOnListener receiveSessionOnListener;
+    public static void setReceiveSessionOnListener(CLReceiveSessionOnListener onListener) {
+        receiveSessionOnListener = onListener;
+    }
+
     /// 插入或者更新数据
     public static void updateData(CLSessionBean sessionBean){
         Realm realm = Realm.getDefaultInstance();
@@ -67,6 +81,13 @@ public class CLSessionBean implements RealmModel {
             @Override
             public void execute(Realm realm) {
                 realm.copyToRealmOrUpdate(sessionBean);
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                if (receiveSessionOnListener != null){
+                    receiveSessionOnListener.onMessage();
+                }
             }
         });
     }
@@ -105,7 +126,7 @@ public class CLSessionBean implements RealmModel {
     }
 
     public String getName() {
-        return name;
+        return TextUtils.isEmpty(name) ? "" : name;
     }
 
     public void setName(String name) {
@@ -113,7 +134,7 @@ public class CLSessionBean implements RealmModel {
     }
 
     public String getAliasName() {
-        return aliasName;
+        return TextUtils.isEmpty(aliasName) ? "" : aliasName;
     }
 
     public void setAliasName(String aliasName) {
@@ -129,7 +150,7 @@ public class CLSessionBean implements RealmModel {
     }
 
     public String getContent() {
-        return content;
+        return TextUtils.isEmpty(content) ? "" : content;
     }
 
     public void setContent(String content) {
@@ -145,7 +166,7 @@ public class CLSessionBean implements RealmModel {
     }
 
     public String getSendTime() {
-        return CLUtils.formatTime(sendTime);
+        return CLUtils.formatTime(TextUtils.isEmpty(sendTime) ? "0" : sendTime);
     }
 
     public void setSendTime(String sendTime) {
@@ -153,7 +174,7 @@ public class CLSessionBean implements RealmModel {
     }
 
     public String getTargetId() {
-        return targetId;
+        return TextUtils.isEmpty(targetId) ? "" : targetId;
     }
 
     public void setTargetId(String targetId) {

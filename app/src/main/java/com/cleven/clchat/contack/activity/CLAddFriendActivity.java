@@ -211,7 +211,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                                 CLFriendBean.updateData(bean);
 
                                 /// 回调
-                                setResult(100);
+                                setResult(CLAPPConst.ADDFRIENDRESULTCODE);
 
                             }
 

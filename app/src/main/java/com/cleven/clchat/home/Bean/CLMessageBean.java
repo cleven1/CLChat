@@ -77,17 +77,16 @@ public class CLMessageBean implements RealmModel {
      * 发送者的用户信息
      */
     private CLUserBean userInfo;
-
-    /**
-     * 消息中的@提醒信息
-     */
-    @Ignore
-    private CLMentionedInfo mentionedInfo;
     /**
      * 收到消息的状态
      * CLReceivedStatus
      */
     private int receivedStatus;
+    /**
+     * 消息中的@提醒信息
+     */
+    @Ignore
+    private CLMentionedInfo mentionedInfo;
 
 
     /// 插入或者更新数据
@@ -97,6 +96,20 @@ public class CLMessageBean implements RealmModel {
             @Override
             public void execute(Realm realm) {
                 realm.copyToRealmOrUpdate(messageBean);
+            }
+        });
+    }
+
+    /// 更新状态
+    public static void updateMessageStatus(List<CLMessageBean> messageBeans){
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (CLMessageBean messageBean : messageBeans){
+                    messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
+                    realm.copyToRealmOrUpdate(messageBean);
+                }
             }
         });
     }
@@ -128,7 +141,8 @@ public class CLMessageBean implements RealmModel {
                 .equalTo("targetId",targetId)
                 .equalTo("receivedStatus", CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName())
                 .findAll();
-        return realm.copyFromRealm(sessionBeans);
+        List<CLMessageBean> beanList = realm.copyFromRealm(sessionBeans);
+        return beanList;
     }
 
     /// 根据用户删除数据

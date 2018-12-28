@@ -72,4 +72,8 @@ public class CLAPPConst {
     public static final String VIDEO_SAVE_DIR = CLFileUtils.getDir("video");
     //照片存放位置
     public static final String PHOTO_SAVE_DIR = CLFileUtils.getDir("photo");
+    /// 聊天界面回传值code
+    public static final int SESSIONMESSAGERESULTCODE = 10000;
+    /// 添加好友界面回传值code
+    public static final int ADDFRIENDRESULTCODE = 100;
 }

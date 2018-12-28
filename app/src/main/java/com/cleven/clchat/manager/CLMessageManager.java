@@ -68,17 +68,6 @@ public class CLMessageManager {
     }
 
     /**
-     * 定义消息会话回调的接口
-     */
-    public interface CLReceiveSessionOnListener{
-        void onMessage(CLSessionBean sessionBean);
-    }
-    private CLReceiveSessionOnListener receiveSessionOnListener;
-    public void setReceiveSessionOnListener(CLReceiveSessionOnListener receiveSessionOnListener) {
-        this.receiveSessionOnListener = receiveSessionOnListener;
-    }
-
-    /**
      * 定义收到好友请求接口
      */
     public interface CLReceiveFriendOnListener{
@@ -109,7 +98,7 @@ public class CLMessageManager {
             message.setHeight(size[1]);
         }
 
-        String imageName = CLUtils.timeStamp + ".png";
+        String imageName = CLUtils.getTimeStamp() + ".png";
         message.setMediaUrl(imageName);
         /// 发送者信息
         message.setUserInfo(CLUserManager.getInstence().getUserInfo());
@@ -162,7 +151,7 @@ public class CLMessageManager {
         /// 消息类型
         message.setMessageType(CLMessageBodyType.MessageBodyType_Voice.getTypeName());
         message.setLocalUrl(filePath);
-        String fileName = CLUtils.timeStamp + ".mp3";
+        String fileName = CLUtils.getTimeStamp() + ".mp3";
         message.setMediaUrl(fileName);
         message.setDuration(duration);
         /// 发送者信息
@@ -189,7 +178,7 @@ public class CLMessageManager {
         /// 消息类型
         message.setMessageType(CLMessageBodyType.MessageBodyType_Video.getTypeName());
         message.setLocalUrl(filePath);
-        String videoName = CLUtils.timeStamp + ".mp4";
+        String videoName = CLUtils.getTimeStamp() + ".mp4";
         message.setMediaUrl(videoName);
         int[] size = BitmapUtils.getImageWidthHeight(CLEmojiFileUtils.getFolderPath("/") + thumnailPath);
         /// 设置图片的size
@@ -244,10 +233,13 @@ public class CLMessageManager {
             message.setSendStatus(SendStatus_SENDING.getTypeName());
         }
         /// 发送时间
-        message.setSendTime("" + CLUtils.timeStamp);
+        message.setSendTime("" + CLUtils.getTimeStamp());
+        /// 自己发的标记为已读
+        message.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
 
         /// 插入数据库
         CLMessageBean.insertMessageData(message);
+        SessionMessageHandler(message);
 
         String jsonString = JSON.toJSONString(message);
 
@@ -268,6 +260,7 @@ public class CLMessageManager {
                     messageBean.setSendStatus(SendStatus_SEND.getTypeName());
                     /// 更新数据库
                     CLMessageBean.insertMessageData(messageBean);
+                    SessionMessageHandler(messageBean);
                     messageStatusOnListener.onSuccess(messageBean);
                 }
             }
@@ -280,6 +273,7 @@ public class CLMessageManager {
                     messageBean.setSendStatus(SendStatus_FAILED.getTypeName());
                     /// 更新数据库
                     CLMessageBean.insertMessageData(messageBean);
+                    SessionMessageHandler(messageBean);
                     messageStatusOnListener.onFailure(messageBean);
                 }
             }
@@ -300,22 +294,23 @@ public class CLMessageManager {
     }
 
     /// 插入消息会话列表
-    private void SessionMessageHandler(CLMessageBean messageBean){
+    public void SessionMessageHandler(CLMessageBean messageBean){
         CLSessionBean sessionBean = new CLSessionBean();
-        sessionBean.setAliasName(messageBean.getUserInfo().getAliasName());
-        sessionBean.setAvatarUrl(messageBean.getUserInfo().getAvatarUrl());
+        if (messageBean.getUserInfo() != null){
+            sessionBean.setAliasName(messageBean.getUserInfo().getAliasName());
+            sessionBean.setAvatarUrl(messageBean.getUserInfo().getAvatarUrl());
+            sessionBean.setName(messageBean.getUserInfo().getName());
+        }
         sessionBean.setContent(messageBean.getContent());
         sessionBean.setGroupSession(messageBean.isGroupSession());
         sessionBean.setMessageType(messageBean.getMessageType());
-        sessionBean.setName(messageBean.getUserInfo().getName());
         sessionBean.setSendStatus(messageBean.getSendStatus());
         sessionBean.setTargetId(messageBean.getTargetId());
-        sessionBean.setTargetId(messageBean.getUserInfo().getUserId());
+        sessionBean.setSendTime(messageBean.getSendTime());
+
         /// 插入数据库
         CLSessionBean.updateData(sessionBean);
-        if (receiveSessionOnListener != null){
-            receiveSessionOnListener.onMessage(sessionBean);
-        }
+
     }
 
     /// 收到好友请求

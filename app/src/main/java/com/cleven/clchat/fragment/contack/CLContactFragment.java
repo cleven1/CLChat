@@ -16,8 +16,10 @@ import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.contack.bean.CLNewFriendBean;
 import com.cleven.clchat.fragment.contack.adpater.ContactsAdapter;
 import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
+import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.activity.CLSessionActivity;
 import com.cleven.clchat.manager.CLMessageManager;
+import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLHUDUtil;
 import com.cleven.clchat.utils.CLJsonUtil;
@@ -172,7 +174,7 @@ public class CLContactFragment extends CLBaseFragment {
                 }else if (postion == 1){ // 好友通知
                     Intent intent = new Intent(mContext,CLAddFriendActivity.class);
                     intent.putExtra("title","好友通知");
-                    startActivityForResult(intent,100);
+                    startActivityForResult(intent,CLAPPConst.ADDFRIENDRESULTCODE);
                     NEWFRIENDNOTIFAICATIONNUMBER = 0;
                     refreshFriendNotication();
                 }else { // 跳到聊天界面
@@ -180,6 +182,16 @@ public class CLContactFragment extends CLBaseFragment {
                     intent.putExtra("userName",friendBean.getName());
                     intent.putExtra("userId",friendBean.getUserId());
                     mContext.startActivity(intent);
+                    CLMessageBean messageBean = new CLMessageBean();
+                    messageBean.setTargetId(friendBean.getUserId());
+                    CLUserBean userBean = new CLUserBean();
+                    userBean.setName(friendBean.getName());
+                    userBean.setAliasName(friendBean.getAliasName());
+                    userBean.setAvatarUrl(friendBean.getAvatarUrl());
+                    userBean.setBirthday(friendBean.getBirthday());
+                    userBean.setCity(friendBean.getCity());
+                    messageBean.setUserInfo(userBean);
+                    CLMessageManager.getInstance().SessionMessageHandler(messageBean);
                 }
             }
         });
@@ -246,7 +258,7 @@ public class CLContactFragment extends CLBaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100){ // 好友通知
+        if (requestCode == CLAPPConst.ADDFRIENDRESULTCODE){ // 好友通知
             /// 同意好友请求回调,刷新数据
             List<CLFriendBean> allFriendData = CLFriendBean.getAllFriendData();
             mContactModels.clear();
