@@ -420,9 +420,14 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        AudioRecordManager.getInstance(CLSessionActivity.this).startRecord();
+                        if (EasyPermissions.hasPermissions(CLSessionActivity.this,Manifest.permission.RECORD_AUDIO)){
+                            AudioRecordManager.getInstance(CLSessionActivity.this).startRecord();
+                        }
                         break;
                     case MotionEvent.ACTION_MOVE:
+                        if (!EasyPermissions.hasPermissions(CLSessionActivity.this,Manifest.permission.RECORD_AUDIO)){
+                            return false;
+                        }
                         if (isCancelled(view, motionEvent)) {
                             AudioRecordManager.getInstance(CLSessionActivity.this).willCancelRecord();
                         } else {
@@ -430,6 +435,9 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                         }
                         break;
                     case MotionEvent.ACTION_UP:
+                        if (!EasyPermissions.hasPermissions(CLSessionActivity.this,Manifest.permission.RECORD_AUDIO)){
+                            return false;
+                        }
                         AudioRecordManager.getInstance(CLSessionActivity.this).stopRecord();
                         AudioRecordManager.getInstance(CLSessionActivity.this).destroyRecord();
                         break;
@@ -507,7 +515,9 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
     }
 
     private void sendMessage(CLMessageBean messageBean){
-
+        if (messageList.contains(messageBean)){
+            return;
+        }
         messageList.add(messageBean);
         /// 插入并刷新
         adapter.notifyItemInserted(messageList.size());
@@ -535,11 +545,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        messageList.add(message);
-                        /// 插入并刷新
-                        adapter.notifyItemInserted(messageList.size());
-                        /// 滚到最后一个位置
-                        scrollToBottom();
+                        sendMessage(message);
                     }
                 });
             }

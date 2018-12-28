@@ -82,6 +82,18 @@ public class CLFriendBean implements RealmModel {
 
     }
 
+    /// 获取好友信息
+    public static CLFriendBean getFriendUserInfo(String userId){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLFriendBean> all = realm.where(CLFriendBean.class)
+                .equalTo("userId",userId)
+                .findAll();
+        if (all.size() > 0){
+            return realm.copyFromRealm(all.first());
+        }
+        return null;
+    }
+
     /// 查询所有
     public static List<CLFriendBean> getAllFriendData(){
         List<CLFriendBean> list = new ArrayList<>();

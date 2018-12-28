@@ -156,8 +156,12 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 });
             }else if (CLSendStatus.fromTypeName(messageBean.getSendStatus()) == CLSendStatus.SendStatus_SEND){
                 // 发送成功
-                pbBar.setVisibility(View.GONE);
-                sendfail.setVisibility(View.GONE);
+                if (pbBar != null){
+                    pbBar.setVisibility(View.GONE);
+                }
+                if (sendfail != null){
+                    sendfail.setVisibility(View.GONE);
+                }
                 mAudio_duration.setVisibility(View.VISIBLE);
             }
 

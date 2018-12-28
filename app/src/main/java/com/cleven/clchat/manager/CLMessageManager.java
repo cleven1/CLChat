@@ -3,6 +3,7 @@ package com.cleven.clchat.manager;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.contack.bean.CLNewFriendBean;
 import com.cleven.clchat.fragment.home.bean.CLSessionBean;
 import com.cleven.clchat.home.Bean.CLMessageBean;
@@ -296,7 +297,12 @@ public class CLMessageManager {
     /// 插入消息会话列表
     public void SessionMessageHandler(CLMessageBean messageBean){
         CLSessionBean sessionBean = new CLSessionBean();
-        if (messageBean.getUserInfo() != null){
+        CLFriendBean friendUserInfo = CLFriendBean.getFriendUserInfo(messageBean.getTargetId());
+        if (friendUserInfo != null){
+            sessionBean.setAliasName(friendUserInfo.getAliasName());
+            sessionBean.setAvatarUrl(friendUserInfo.getAvatarUrl());
+            sessionBean.setName(friendUserInfo.getName());
+        }else {
             sessionBean.setAliasName(messageBean.getUserInfo().getAliasName());
             sessionBean.setAvatarUrl(messageBean.getUserInfo().getAvatarUrl());
             sessionBean.setName(messageBean.getUserInfo().getName());
