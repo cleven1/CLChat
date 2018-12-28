@@ -2,15 +2,22 @@ package com.cleven.clchat.model;
 
 import android.text.TextUtils;
 
+import com.cleven.clchat.utils.CLAPPConst;
+
+import io.realm.RealmModel;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.RealmClass;
+
 /**
  * Created by cleven on 2018/12/14.
  */
-
-public class CLUserBean {
+@RealmClass
+public class CLUserBean implements RealmModel {
 
     /**
      * 用户id
      */
+    @PrimaryKey
     private String userId;
     /**
      * 用户昵称
@@ -61,7 +68,7 @@ public class CLUserBean {
     }
 
     public String getAvatarUrl() {
-        return avatarUrl;
+        return CLAPPConst.QINGCLOUD_AVATAR_URL + avatarUrl;
     }
 
     public void setAvatarUrl(String avatarUrl) {

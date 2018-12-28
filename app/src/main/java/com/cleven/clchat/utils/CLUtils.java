@@ -19,7 +19,7 @@ public class CLUtils {
     /// 时间戳,毫秒级
     public static long timeStamp  = (long) (System.currentTimeMillis());
 
-    public static String formatTiem(String time){
+    public static String formatTime(String time){
         long parseLong = Long.parseLong(time) / 1000;
         long currentTime = timeStamp/1000;
         long marginTime = currentTime - parseLong;
@@ -54,9 +54,25 @@ public class CLUtils {
             if (FileUtils.isFileExists(message.getLocalUrl())){
                 return message.getLocalUrl();
             }else {
+                CLMessageBodyType type = CLMessageBodyType.fromTypeName(message.getMessageType());
+                if (type == CLMessageBodyType.MessageBodyType_Image){
+                    return CLAPPConst.QINGCLOUD_IMAGE_URL + message.getMediaUrl();
+                }else if (type == CLMessageBodyType.MessageBodyType_Video){
+                    return CLAPPConst.QINGCLOUD_VIDEO_URL + message.getMediaUrl();
+                }else if (type == CLMessageBodyType.MessageBodyType_Voice){
+                    return CLAPPConst.QINGCLOUD_AUDIO_URL + message.getMediaUrl();
+                }
                 return message.getMediaUrl();
             }
         }else{
+            CLMessageBodyType type = CLMessageBodyType.fromTypeName(message.getMessageType());
+            if (type == CLMessageBodyType.MessageBodyType_Image){
+                return CLAPPConst.QINGCLOUD_IMAGE_URL + message.getMediaUrl();
+            }else if (type == CLMessageBodyType.MessageBodyType_Video){
+                return CLAPPConst.QINGCLOUD_VIDEO_URL + message.getMediaUrl();
+            }else if (type == CLMessageBodyType.MessageBodyType_Voice){
+                return CLAPPConst.QINGCLOUD_AUDIO_URL + message.getMediaUrl();
+            }
             return message.getMediaUrl();
         }
 

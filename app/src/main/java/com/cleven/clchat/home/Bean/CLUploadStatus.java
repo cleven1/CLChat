@@ -27,8 +27,8 @@ public enum CLUploadStatus {
      *
      * @param typeName 类型名称
      */
-    public static CLSendStatus fromTypeName(int typeName) {
-        for (CLSendStatus type : CLSendStatus.values()) {
+    public static CLUploadStatus fromTypeName(int typeName) {
+        for (CLUploadStatus type : CLUploadStatus.values()) {
             if (type.getTypeName() == typeName) {
                 return type;
             }

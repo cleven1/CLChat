@@ -4,8 +4,10 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.cleven.clchat.contack.bean.CLNewFriendBean;
+import com.cleven.clchat.fragment.home.bean.CLSessionBean;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
+import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 import com.cleven.clchat.utils.CLJsonUtil;
 import com.cleven.clchat.utils.CLUtils;
@@ -63,6 +65,17 @@ public class CLMessageManager {
     private CLReceiveMessageOnListener receiveMessageOnListener;
     public void setReceiveMessageOnListener(CLReceiveMessageOnListener receiveMessageOnListener) {
         this.receiveMessageOnListener = receiveMessageOnListener;
+    }
+
+    /**
+     * 定义消息会话回调的接口
+     */
+    public interface CLReceiveSessionOnListener{
+        void onMessage(CLSessionBean sessionBean);
+    }
+    private CLReceiveSessionOnListener receiveSessionOnListener;
+    public void setReceiveSessionOnListener(CLReceiveSessionOnListener receiveSessionOnListener) {
+        this.receiveSessionOnListener = receiveSessionOnListener;
     }
 
     /**
@@ -236,7 +249,7 @@ public class CLMessageManager {
             message.setSendStatus(SendStatus_SENDING.getTypeName());
         }
         /// 发送时间
-        message.setSentTime("" + CLUtils.timeStamp);
+        message.setSendTime("" + CLUtils.timeStamp);
 
         String jsonString = JSON.toJSONString(message);
 
@@ -275,8 +288,31 @@ public class CLMessageManager {
     /// 收到聊天消息
     public void receiveMessageHandler(String msg){
         CLMessageBean messageBean = JSON.parseObject(msg, CLMessageBean.class);
+        messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName());
+        /// 插入数据库
+        CLMessageBean.updateData(messageBean);
+        SessionMessageHandler(messageBean);
         if (receiveMessageOnListener != null){
             receiveMessageOnListener.onMessage(messageBean);
+        }
+    }
+
+    /// 插入消息会话列表
+    private void SessionMessageHandler(CLMessageBean messageBean){
+        CLSessionBean sessionBean = new CLSessionBean();
+        sessionBean.setAliasName(messageBean.getUserInfo().getAliasName());
+        sessionBean.setAvatarUrl(messageBean.getUserInfo().getAvatarUrl());
+        sessionBean.setContent(messageBean.getContent());
+        sessionBean.setGroupSession(messageBean.isGroupSession());
+        sessionBean.setMessageType(messageBean.getMessageType());
+        sessionBean.setName(messageBean.getUserInfo().getName());
+        sessionBean.setSendStatus(messageBean.getSendStatus());
+        sessionBean.setTargetId(messageBean.getTargetId());
+        sessionBean.setTargetId(messageBean.getUserInfo().getUserId());
+        /// 插入数据库
+        CLSessionBean.updateData(sessionBean);
+        if (receiveSessionOnListener != null){
+            receiveSessionOnListener.onMessage(sessionBean);
         }
     }
 

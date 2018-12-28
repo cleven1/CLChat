@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
+import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.home.Bean.CLUploadStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
@@ -86,6 +87,16 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         obseverReceiveMessage();
 
         initAudioRecord();
+
+        initData();
+    }
+
+    private void initData() {
+        /// 在数据库中获取历史聊天信息
+        messageList = CLMessageBean.getAllMessageData();
+        adapter.notifyDataSetChanged();
+        scrollToBottom();
+
     }
 
     private void initEmoticonsKeyBoardBar() {
@@ -510,6 +521,11 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 if (!targetUserId.equals(mUserId)){
                     return;
                 }
+                /// 状态修改为已读
+                message.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
+                //TODO: 存储数据库
+                CLMessageBean.updateData(message);
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -517,7 +533,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                         /// 插入并刷新
                         adapter.notifyItemInserted(messageList.size());
                         /// 滚到最后一个位置
-                        mRvSessionView.scrollToPosition(messageList.size() - 1);
+                        scrollToBottom();
                     }
                 });
             }
@@ -554,7 +570,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
             CLMessageBean bean = messageList.get(i - 1);
             if (bean.getMessageId().equals(message.getMessageId())){
                 bean.setSendStatus(message.getSendStatus());
-                bean.setUploadStatus(message.getUploadStatus());
+                bean.setUploadStatus(message.getUploadStatus().getTypeName());
                 final int finalI = i;
                 runOnUiThread(new Runnable() {
                     @Override
@@ -571,7 +587,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         for (int i = messageList.size(); i > 0; i--){
             final CLMessageBean bean = messageList.get(i - 1);
             if (bean.getMediaUrl().equals(fileName)) {
-                bean.setUploadStatus(status);
+                bean.setUploadStatus(status.getTypeName());
                 if (status == CLUploadStatus.UploadStatus_success){
                     bean.setSendStatus(CLSendStatus.SendStatus_SEND.getTypeName());
                     CLMessageManager.getInstance().sendMessage(bean,mUserId);

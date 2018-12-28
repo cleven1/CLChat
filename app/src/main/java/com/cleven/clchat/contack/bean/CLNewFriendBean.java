@@ -98,9 +98,9 @@ public class CLNewFriendBean implements RealmModel{
     }
 
     /// 根据用户删除
-    public static void deleteUser(CLNewFriendBean friendBean){
+    public static void deleteUser(String userId){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLNewFriendBean> beans = realm.where(CLNewFriendBean.class).equalTo("userId", friendBean.getUserId()).findAll();
+        RealmResults<CLNewFriendBean> beans = realm.where(CLNewFriendBean.class).equalTo("userId", userId).findAll();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

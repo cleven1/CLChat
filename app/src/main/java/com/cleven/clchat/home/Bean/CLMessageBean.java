@@ -2,11 +2,22 @@ package com.cleven.clchat.home.Bean;
 
 import com.cleven.clchat.model.CLUserBean;
 
-public class CLMessageBean {
+import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmModel;
+import io.realm.RealmResults;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.RealmClass;
+
+@RealmClass
+public class CLMessageBean implements RealmModel {
 
     /**
      * 消息id
      */
+    @PrimaryKey
     private String messageId;
     /**
      * 文本内容
@@ -18,12 +29,13 @@ public class CLMessageBean {
     private int sendStatus;
     /**
      * 文件上传状态
+     * CLUploadStatus
      */
-    private CLUploadStatus uploadStatus;
+    private int uploadStatus;
     /**
      * 消息的发送时间
      */
-    private String sentTime;
+    private String sendTime;
     /**
      * 目标会话id
      */
@@ -69,12 +81,67 @@ public class CLMessageBean {
     /**
      * 消息中的@提醒信息
      */
+    @Ignore
     private CLMentionedInfo mentionedInfo;
     /**
      * 收到消息的状态
+     * CLReceivedStatus
      */
-    private CLReceivedStatus receivedStatus;
+    private int receivedStatus;
 
+
+    /// 插入或者更新数据
+    public static void updateData(CLMessageBean messageBean){
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.copyToRealmOrUpdate(messageBean);
+            }
+        });
+    }
+
+    /// 查询所有消息
+    public static List<CLMessageBean> getAllMessageData(){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class).findAll();
+        /// 根据发送时间排序
+        sessionBeans = sessionBeans.sort("sendTime");
+        return realm.copyFromRealm(sessionBeans);
+    }
+
+    /// 查询所有未读的消息
+    public static List<CLMessageBean> getAllUnReadMessageData(){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("receivedStatus", CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName())
+                .findAll();
+        return realm.copyFromRealm(sessionBeans);
+    }
+
+    /// 根据用户删除数据
+    public static void deleteUserMessageData(String targetId){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLMessageBean> results = realm.where(CLMessageBean.class).equalTo("targetId", targetId).findAll();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                results.deleteAllFromRealm();
+            }
+        });
+    }
+
+    /// 删除所有
+    public static void deleteAllMessageData(){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLMessageBean> all = realm.where(CLMessageBean.class).findAll();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                all.deleteAllFromRealm();
+            }
+        });
+    }
 
     public String getMessageId() {
         return messageId;
@@ -100,12 +167,12 @@ public class CLMessageBean {
         this.sendStatus = sendStatus;
     }
 
-    public String getSentTime() {
-        return sentTime;
+    public String getSendTime() {
+        return sendTime;
     }
 
-    public void setSentTime(String sentTime) {
-        this.sentTime = sentTime;
+    public void setSendTime(String sendTime) {
+        this.sendTime = sendTime;
     }
 
     public String getTargetId() {
@@ -145,18 +212,18 @@ public class CLMessageBean {
     }
 
     public CLReceivedStatus getReceivedStatus() {
-        return receivedStatus;
+        return CLReceivedStatus.fromTypeName(receivedStatus);
     }
 
-    public void setReceivedStatus(CLReceivedStatus receivedStatus) {
+    public void setReceivedStatus(int receivedStatus) {
         this.receivedStatus = receivedStatus;
     }
 
     public CLUploadStatus getUploadStatus() {
-        return uploadStatus;
+        return CLUploadStatus.fromTypeName(uploadStatus);
     }
 
-    public void setUploadStatus(CLUploadStatus uploadStatus) {
+    public void setUploadStatus(int uploadStatus) {
         this.uploadStatus = uploadStatus;
     }
 
@@ -218,7 +285,7 @@ public class CLMessageBean {
                 "messageId='" + messageId + '\'' +
                 ", content='" + content + '\'' +
                 ", sendStatus=" + sendStatus +
-                ", sentTime='" + sentTime + '\'' +
+                ", sendTime='" + sendTime + '\'' +
                 ", targetId='" + targetId + '\'' +
                 ", isGroupSession=" + isGroupSession +
                 ", messageType=" + messageType +

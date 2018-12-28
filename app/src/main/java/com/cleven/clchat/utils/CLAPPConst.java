@@ -9,7 +9,8 @@ public class CLAPPConst {
     /**
      * http server base url
      */
-    public static final String HTTP_SERVER_BASE_URL = "http://192.168.1.105:5000/api/";
+//    public static final String HTTP_SERVER_BASE_URL = "http://192.168.1.105:5000/api/";
+    public static final String HTTP_SERVER_BASE_URL = "http://192.168.10.142:5000/api/";
 //    public static final String HTTP_SERVER_BASE_URL = "http://192.168.31.98:5000/api/";
     /// 获取验证码
     public static final String SMSCODE = HTTP_SERVER_BASE_URL + "user/smscode";
@@ -59,9 +60,9 @@ public class CLAPPConst {
     public static final String QINGCLOUD_SECRCT_ACCESS_KEY_ID = "aSHZ6MgrWyqK7oXxffZmpuXmdHY1avlQ9YFJdAcY";
     private static final String QINGCLOUD_BASE_URL = "http://cleven-chat-shanghai.sh1a.qingstor.com/";
     public static final String QINGCLOUD_IMAGE_URL = QINGCLOUD_BASE_URL + "images/";
-    public static final String QINGCLOUD_VIDEOS_URL = QINGCLOUD_BASE_URL + "videos/";
-    public static final String QINGCLOUD_AUDIOS_URL = QINGCLOUD_BASE_URL + "audios/";
-    public static final String QINGCLOUD_AVATARS_URL = QINGCLOUD_BASE_URL + "avatars/";
+    public static final String QINGCLOUD_VIDEO_URL = QINGCLOUD_BASE_URL + "videos/";
+    public static final String QINGCLOUD_AUDIO_URL = QINGCLOUD_BASE_URL + "audios/";
+    public static final String QINGCLOUD_AVATAR_URL = QINGCLOUD_BASE_URL + "avatars/";
 
 
     //语音存放位置

@@ -64,7 +64,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
         }
 
         public void setTimeData(String sentTime) {
-            mTime.setText(CLUtils.formatTiem(sentTime));
+            mTime.setText(CLUtils.formatTime(sentTime));
         }
     }
 
@@ -211,7 +211,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                         }
                     });
                     /// 状态改为已听
-                    messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_LISTENED);
+                    messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_LISTENED.getTypeName());
                 }
             });
 
@@ -480,7 +480,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             textViewHolder.setData(messageBean);
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Time){
             CLTimeViewHolder timeViewHolder = (CLTimeViewHolder) holder;
-            timeViewHolder.setTimeData(messageBean.getSentTime());
+            timeViewHolder.setTimeData(messageBean.getSendTime());
         }else if (messageBodyType == CLMessageBodyType.MessageBodyType_Voice){
             CLAudioViewHolder audioViewHolder = (CLAudioViewHolder) holder;
             audioViewHolder.setAudioData(messageBean);
