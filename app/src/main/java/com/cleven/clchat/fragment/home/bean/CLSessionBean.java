@@ -177,7 +177,7 @@ public class CLSessionBean implements RealmModel {
     }
 
     public int getUnreadNumber() {
-        return CLMessageBean.getAllUnReadMessageData().size();
+        return CLMessageBean.getUserUnReadMessageData(getTargetId()).size();
     }
 
     public void setUnreadNumber(int unreadNumber) {

@@ -6,6 +6,7 @@ import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 import com.cleven.clchat.manager.CLUserManager;
 
 import java.util.Date;
+import java.util.UUID;
 
 import dev.utils.LogPrintUtils;
 import dev.utils.common.DateUtils;
@@ -18,6 +19,13 @@ import dev.utils.common.FileUtils;
 public class CLUtils {
     /// 时间戳,毫秒级
     public static long timeStamp  = (long) (System.currentTimeMillis());
+
+    /// 获取UUID
+    public static String getUUID() {
+        UUID uuid = UUID.randomUUID();
+        String uniqueId = uuid.toString();
+        return uniqueId;
+    }
 
     public static String formatTime(String time){
         long parseLong = Long.parseLong(time) / 1000;

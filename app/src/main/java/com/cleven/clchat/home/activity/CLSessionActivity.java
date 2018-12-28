@@ -93,10 +93,13 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
 
     private void initData() {
         /// 在数据库中获取历史聊天信息
-        messageList = CLMessageBean.getAllMessageData();
-        adapter.notifyDataSetChanged();
-        scrollToBottom();
+        messageList = CLMessageBean.getUserMessageData(mUserId);
 
+        // 设置适配器
+        adapter = new CLSessionRecyclerAdapter(this, messageList);
+        mRvSessionView.setAdapter(adapter);
+        mRvSessionView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+        scrollToBottom();
     }
 
     private void initEmoticonsKeyBoardBar() {
@@ -172,7 +175,9 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         mRvSessionView.post(new Runnable() {
             @Override
             public void run() {
-                mRvSessionView.scrollToPosition(mRvSessionView.getBottom());
+                if (messageList.size() > 0){
+                    mRvSessionView.scrollToPosition(messageList.size() - 1);
+                }
             }
         });
     }
@@ -362,14 +367,6 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         titleBar = (CommonTitleBar) findViewById(R.id.titlebar);
         ekBar = (XhsEmoticonsKeyBoard)findViewById(R.id.ek_bar);
 
-        /// 初始化数据源
-        messageList = new ArrayList<>();
-
-        // 设置适配器
-        adapter = new CLSessionRecyclerAdapter(this, messageList);
-        mRvSessionView.setAdapter(adapter);
-        mRvSessionView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-
     }
 
     public void initListener() {
@@ -524,7 +521,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 /// 状态修改为已读
                 message.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
                 //TODO: 存储数据库
-                CLMessageBean.updateData(message);
+                CLMessageBean.insertMessageData(message);
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -570,7 +567,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
             CLMessageBean bean = messageList.get(i - 1);
             if (bean.getMessageId().equals(message.getMessageId())){
                 bean.setSendStatus(message.getSendStatus());
-                bean.setUploadStatus(message.getUploadStatus().getTypeName());
+                bean.setUploadStatus(message.getUploadStatus());
                 final int finalI = i;
                 runOnUiThread(new Runnable() {
                     @Override

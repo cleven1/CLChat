@@ -16,6 +16,7 @@ import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.contack.bean.CLNewFriendBean;
 import com.cleven.clchat.fragment.contack.adpater.ContactsAdapter;
 import com.cleven.clchat.fragment.contack.views.PinnedHeaderDecoration;
+import com.cleven.clchat.home.activity.CLSessionActivity;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLHUDUtil;
@@ -161,15 +162,24 @@ public class CLContactFragment extends CLBaseFragment {
         initDefaultData();
 
         mShowModels.addAll(mContactModels);
+
         mAdapter = new ContactsAdapter(mContext, mShowModels, new ContactsAdapter.onClickItemListener() {
             @Override
             public void onItem(int postion) {
-                if (postion == 1){ // 好友通知
+                CLFriendBean friendBean = mContactModels.get(postion);
+                if (postion == 0){
+                    CLHUDUtil.showTextHUD(mContext,"消息通知");
+                }else if (postion == 1){ // 好友通知
                     Intent intent = new Intent(mContext,CLAddFriendActivity.class);
                     intent.putExtra("title","好友通知");
                     startActivityForResult(intent,100);
                     NEWFRIENDNOTIFAICATIONNUMBER = 0;
                     refreshFriendNotication();
+                }else { // 跳到聊天界面
+                    Intent intent = new Intent(mContext,CLSessionActivity.class);
+                    intent.putExtra("userName",friendBean.getName());
+                    intent.putExtra("userId",friendBean.getUserId());
+                    mContext.startActivity(intent);
                 }
             }
         });

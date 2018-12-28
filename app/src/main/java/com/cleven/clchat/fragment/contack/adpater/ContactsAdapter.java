@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cleven.clchat.R;
 import com.cleven.clchat.contack.bean.CLFriendBean;
@@ -62,7 +62,7 @@ public class ContactsAdapter extends RecyclerView.Adapter{
             return new HeaderViewHolder(headerView,itemListener);
         }else {
             View view = inflater.inflate(R.layout.layaout_item_contacts, null);
-            return new ContactsViewHolder(view);
+            return new ContactsViewHolder(view,itemListener);
         }
 
     }
@@ -132,7 +132,6 @@ public class ContactsAdapter extends RecyclerView.Adapter{
             contentView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(mContext,"postion = "+postion,Toast.LENGTH_SHORT).show();
                     if (listener!=null){
                         listener.onItem(postion);
                     }
@@ -142,20 +141,22 @@ public class ContactsAdapter extends RecyclerView.Adapter{
     }
 
     class ContactsViewHolder extends RecyclerView.ViewHolder {
+        RelativeLayout contentView;
         TextView tvIndex;
         ImageView ivAvatar;
         TextView tvName;
-        private CLFriendBean data;
+        onClickItemListener listener;
 
-        ContactsViewHolder(View itemView) {
+        ContactsViewHolder(View itemView,onClickItemListener listener) {
             super(itemView);
+            contentView = (RelativeLayout) itemView.findViewById(R.id.contentView);
             tvIndex = (TextView) itemView.findViewById(R.id.tv_index);
             ivAvatar = (ImageView) itemView.findViewById(R.id.iv_avatar);
             tvName = (TextView) itemView.findViewById(R.id.tv_name);
+            this.listener = listener;
         }
 
         public void setData(CLFriendBean contact,int position) {
-            this.data = contact;
             if (position == 0 || !contacts.get(position - 1).getIndex().equals(contact.getIndex())) {
                 tvIndex.setVisibility(View.VISIBLE);
                 tvIndex.setText(contact.getIndex());
@@ -164,6 +165,15 @@ public class ContactsAdapter extends RecyclerView.Adapter{
             }
             tvName.setText(contact.getName());
             CLImageLoadUtil.loadRoundImg(ivAvatar,contact.getAvatarUrl(),R.drawable.avatar,20);
+
+            contentView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener!=null){
+                        listener.onItem(position);
+                    }
+                }
+            });
         }
     }
 }

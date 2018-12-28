@@ -167,7 +167,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             }
 
             if (isMe == false){
-                if (messageBean.getReceivedStatus() != CLReceivedStatus.ReceivedStatus_LISTENED){
+                if (CLReceivedStatus.fromTypeName(messageBean.getReceivedStatus()) != CLReceivedStatus.ReceivedStatus_LISTENED){
                     mAudio_unread.setVisibility(View.VISIBLE);
                 }else {
                     mAudio_unread.setVisibility(View.GONE);
@@ -273,7 +273,7 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 sendfail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (data.getUploadStatus() == CLUploadStatus.UploadStatus_success){ //上传成功了,只需要发送文本
+                        if (CLUploadStatus.fromTypeName(data.getUploadStatus()) == CLUploadStatus.UploadStatus_success){ //上传成功了,只需要发送文本
 
                         }else{ //上传失败,图片也要重新上传
 

@@ -91,7 +91,7 @@ public class CLMessageBean implements RealmModel {
 
 
     /// 插入或者更新数据
-    public static void updateData(CLMessageBean messageBean){
+    public static void insertMessageData(CLMessageBean messageBean){
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -101,10 +101,12 @@ public class CLMessageBean implements RealmModel {
         });
     }
 
-    /// 查询所有消息
-    public static List<CLMessageBean> getAllMessageData(){
+    /// 根据用户查询消息
+    public static List<CLMessageBean> getUserMessageData(String targetId){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class).findAll();
+        RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("targetId",targetId)
+                .findAll();
         /// 根据发送时间排序
         sessionBeans = sessionBeans.sort("sendTime");
         return realm.copyFromRealm(sessionBeans);
@@ -114,6 +116,16 @@ public class CLMessageBean implements RealmModel {
     public static List<CLMessageBean> getAllUnReadMessageData(){
         Realm realm = Realm.getDefaultInstance();
         RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("receivedStatus", CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName())
+                .findAll();
+        return realm.copyFromRealm(sessionBeans);
+    }
+
+    /// 查询用户未读的消息
+    public static List<CLMessageBean> getUserUnReadMessageData(String targetId){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("targetId",targetId)
                 .equalTo("receivedStatus", CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName())
                 .findAll();
         return realm.copyFromRealm(sessionBeans);
@@ -211,16 +223,16 @@ public class CLMessageBean implements RealmModel {
         this.videoThumbnail = videoThumbnail;
     }
 
-    public CLReceivedStatus getReceivedStatus() {
-        return CLReceivedStatus.fromTypeName(receivedStatus);
+    public int getReceivedStatus() {
+        return receivedStatus;
     }
 
     public void setReceivedStatus(int receivedStatus) {
         this.receivedStatus = receivedStatus;
     }
 
-    public CLUploadStatus getUploadStatus() {
-        return CLUploadStatus.fromTypeName(uploadStatus);
+    public int getUploadStatus() {
+        return uploadStatus;
     }
 
     public void setUploadStatus(int uploadStatus) {

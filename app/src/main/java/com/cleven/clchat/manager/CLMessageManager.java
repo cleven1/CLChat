@@ -115,9 +115,8 @@ public class CLMessageManager {
         message.setUserInfo(CLUserManager.getInstence().getUserInfo());
         /// 目标id
         message.setTargetId(userId);
-        long timeStamp = CLUtils.timeStamp;
         /// 消息id
-        message.setMessageId("" + timeStamp);
+        message.setMessageId(CLUtils.getUUID());
         return message;
     }
 
@@ -143,9 +142,8 @@ public class CLMessageManager {
         message.setUserInfo(CLUserManager.getInstence().getUserInfo());
         /// 目标id
         message.setTargetId(userId);
-        long timeStamp = CLUtils.timeStamp;
         /// 消息id
-        message.setMessageId("" + timeStamp);
+        message.setMessageId(CLUtils.getUUID());
         /// 上传
         CLUploadManager.getInstance().uploadImage(filePath,fileName,new MyUploadListener());
         return message;
@@ -171,9 +169,8 @@ public class CLMessageManager {
         message.setUserInfo(CLUserManager.getInstence().getUserInfo());
         /// 目标id
         message.setTargetId(userId);
-        long timeStamp = CLUtils.timeStamp;
         /// 消息id
-        message.setMessageId("" + timeStamp);
+        message.setMessageId(CLUtils.getUUID());
         /// 上传
         CLUploadManager.getInstance().uploadAudio(filePath,fileName,new MyUploadListener());
         return message;
@@ -207,9 +204,8 @@ public class CLMessageManager {
         /// 目标id
         message.setTargetId(userId);
 
-        long timeStamp = CLUtils.timeStamp;
         /// 消息id
-        message.setMessageId("" + timeStamp);
+        message.setMessageId(CLUtils.getUUID());
 
         return message;
     }
@@ -230,9 +226,8 @@ public class CLMessageManager {
         message.setUserInfo(CLUserManager.getInstence().getUserInfo());
         /// 目标id
         message.setTargetId(userId);
-        long timeStamp = CLUtils.timeStamp;
         /// 消息id
-        message.setMessageId("" + timeStamp);
+        message.setMessageId(CLUtils.getUUID());
         sendMessage(message,userId);
 
         return message;
@@ -251,6 +246,9 @@ public class CLMessageManager {
         /// 发送时间
         message.setSendTime("" + CLUtils.timeStamp);
 
+        /// 插入数据库
+        CLMessageBean.insertMessageData(message);
+
         String jsonString = JSON.toJSONString(message);
 
         /// 发送
@@ -268,6 +266,8 @@ public class CLMessageManager {
                     CLMessageBean messageBean = JSON.parseObject(message, CLMessageBean.class);
                     // 发送成功  CLSendStatus
                     messageBean.setSendStatus(SendStatus_SEND.getTypeName());
+                    /// 更新数据库
+                    CLMessageBean.insertMessageData(messageBean);
                     messageStatusOnListener.onSuccess(messageBean);
                 }
             }
@@ -278,6 +278,8 @@ public class CLMessageManager {
                     CLMessageBean messageBean = JSON.parseObject(message, CLMessageBean.class);
                     /// 发送失败 CLSendStatus
                     messageBean.setSendStatus(SendStatus_FAILED.getTypeName());
+                    /// 更新数据库
+                    CLMessageBean.insertMessageData(messageBean);
                     messageStatusOnListener.onFailure(messageBean);
                 }
             }
@@ -290,7 +292,7 @@ public class CLMessageManager {
         CLMessageBean messageBean = JSON.parseObject(msg, CLMessageBean.class);
         messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName());
         /// 插入数据库
-        CLMessageBean.updateData(messageBean);
+        CLMessageBean.insertMessageData(messageBean);
         SessionMessageHandler(messageBean);
         if (receiveMessageOnListener != null){
             receiveMessageOnListener.onMessage(messageBean);
