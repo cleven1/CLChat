@@ -204,6 +204,8 @@ public class CLContactFragment extends CLBaseFragment {
                     CLFriendBean userBean = CLJsonUtil.parseJsonToObj(list.get(i).toString(), CLFriendBean.class);
                     mContactModels.add(userBean);
                     mShowModels.add(userBean);
+                    /// 插入数据库
+                    CLFriendBean.updateData(userBean);
                 }
                 mAdapter.notifyDataSetChanged();
                 CLHUDUtil.hideHUD();

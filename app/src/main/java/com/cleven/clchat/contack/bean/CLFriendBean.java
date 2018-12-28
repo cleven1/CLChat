@@ -10,6 +10,7 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmResults;
+import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmClass;
 
 @RealmClass
@@ -18,6 +19,7 @@ public class CLFriendBean implements RealmModel {
     /**
      * 用户id
      */
+    @PrimaryKey
     private String userId;
     /**
      * 用户昵称
