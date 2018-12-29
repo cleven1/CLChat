@@ -34,6 +34,7 @@ import com.lqr.audio.IAudioPlayListener;
 import java.util.List;
 
 import dev.utils.app.SizeUtils;
+import dev.utils.common.ScaleUtils;
 
 import static com.cleven.clchat.home.Bean.CLMessageBodyType.MessageBodyType_Text;
 
@@ -264,12 +265,13 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
             String url = CLUtils.checkLocalPath(data);
             CLImageLoadUtil.loadRoundImg(mContent,url,R.mipmap.default_image,0);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) contentLayout.getLayoutParams();
-            params.width = data.getWitdh();
-            params.height = data.getHeight();
+            int[] ints = ScaleUtils.calcWidthHeightToScale(data.getWitdh(), data.getHeight(), (float) 1, (float) 0.5);
+            params.width = ints[0];
+            params.height = ints[1];
             contentLayout.setLayoutParams(params);
             ViewGroup.LayoutParams imageParams = mContent.getLayoutParams();
-            imageParams.width = data.getWitdh();
-            imageParams.height = data.getHeight();
+            imageParams.width = ints[0];
+            imageParams.height = ints[1];
             mContent.setLayoutParams(imageParams);
 
             CLImageLoadUtil.loadRoundImg(ivAvatar,data.getUserInfo().getAvatarUrl(),R.drawable.avatar,20);
