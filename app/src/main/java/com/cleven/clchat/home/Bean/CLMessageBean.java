@@ -138,7 +138,7 @@ public class CLMessageBean implements RealmModel {
         RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
                 .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
-                .sort("sendTime",Sort.DESCENDING)
+                .sort("messageId",Sort.DESCENDING)
                 .findAll();
         return realm.copyFromRealm(sessionBeans);
     }
@@ -172,7 +172,7 @@ public class CLMessageBean implements RealmModel {
                 .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
                 .equalTo("messageType",CLMessageBodyType.MessageBodyType_Image.getTypeName())
-                .sort("sendTime",Sort.DESCENDING)
+                .sort("messageId",Sort.DESCENDING)
                 .findAll();
         List<CLMessageBean> beanList = realm.copyFromRealm(sessionBeans);
         List<String> tempArray = new ArrayList<>();
