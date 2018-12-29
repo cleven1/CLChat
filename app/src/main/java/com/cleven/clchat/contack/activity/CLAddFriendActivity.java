@@ -208,6 +208,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                                 /// 插入好友数据库
                                 String json = CLJsonUtil.parseObjToJson(friendBean);
                                 CLFriendBean bean = CLJsonUtil.parseJsonToObj(json, CLFriendBean.class);
+                                bean.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
                                 CLFriendBean.updateData(bean);
 
                                 /// 回调

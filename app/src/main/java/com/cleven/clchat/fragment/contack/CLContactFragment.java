@@ -233,6 +233,7 @@ public class CLContactFragment extends CLBaseFragment {
                 List list = (List) response.get("data");
                 for (int i = 0; i< list.size(); i++){
                     CLFriendBean userBean = CLJsonUtil.parseJsonToObj(list.get(i).toString(), CLFriendBean.class);
+                    userBean.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
                     mContactModels.add(userBean);
                     mShowModels.add(userBean);
                     /// 插入数据库

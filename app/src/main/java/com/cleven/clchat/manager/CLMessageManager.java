@@ -237,7 +237,7 @@ public class CLMessageManager {
         message.setSendTime("" + CLUtils.getTimeStamp());
         /// 自己发的标记为已读
         message.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
-
+        message.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
         /// 插入数据库
         CLMessageBean.insertMessageData(message);
         SessionMessageHandler(message);
@@ -307,6 +307,7 @@ public class CLMessageManager {
             sessionBean.setAvatarUrl(messageBean.getUserInfo().getAvatarUrl());
             sessionBean.setName(messageBean.getUserInfo().getName());
         }
+        sessionBean.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
         sessionBean.setContent(messageBean.getContent());
         sessionBean.setGroupSession(messageBean.isGroupSession());
         sessionBean.setMessageType(messageBean.getMessageType());
@@ -326,6 +327,7 @@ public class CLMessageManager {
     /// 收到好友请求
     public void receiveFriendHandler(String msg){
         CLNewFriendBean friendBean = CLJsonUtil.parseJsonToObj(msg, CLNewFriendBean.class);
+        friendBean.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
         if (receiveFriendOnListener != null){
             runOnUiThread(new Runnable() {
                 @Override

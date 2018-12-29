@@ -1,5 +1,6 @@
 package com.cleven.clchat.home.Bean;
 
+import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.model.CLUserBean;
 
 import java.util.List;
@@ -87,7 +88,10 @@ public class CLMessageBean implements RealmModel {
      */
     @Ignore
     private CLMentionedInfo mentionedInfo;
-
+    /**
+     * 当前登录的用户id
+     */
+    private String currentUserId;
 
     /// 插入或者更新数据
     public static void insertMessageData(CLMessageBean messageBean){
@@ -129,6 +133,7 @@ public class CLMessageBean implements RealmModel {
     public static List<CLMessageBean> getUserMessageData(String targetId){
         Realm realm = Realm.getDefaultInstance();
         RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
                 .findAll();
         /// 根据发送时间排序
@@ -140,6 +145,7 @@ public class CLMessageBean implements RealmModel {
     public static List<CLMessageBean> getAllUnReadMessageData(){
         Realm realm = Realm.getDefaultInstance();
         RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("receivedStatus", CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName())
                 .findAll();
         return realm.copyFromRealm(sessionBeans);
@@ -149,6 +155,7 @@ public class CLMessageBean implements RealmModel {
     public static List<CLMessageBean> getUserUnReadMessageData(String targetId){
         Realm realm = Realm.getDefaultInstance();
         RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
                 .equalTo("receivedStatus", CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName())
                 .findAll();
@@ -159,7 +166,9 @@ public class CLMessageBean implements RealmModel {
     /// 根据用户删除数据
     public static void deleteUserMessageData(String targetId){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLMessageBean> results = realm.where(CLMessageBean.class).equalTo("targetId", targetId).findAll();
+        RealmResults<CLMessageBean> results = realm.where(CLMessageBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .equalTo("targetId", targetId).findAll();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -171,7 +180,9 @@ public class CLMessageBean implements RealmModel {
     /// 删除所有
     public static void deleteAllMessageData(){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLMessageBean> all = realm.where(CLMessageBean.class).findAll();
+        RealmResults<CLMessageBean> all = realm.where(CLMessageBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .findAll();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -314,6 +325,14 @@ public class CLMessageBean implements RealmModel {
 
     public void setGroupSession(boolean groupSession) {
         isGroupSession = groupSession;
+    }
+
+    public String getCurrentUserId() {
+        return currentUserId;
+    }
+
+    public void setCurrentUserId(String currentUserId) {
+        this.currentUserId = currentUserId;
     }
 
     @Override

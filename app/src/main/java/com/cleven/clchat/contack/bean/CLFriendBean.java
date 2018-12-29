@@ -2,6 +2,7 @@ package com.cleven.clchat.contack.bean;
 
 import android.text.TextUtils;
 
+import com.cleven.clchat.manager.CLUserManager;
 import com.nanchen.wavesidebar.FirstLetterUtil;
 
 import java.util.ArrayList;
@@ -69,7 +70,10 @@ public class CLFriendBean implements RealmModel {
      * 其它:表示内容
      */
     private int itemType;
-
+    /**
+     * 当前用户id
+     */
+    private String currentUserId;
     /// 插入数据
     public static void updateData(CLFriendBean friendBean){
         Realm realm = Realm.getDefaultInstance();
@@ -86,6 +90,7 @@ public class CLFriendBean implements RealmModel {
     public static CLFriendBean getFriendUserInfo(String userId){
         Realm realm = Realm.getDefaultInstance();
         RealmResults<CLFriendBean> all = realm.where(CLFriendBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("userId",userId)
                 .findAll();
         if (all.size() > 0){
@@ -98,7 +103,9 @@ public class CLFriendBean implements RealmModel {
     public static List<CLFriendBean> getAllFriendData(){
         List<CLFriendBean> list = new ArrayList<>();
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLFriendBean> all = realm.where(CLFriendBean.class).findAll();
+        RealmResults<CLFriendBean> all = realm.where(CLFriendBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .findAll();
         list.addAll(realm.copyFromRealm(all));
         return list;
     }
@@ -106,7 +113,9 @@ public class CLFriendBean implements RealmModel {
     /// 根据用户删除
     public static void deleteUser(String userId){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLFriendBean> results = realm.where(CLFriendBean.class).equalTo("userId", userId).findAll();
+        RealmResults<CLFriendBean> results = realm.where(CLFriendBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .equalTo("userId", userId).findAll();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -117,7 +126,9 @@ public class CLFriendBean implements RealmModel {
     /// 删除所有
     public static void deleteAllUser(){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLFriendBean> all = realm.where(CLFriendBean.class).findAll();
+        RealmResults<CLFriendBean> all = realm.where(CLFriendBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .findAll();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -220,5 +231,13 @@ public class CLFriendBean implements RealmModel {
 
     public void setFriend(boolean friend) {
         isFriend = friend;
+    }
+
+    public String getCurrentUserId() {
+        return currentUserId;
+    }
+
+    public void setCurrentUserId(String currentUserId) {
+        this.currentUserId = currentUserId;
     }
 }

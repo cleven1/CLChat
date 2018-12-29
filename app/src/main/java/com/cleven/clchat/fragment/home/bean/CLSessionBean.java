@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLSendStatus;
+import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLUtils;
 
@@ -61,6 +62,10 @@ public class CLSessionBean implements RealmModel {
      * CLMessageBodyType
      */
     private int messageType;
+    /**
+     * 当前登录的用户id
+     */
+    private String currentUserId;
 
 
     /**
@@ -95,7 +100,9 @@ public class CLSessionBean implements RealmModel {
     /// 查询所有消息会话
     public static List<CLSessionBean> getAllSessionData(){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLSessionBean> sessionBeans = realm.where(CLSessionBean.class).findAll();
+        RealmResults<CLSessionBean> sessionBeans = realm.where(CLSessionBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .findAll();
         /// 根据发送时间排序
         sessionBeans = sessionBeans.sort("sendTime");
         return realm.copyFromRealm(sessionBeans);
@@ -104,7 +111,9 @@ public class CLSessionBean implements RealmModel {
     /// 根据用户id删除数据
     public static void deleteUserSessionData(String targetId){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLSessionBean> results = realm.where(CLSessionBean.class).equalTo("targetId", targetId).findAll();
+        RealmResults<CLSessionBean> results = realm.where(CLSessionBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .equalTo("targetId", targetId).findAll();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -116,7 +125,9 @@ public class CLSessionBean implements RealmModel {
     /// 删除所有
     public static void deleteAllSessionData(){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<CLSessionBean> all = realm.where(CLSessionBean.class).findAll();
+        RealmResults<CLSessionBean> all = realm.where(CLSessionBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .findAll();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -213,5 +224,11 @@ public class CLSessionBean implements RealmModel {
 
     public void setUnreadNumber(int unreadNumber) {
         this.unreadNumber = unreadNumber;
+    }
+    public String getCurrentUserId() {
+        return currentUserId;
+    }
+    public void setCurrentUserId(String currentUserId) {
+        this.currentUserId = currentUserId;
     }
 }
