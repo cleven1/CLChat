@@ -2,7 +2,9 @@ package com.cleven.clchat.home.Bean;
 
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.model.CLUserBean;
+import com.cleven.clchat.utils.CLUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
@@ -161,6 +163,22 @@ public class CLMessageBean implements RealmModel {
                 .findAll();
         List<CLMessageBean> beanList = realm.copyFromRealm(sessionBeans);
         return beanList;
+    }
+
+    /// 查询所有图片的url
+    public static List<String> getMediaUrlData(String targetId){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .equalTo("targetId",targetId)
+                .equalTo("messageType",CLMessageBodyType.MessageBodyType_Image.getTypeName())
+                .findAll();
+        List<CLMessageBean> beanList = realm.copyFromRealm(sessionBeans);
+        List<String> tempArray = new ArrayList<>();
+        for (CLMessageBean bean : beanList){
+            tempArray.add(CLUtils.checkLocalPath(bean));
+        }
+        return tempArray;
     }
 
     /// 根据用户删除数据

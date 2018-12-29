@@ -26,6 +26,7 @@ import com.cleven.clchat.home.Bean.CLUploadStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLImageLoadUtil;
+import com.cleven.clchat.utils.CLPhotoBrowser;
 import com.cleven.clchat.utils.CLUtils;
 import com.lqr.audio.AudioPlayManager;
 import com.lqr.audio.IAudioPlayListener;
@@ -292,6 +293,15 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 pbBar.setAlpha(0);
                 sendfail.setAlpha(0);
             }
+            /// 浏览图片
+            mContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    List<String> imageUrlList = CLMessageBean.getMediaUrlData(data.getTargetId());
+                    int i = imageUrlList.indexOf(CLUtils.checkLocalPath(data));
+                    CLPhotoBrowser.Browser(mContext,imageUrlList,i);
+                }
+            });
         }
     }
 
