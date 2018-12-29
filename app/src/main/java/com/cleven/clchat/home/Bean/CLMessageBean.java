@@ -10,6 +10,7 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmClass;
@@ -137,9 +138,8 @@ public class CLMessageBean implements RealmModel {
         RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
                 .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
+                .sort("sendTime",Sort.DESCENDING)
                 .findAll();
-        /// 根据发送时间排序
-        sessionBeans = sessionBeans.sort("sendTime");
         return realm.copyFromRealm(sessionBeans);
     }
 
@@ -172,6 +172,7 @@ public class CLMessageBean implements RealmModel {
                 .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
                 .equalTo("messageType",CLMessageBodyType.MessageBodyType_Image.getTypeName())
+                .sort("sendTime",Sort.DESCENDING)
                 .findAll();
         List<CLMessageBean> beanList = realm.copyFromRealm(sessionBeans);
         List<String> tempArray = new ArrayList<>();

@@ -36,7 +36,7 @@ public class CLPhotoBrowser {
                 // 是否显示关闭页面按钮，在页面左下角。默认不显示
                 .setShowCloseButton(false)
                 // 是否显示下载按钮，在页面右下角。默认显示
-                .setShowDownButton(true)
+                .setShowDownButton(false)
                 // 设置下载按钮图片资源，可不填，默认为：R.drawable.icon_download_new
                 .setDownIconResId(R.drawable.icon_download_new)
                 // 设置是否显示顶部的指示器（1/9）默认显示
