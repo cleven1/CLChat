@@ -25,6 +25,7 @@ import static com.cleven.clchat.utils.CLAPPConst.MQTT_CONNECT_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_DELETE_FRIEND_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_DISCONNECT_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_GROUP_CHAT_TOPIC;
+import static com.cleven.clchat.utils.CLAPPConst.MQTT_INVITE_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_SINLE_CHAT_TOPIC;
 import static com.cleven.clchat.utils.CLAPPConst.MQTT_SYSTEM_TOPIC;
 
@@ -160,6 +161,14 @@ public class CLMQTTManager {
         String msg = JSON.toJSONString(CLUserManager.getInstence().getUserInfo());
         sendMessage(msg,MQTT_ADD_FRIEND_TOPIC,userId);
     }
+    /**
+     * 添加好友邀请
+     * @param userId
+     */
+    public void sendnviteFriendMessage(String userId){
+        String msg = JSON.toJSONString(CLUserManager.getInstence().getUserInfo());
+        sendMessage(msg,MQTT_INVITE_TOPIC,userId);
+    }
 
     public void sendMessage(final String msg, String topic, String userId){
         if (client != null && client.isConnected()){
@@ -235,6 +244,8 @@ public class CLMQTTManager {
 
                         }else if (topic.equals(baseTopic + MQTT_ADD_FRIEND_TOPIC + userId)){ //添加好友
                             CLMessageManager.getInstance().receiveFriendHandler(message.toString());
+                        }else if (topic.equals(baseTopic + MQTT_INVITE_TOPIC + userId)) { //添加好友邀请
+                            CLMessageManager.getInstance().receiveInviteFriendHandler(message.toString());
                         }else if (topic.equals(baseTopic + MQTT_DELETE_FRIEND_TOPIC + userId)){ //删除好友
 
                         }else if (topic.equals(baseTopic + MQTT_SYSTEM_TOPIC)){ //系统通知
@@ -298,7 +309,7 @@ public class CLMQTTManager {
     private void subscribeTopic(){
         String userId = CLUserManager.getInstence().getUserInfo().getUserId();
         // 订阅
-        final String[] topic = new String[5];
+        final String[] topic = new String[6];
         /// 单聊
         topic[0] = MQTT_BASE_TOPIC + MQTT_SINLE_CHAT_TOPIC + userId;
         /// 群聊
@@ -309,6 +320,8 @@ public class CLMQTTManager {
         topic[3] = MQTT_BASE_TOPIC + MQTT_DELETE_FRIEND_TOPIC + userId;
         /// 系统通知
         topic[4] = MQTT_BASE_TOPIC + MQTT_SYSTEM_TOPIC;
+        /// 添加好友邀请
+        topic[5] = MQTT_BASE_TOPIC + MQTT_INVITE_TOPIC;
 
         int[] qos = new int[topic.length];
         qos[0] = 1;
@@ -316,6 +329,7 @@ public class CLMQTTManager {
         qos[2] = 1;
         qos[3] = 1;
         qos[4] = 1;
+        qos[5] = 1;
         try {
             client.subscribe(topic,qos);
         } catch (MqttException e) {

@@ -15,6 +15,7 @@ import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.contack.bean.CLNewFriendBean;
+import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.manager.CLMQTTManager;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.manager.CLUserManager;
@@ -203,6 +204,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                                 CLNewFriendBean.updateData(friendBean);
                                 /// 发送消息通知好友
                                 String name = CLUserManager.getInstence().getUserInfo().getName();
+                                CLMQTTManager.getInstance().sendAddFriendMessage(friendBean.getUserId());
                                 CLMessageManager.getInstance().sendTextMessage(name + "已经和你成为好友了",friendBean.getUserId(),false);
 
                                 /// 插入好友数据库
@@ -210,6 +212,8 @@ public class CLAddFriendActivity extends CLBaseActivity {
                                 CLFriendBean bean = CLJsonUtil.parseJsonToObj(json, CLFriendBean.class);
                                 bean.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
                                 CLFriendBean.updateData(bean);
+                                /// 插入消息会话列表
+                                CLMessageManager.getInstance().SessionMessageHandler(CLMessageBean.friendToMessage(bean));
 
                                 /// 回调
                                 setResult(CLAPPConst.ADDFRIENDRESULTCODE);
@@ -234,7 +238,7 @@ public class CLAddFriendActivity extends CLBaseActivity {
                                 /// 不是好友
                                 if (error.get("error_code").equals("4002")){
                                     /// 通过MQTT发送添加好友
-                                    CLMQTTManager.getInstance().sendAddFriendMessage(friendBean.getUserId());
+                                    CLMQTTManager.getInstance().sendnviteFriendMessage(friendBean.getUserId());
                                     viewHolder.addFriend.setText("已发送");
                                     viewHolder.addFriend.setBackgroundResource(R.drawable.addfriend_text_add_shape);
                                     viewHolder.addFriend.setEnabled(false);

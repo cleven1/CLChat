@@ -324,8 +324,23 @@ public class CLMessageManager {
         });
     }
 
-    /// 收到好友请求
+    /// 收到添加好友
     public void receiveFriendHandler(String msg){
+        CLFriendBean friendBean = CLJsonUtil.parseJsonToObj(msg, CLFriendBean.class);
+        friendBean.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
+        if (receiveFriendOnListener != null){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    /// 插入好友数据库
+                    CLFriendBean.updateData(friendBean);
+                }
+            });
+        }
+    }
+
+    /// 收到好友邀请
+    public void receiveInviteFriendHandler(String msg){
         CLNewFriendBean friendBean = CLJsonUtil.parseJsonToObj(msg, CLNewFriendBean.class);
         friendBean.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
         if (receiveFriendOnListener != null){

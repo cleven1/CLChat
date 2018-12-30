@@ -4,7 +4,7 @@
             "outputFile": "/Users/cleven/Desktop/AndroidDemo/CLChat/easypermissions/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-fr-rCA/values-fr-rCA.xml",
             "map": [
                 {
-                    "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/support-compat-27.1.1.aar/08ae51e6ba65d7f69de5b883da2369f9/res/values-fr-rCA/values-fr-rCA.xml",
+                    "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/support-compat-27.1.1.aar/c2291daea4398343d194c55cffe7b81b/res/values-fr-rCA/values-fr-rCA.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/ab5fbdeec4c7f59b35275c87f7c7c427/res/values-fr-rCA/values-fr-rCA.xml",
+                    "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/df2ae29e299b93ac3575ddb27e5e7202/res/values-fr-rCA/values-fr-rCA.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

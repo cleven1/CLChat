@@ -1,5 +1,6 @@
 package com.cleven.clchat.home.Bean;
 
+import com.cleven.clchat.contack.bean.CLFriendBean;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLUtils;
@@ -208,6 +209,20 @@ public class CLMessageBean implements RealmModel {
                 all.deleteAllFromRealm();
             }
         });
+    }
+
+    /// friendModel转messageModel
+    public static CLMessageBean friendToMessage(CLFriendBean friendBean){
+        CLMessageBean messageBean = new CLMessageBean();
+        messageBean.setTargetId(friendBean.getUserId());
+        CLUserBean userBean = new CLUserBean();
+        userBean.setName(friendBean.getName());
+        userBean.setAliasName(friendBean.getAliasName());
+        userBean.setAvatarUrl(friendBean.getAvatarUrl());
+        userBean.setBirthday(friendBean.getBirthday());
+        userBean.setCity(friendBean.getCity());
+        messageBean.setUserInfo(userBean);
+        return messageBean;
     }
 
     public String getMessageId() {

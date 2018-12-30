@@ -4,7 +4,7 @@
             "outputFile": "/Users/cleven/Desktop/AndroidDemo/CLChat/easypermissions/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-v22/values-v22.xml",
             "map": [
                 {
-                    "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/ab5fbdeec4c7f59b35275c87f7c7c427/res/values-v22/values-v22.xml",
+                    "source": "/Users/cleven/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/df2ae29e299b93ac3575ddb27e5e7202/res/values-v22/values-v22.xml",
                     "from": {
                         "startLines": "2,3,4,9",
                         "startColumns": "4,4,4,4",

@@ -74,6 +74,19 @@ public class CLFriendBean implements RealmModel {
      * 当前用户id
      */
     private String currentUserId;
+
+
+    /**
+     * 定义收到添加好友回调的接口
+     */
+    public interface CLReceiveFriendOnListener{
+        void onFriend();
+    }
+    private static CLReceiveFriendOnListener receiveFriendOnListener;
+    public static void setReceiveSessionOnListener(CLReceiveFriendOnListener onListener) {
+        receiveFriendOnListener = onListener;
+    }
+
     /// 插入数据
     public static void updateData(CLFriendBean friendBean){
         Realm realm = Realm.getDefaultInstance();
@@ -81,6 +94,13 @@ public class CLFriendBean implements RealmModel {
             @Override
             public void execute(Realm realm) {
                 realm.copyToRealmOrUpdate(friendBean);
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                if (receiveFriendOnListener != null){
+                    receiveFriendOnListener.onFriend();
+                }
             }
         });
 

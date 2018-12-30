@@ -20,7 +20,6 @@ import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.activity.CLSessionActivity;
 import com.cleven.clchat.manager.CLMessageManager;
 import com.cleven.clchat.manager.CLUserManager;
-import com.cleven.clchat.model.CLUserBean;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLHUDUtil;
 import com.cleven.clchat.utils.CLJsonUtil;
@@ -184,21 +183,14 @@ public class CLContactFragment extends CLBaseFragment {
                     intent.putExtra("userName",friendBean.getName());
                     intent.putExtra("userId",friendBean.getUserId());
                     mContext.startActivity(intent);
-                    CLMessageBean messageBean = new CLMessageBean();
-                    messageBean.setTargetId(friendBean.getUserId());
-                    CLUserBean userBean = new CLUserBean();
-                    userBean.setName(friendBean.getName());
-                    userBean.setAliasName(friendBean.getAliasName());
-                    userBean.setAvatarUrl(friendBean.getAvatarUrl());
-                    userBean.setBirthday(friendBean.getBirthday());
-                    userBean.setCity(friendBean.getCity());
-                    messageBean.setUserInfo(userBean);
+                    CLMessageBean messageBean = CLMessageBean.friendToMessage(friendBean);
                     CLMessageManager.getInstance().SessionMessageHandler(messageBean);
                 }
             }
         });
         mRecyclerView.setAdapter(mAdapter);
 
+        /// 获取好友
         List<CLFriendBean> allFriendData = CLFriendBean.getAllFriendData();
         if (allFriendData.size() <= 0){
             getFriendList();
@@ -207,6 +199,20 @@ public class CLContactFragment extends CLBaseFragment {
             mShowModels.addAll(allFriendData);
             mAdapter.notifyDataSetChanged();
         }
+
+        /// 监听新好友加入数据库
+        CLFriendBean.setReceiveSessionOnListener(new CLFriendBean.CLReceiveFriendOnListener() {
+            @Override
+            public void onFriend() {
+                mContactModels.clear();
+                mShowModels.clear();
+                List<CLFriendBean> allFriendData = CLFriendBean.getAllFriendData();
+                initDefaultData();
+                mContactModels.addAll(allFriendData);
+                mShowModels.addAll(mContactModels);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
 
     }
 
