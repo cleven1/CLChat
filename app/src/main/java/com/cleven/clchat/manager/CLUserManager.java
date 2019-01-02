@@ -1,5 +1,9 @@
 package com.cleven.clchat.manager;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.cleven.clchat.app.CLApplication;
 import com.cleven.clchat.model.CLUserBean;
 
 /**
@@ -29,7 +33,10 @@ public class CLUserManager {
 
     public void setUserInfo(CLUserBean userInfo) {
         this.userInfo = userInfo;
-//        SharedPreferences sp = CLApplication.mContext.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        SharedPreferences sp = CLApplication.mContext.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        if (userInfo == null){
+            sp.edit().putString(CACHE_USERINFOKEY,"").commit();
+        }
 //        String jsonString = JSON.toJSONString(userInfo);
 //        sp.edit().putString(CACHE_USERINFOKEY,jsonString).commit();
     }

@@ -2,6 +2,7 @@ package com.cleven.clchat.API;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cleven.clchat.utils.CLAPPConst;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.HttpParams;
@@ -24,6 +25,9 @@ public class OkGoUtil {
     }
 
     public static void getRequets(String url, Object tag, HttpParams params, final CLNetworkCallBack callback) {
+        if (!url.startsWith("http")){
+            url = CLAPPConst.HTTP_SERVER_BASE_URL + url;
+        }
         OkGo.<String>get(url)
                 .tag(tag)
                 .params(params)
@@ -31,6 +35,9 @@ public class OkGoUtil {
     }
 
     public static void postRequest(String url, Object tag, HttpParams params, final CLNetworkCallBack callback) {
+        if (!url.startsWith("http")){
+            url = CLAPPConst.HTTP_SERVER_BASE_URL + url;
+        }
         OkGo.<String>post(url)
                 .tag(tag)
                 .params(params)
