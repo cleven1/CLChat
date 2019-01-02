@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
+import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.home.Bean.CLUploadStatus;
@@ -106,6 +107,41 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         CLMessageBean.updateRecviveMessageStatus(mUserId);
         /// 回调
         setResult(CLAPPConst.SESSIONMESSAGERESULTCODE);
+        /// 监听点击重发按钮
+        adapter.setMessageSendFailListener(new CLSessionRecyclerAdapter.CLMessageSendFailListener() {
+            @Override
+            public void onRetry(CLMessageBean messageBean) {
+                CLMessageBodyType messageBodyType = CLMessageBodyType.fromTypeName(messageBean.getMessageType());
+                CLUploadStatus uploadStatus = CLUploadStatus.fromTypeName(messageBean.getUploadStatus());
+                switch (messageBodyType){
+                    case MessageBodyType_Text:
+                        CLMessageManager.getInstance().sendTextMessage(messageBean.getContent(),mUserId,messageBean.isGroupSession());
+                        break;
+                    case MessageBodyType_Voice:
+                        if (uploadStatus == CLUploadStatus.UploadStatus_fail){
+                            CLMessageManager.getInstance().sendAudioMessage(messageBean.getLocalUrl(),messageBean.getDuration(),mUserId,messageBean.isGroupSession(),true);
+                        }else {
+                            CLMessageManager.getInstance().sendAudioMessage(messageBean.getLocalUrl(),messageBean.getDuration(),mUserId,messageBean.isGroupSession(),false);
+                        }
+                        break;
+                    case MessageBodyType_Image:
+                        if (uploadStatus == CLUploadStatus.UploadStatus_fail){
+                            CLMessageManager.getInstance().sendImageMessage(messageBean.getLocalUrl(),messageBean.getMediaUrl(),messageBean.getWitdh(),messageBean.getHeight(),mUserId,messageBean.isGroupSession(),true);
+                        }else {
+                            CLMessageManager.getInstance().sendImageMessage(messageBean.getLocalUrl(),messageBean.getMediaUrl(),messageBean.getWitdh(),messageBean.getHeight(),mUserId,messageBean.isGroupSession(),false);
+                        }
+                        break;
+                    case MessageBodyType_Video:
+                        if (uploadStatus == CLUploadStatus.UploadStatus_fail){
+                            CLMessageManager.getInstance().sendVideoMessage(messageBean.getLocalUrl(),messageBean.getVideoThumbnail(),messageBean.getDuration(),mUserId,messageBean.isGroupSession(),true);
+                        }else {
+                            CLMessageManager.getInstance().sendVideoMessage(messageBean.getLocalUrl(),messageBean.getVideoThumbnail(),messageBean.getDuration(),mUserId,messageBean.isGroupSession(),false);
+                        }
+                        break;
+                }
+            }
+        });
+
     }
 
     private void initPickImage() {
@@ -309,7 +345,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
 //                    mPresenter.sendAudioFile(audioPath, duration);
                     Toast.makeText(CLSessionActivity.this,"录制完成 时长 = " + duration,Toast.LENGTH_SHORT).show();
                 }
-                CLMessageBean messageBean = CLMessageManager.getInstance().sendAudioMessage(audioPath.getPath(), duration, mUserId, mIsGroup);
+                CLMessageBean messageBean = CLMessageManager.getInstance().sendAudioMessage(audioPath.getPath(), duration, mUserId, mIsGroup,true);
                 sendMessage(messageBean);
             }
 
@@ -486,6 +522,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 Log.e("CSDN_LQR", isOrig ? "发原图" : "不发原图");//若不发原图的话，需要在自己在项目中做好压缩图片算法
                 for (ImageItem imageItem : images) {
                     Log.e("CSDN_LQR", imageItem.path);
+                    Log.e("CSDN_LQR_TYPE", imageItem.mimeType);
                     String imagePath = "";
                     if (isOrig != true){ //压缩
                         imagePath = CLFileUtils.getCachePath() + imageItem.name;
@@ -494,7 +531,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                     }else {
                         imagePath = imageItem.path;
                     }
-                    CLMessageBean messageBean = CLMessageManager.getInstance().sendImageMessage(imageItem.path,imageItem.name,imageItem.width,imageItem.height,mUserId,mIsGroup);
+                    CLMessageBean messageBean = CLMessageManager.getInstance().sendImageMessage(imageItem.path,imageItem.name,imageItem.width,imageItem.height,mUserId,mIsGroup,true);
                     sendMessage(messageBean);
                 }
             }

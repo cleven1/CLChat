@@ -15,14 +15,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cleven.clchat.R;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
-import com.cleven.clchat.home.Bean.CLUploadStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLImageLoadUtil;
@@ -43,6 +41,15 @@ import static com.cleven.clchat.home.Bean.CLMessageBodyType.MessageBodyType_Text
  */
 
 public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
+
+    /// 点击重试按钮回调
+    private CLMessageSendFailListener messageSendFailListener;
+    public void setMessageSendFailListener(CLMessageSendFailListener messageSendFailListener) {
+        this.messageSendFailListener = messageSendFailListener;
+    }
+    public interface CLMessageSendFailListener{
+        void onRetry(CLMessageBean messageBean);
+    }
 
     /// 上下文
     private final Context mContext;
@@ -153,7 +160,11 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 sendfail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
+                        if (messageSendFailListener != null){
+                            sendfail.setVisibility(View.GONE);
+                            pbBar.setVisibility(View.VISIBLE);
+                            messageSendFailListener.onRetry(messageBean);
+                        }
                     }
                 });
             }else if (CLSendStatus.fromTypeName(messageBean.getSendStatus()) == CLSendStatus.SendStatus_SEND){
@@ -282,12 +293,11 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 sendfail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (CLUploadStatus.fromTypeName(data.getUploadStatus()) == CLUploadStatus.UploadStatus_success){ //上传成功了,只需要发送文本
-
-                        }else{ //上传失败,图片也要重新上传
-
+                        if (messageSendFailListener != null){
+                            sendfail.setVisibility(View.GONE);
+                            pbBar.setVisibility(View.VISIBLE);
+                            messageSendFailListener.onRetry(data);
                         }
-                        Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
                     }
                 });
             }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND){
@@ -361,7 +371,11 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 sendfail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
+                        if (messageSendFailListener != null){
+                            sendfail.setVisibility(View.GONE);
+                            pbBar.setVisibility(View.VISIBLE);
+                            messageSendFailListener.onRetry(data);
+                        }
                     }
                 });
             }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND){
@@ -418,7 +432,11 @@ public class CLSessionRecyclerAdapter extends RecyclerView.Adapter {
                 sendfail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(mContext,"重发",Toast.LENGTH_SHORT).show();
+                        if (messageSendFailListener != null){
+                            sendfail.setVisibility(View.GONE);
+                            pbBar.setVisibility(View.VISIBLE);
+                            messageSendFailListener.onRetry(data);
+                        }
                     }
                 });
             }else if (CLSendStatus.fromTypeName(data.getSendStatus()) == CLSendStatus.SendStatus_SEND){

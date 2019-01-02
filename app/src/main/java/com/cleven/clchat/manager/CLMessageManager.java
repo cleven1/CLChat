@@ -114,7 +114,7 @@ public class CLMessageManager {
      * 发送图片
      * @param filePath
      */
-    public CLMessageBean sendImageMessage(String filePath,String fileName,int w,int h,String userId,boolean isGroup){
+    public CLMessageBean sendImageMessage(String filePath,String fileName,int w,int h,String userId,boolean isGroup,boolean isUploadFile){
         CLMessageBean message = new CLMessageBean();
         /// 是否是群聊会话
         message.setGroupSession(isGroup);
@@ -135,7 +135,9 @@ public class CLMessageManager {
         /// 消息id
         message.setMessageId(CLUtils.getUUID());
         /// 上传
-        CLUploadManager.getInstance().uploadImage(filePath,fileName,new MyUploadListener());
+        if (isUploadFile){
+            CLUploadManager.getInstance().uploadImage(filePath,fileName,new MyUploadListener());
+        }
         return message;
     }
 
@@ -143,7 +145,7 @@ public class CLMessageManager {
      * 发送音频
      * @param filePath
      */
-    public CLMessageBean sendAudioMessage(String filePath,int duration,String userId,boolean isGroup){
+    public CLMessageBean sendAudioMessage(String filePath,int duration,String userId,boolean isGroup,boolean isUploadFile){
         CLMessageBean message = new CLMessageBean();
         /// 是否是群聊会话
         message.setGroupSession(isGroup);
@@ -162,7 +164,9 @@ public class CLMessageManager {
         /// 消息id
         message.setMessageId(CLUtils.getUUID());
         /// 上传
-        CLUploadManager.getInstance().uploadAudio(filePath,fileName,new MyUploadListener());
+        if (isUploadFile){
+            CLUploadManager.getInstance().uploadAudio(filePath,fileName,new MyUploadListener());
+        }
         return message;
     }
 
@@ -170,7 +174,7 @@ public class CLMessageManager {
      * 发送视频
      * @param filePath
      */
-    public CLMessageBean sendVideoMessage(String filePath,String thumnailPath,int duration,String userId,boolean isGroup){
+    public CLMessageBean sendVideoMessage(String filePath,String thumnailPath,int duration,String userId,boolean isGroup,boolean isUploadFile){
         CLMessageBean message = new CLMessageBean();
         /// 是否是群聊会话
         message.setGroupSession(isGroup);
