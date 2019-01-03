@@ -9,8 +9,7 @@ public class CLAPPConst {
     /**
      * http server base url
      */
-//    public static final String HTTP_SERVER_BASE_URL = "http://192.168.1.105:5000/api/";
-    public static final String HTTP_SERVER_BASE_URL = "http://192.168.10.142:5000/api/";
+    public static final String HTTP_SERVER_BASE_URL = "http://192.168.1.105:5000/api/";
 //    public static final String HTTP_SERVER_BASE_URL = "http://192.168.31.98:5000/api/";
     /// 获取验证码
     public static final String SMSCODE = HTTP_SERVER_BASE_URL + "user/smscode";

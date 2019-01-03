@@ -555,6 +555,10 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         if (messageList.contains(messageBean)){
             return;
         }
+        CLMessageBean timeMessage = CLMessageManager.getInstance().sendTimeMessage(mUserId);
+        if (timeMessage != null){
+            messageList.add(timeMessage);
+        }
         messageList.add(messageBean);
         /// 插入并刷新
         adapter.notifyItemInserted(messageList.size());

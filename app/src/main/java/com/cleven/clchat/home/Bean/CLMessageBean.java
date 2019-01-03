@@ -8,6 +8,7 @@ import com.cleven.clchat.utils.CLUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.utils.LogPrintUtils;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmResults;
@@ -105,6 +106,16 @@ public class CLMessageBean implements RealmModel {
             public void execute(Realm realm) {
                 realm.copyToRealmOrUpdate(messageBean);
             }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                LogPrintUtils.eTag("插入消息", "成功");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                LogPrintUtils.eTag("插入消息", "失败");
+            }
         });
     }
     /// 更新消息已读未读状态
@@ -142,6 +153,21 @@ public class CLMessageBean implements RealmModel {
                 .sort("messageId",Sort.DESCENDING)
                 .findAll();
         return realm.copyFromRealm(sessionBeans);
+    }
+
+    /// 根据用户查询最后一条时间消息
+    public static CLMessageBean getUserMessageLastTimeData(String targetId){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .equalTo("targetId",targetId)
+                .equalTo("messageType",CLMessageBodyType.MessageBodyType_Time.getTypeName())
+                .findAll();
+        if (sessionBeans.size() > 0){
+            return realm.copyFromRealm(sessionBeans.last());
+        }else {
+            return null;
+        }
     }
 
     /// 查询所有未读的消息

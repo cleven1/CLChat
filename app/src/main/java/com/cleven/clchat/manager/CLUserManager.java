@@ -3,6 +3,7 @@ package com.cleven.clchat.manager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.alibaba.fastjson.JSON;
 import com.cleven.clchat.app.CLApplication;
 import com.cleven.clchat.model.CLUserBean;
 
@@ -24,11 +25,11 @@ public class CLUserManager {
     private CLUserBean userInfo;
 
     public CLUserBean getUserInfo() {
-//        SharedPreferences sp = CLApplication.mContext.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-//        String string = sp.getString(CACHE_USERINFOKEY,"");
-//        CLUserBean userBean = JSON.parseObject(string, CLUserBean.class);
-//        return userBean;
-        return userInfo;
+        SharedPreferences sp = CLApplication.mContext.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        String string = sp.getString(CACHE_USERINFOKEY,"");
+        CLUserBean userBean = JSON.parseObject(string, CLUserBean.class);
+        return userBean;
+//        return userInfo;
     }
 
     public void setUserInfo(CLUserBean userInfo) {
@@ -37,7 +38,7 @@ public class CLUserManager {
         if (userInfo == null){
             sp.edit().putString(CACHE_USERINFOKEY,"").commit();
         }
-//        String jsonString = JSON.toJSONString(userInfo);
-//        sp.edit().putString(CACHE_USERINFOKEY,jsonString).commit();
+        String jsonString = JSON.toJSONString(userInfo);
+        sp.edit().putString(CACHE_USERINFOKEY,jsonString).commit();
     }
 }

@@ -9,6 +9,7 @@ import com.cleven.clchat.fragment.home.bean.CLSessionBean;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
 import com.cleven.clchat.home.Bean.CLReceivedStatus;
+import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiFileUtils;
 import com.cleven.clchat.utils.CLJsonUtil;
 import com.cleven.clchat.utils.CLUtils;
@@ -17,7 +18,6 @@ import dev.utils.LogPrintUtils;
 import dev.utils.app.image.BitmapUtils;
 
 import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_FAILED;
-import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_SEND;
 import static com.cleven.clchat.home.Bean.CLSendStatus.SendStatus_SENDING;
 import static dev.DevUtils.runOnUiThread;
 
@@ -228,6 +228,10 @@ public class CLMessageManager {
     }
 
     public CLMessageBean sendMessage(CLMessageBean message, String userId){
+
+        /// 监听发送消息状态
+        instance.obersverMessageSendStatus();
+
         /// 是否是群聊会话
         message.setGroupSession(false);
 
@@ -237,24 +241,53 @@ public class CLMessageManager {
         }else {
             message.setSendStatus(SendStatus_SENDING.getTypeName());
         }
-        /// 发送时间
-        message.setSendTime("" + CLUtils.getTimeStamp());
+
         /// 自己发的标记为已读
         message.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
         message.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
+
+        /// 发送时间
+        message.setSendTime("" + CLUtils.getTimeStamp());
+        String jsonString = JSON.toJSONString(message);
+
         /// 插入数据库
         CLMessageBean.insertMessageData(message);
         SessionMessageHandler(message);
-
-        String jsonString = JSON.toJSONString(message);
-
         /// 发送
         if (CLMQTTManager.getInstance().getCurrentStatus() == CLMQTTManager.CLMQTTStatus.connect_succss){
             CLMQTTManager.getInstance().sendSingleMessage(jsonString,userId);
         }
 
-        LogPrintUtils.d(jsonString);
+        return message;
+    }
 
+    /// 时间大于两分钟发送
+    public CLMessageBean sendTimeMessage(String userId){
+        /// 判断上一条时间消息和本条相差是否是两分钟,两分钟先发送时间消息
+        CLMessageBean userMessageData = CLMessageBean.getUserMessageLastTimeData(userId);
+        if (userMessageData == null || CLUtils.getTimeStamp() - Long.parseLong(userMessageData.getSendTime()) >= 2 * 60 * 1000){
+            if (CLMQTTManager.getInstance().getCurrentStatus() == CLMQTTManager.CLMQTTStatus.connect_succss){
+                /// 发送时间
+                CLMessageBean timeMessage = new CLMessageBean();
+                timeMessage.setTargetId(userId);
+                timeMessage.setMessageId(CLUtils.getUUID());
+                timeMessage.setSendStatus(CLSendStatus.SendStatus_SEND.getTypeName());
+                timeMessage.setSendTime("" + CLUtils.getTimeStamp());
+                timeMessage.setMessageType(CLMessageBodyType.MessageBodyType_Time.getTypeName());
+                timeMessage.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
+                String timeJson = JSON.toJSONString(timeMessage);
+                CLMQTTManager.getInstance().sendSingleMessage(timeJson,userId);
+                /// 插入数据库
+                CLMessageBean.insertMessageData(timeMessage);
+                return timeMessage;
+            }
+        }
+        return null;
+    }
+
+
+    /// 监听消息发送状态
+    private void obersverMessageSendStatus(){
         CLMQTTManager.getInstance().setMessageStatusOnListener(new CLMQTTManager.CLSendMessageStatusOnListener() {
             @Override
             public void onSuccess(String message) {
@@ -262,7 +295,7 @@ public class CLMessageManager {
                     Log.e("tag","message = " + message);
                     CLMessageBean messageBean = JSON.parseObject(message, CLMessageBean.class);
                     // 发送成功  CLSendStatus
-                    messageBean.setSendStatus(SendStatus_SEND.getTypeName());
+                    messageBean.setSendStatus(CLSendStatus.SendStatus_SEND.getTypeName());
                     /// 更新数据库
                     CLMessageBean.insertMessageData(messageBean);
                     SessionMessageHandler(messageBean);
@@ -283,7 +316,6 @@ public class CLMessageManager {
                 }
             }
         });
-        return message;
     }
 
     /// 收到聊天消息

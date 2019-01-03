@@ -52,7 +52,7 @@ public class CLUserBean implements RealmModel {
 
 
     public String getUserId() {
-        return TextUtils.isEmpty(userId) ? "" : userId;
+        return TextUtils.isEmpty(userId) ? " " : userId;
     }
 
     public void setUserId(String userId) {
@@ -60,7 +60,7 @@ public class CLUserBean implements RealmModel {
     }
 
     public String getName() {
-        return TextUtils.isEmpty(name) ? "" : name;
+        return TextUtils.isEmpty(name) ? " " : name;
     }
 
     public void setName(String name) {
