@@ -12,7 +12,6 @@ import dev.utils.LogPrintUtils;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmResults;
-import io.realm.Sort;
 import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmClass;
@@ -150,7 +149,6 @@ public class CLMessageBean implements RealmModel {
         RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
                 .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
-                .sort("messageId",Sort.DESCENDING)
                 .findAll();
         return realm.copyFromRealm(sessionBeans);
     }
@@ -199,7 +197,6 @@ public class CLMessageBean implements RealmModel {
                 .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
                 .equalTo("messageType",CLMessageBodyType.MessageBodyType_Image.getTypeName())
-                .sort("messageId",Sort.DESCENDING)
                 .findAll();
         List<CLMessageBean> beanList = realm.copyFromRealm(sessionBeans);
         List<String> tempArray = new ArrayList<>();

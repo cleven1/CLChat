@@ -276,7 +276,7 @@ public class CLMessageManager {
                 timeMessage.setMessageType(CLMessageBodyType.MessageBodyType_Time.getTypeName());
                 timeMessage.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
                 String timeJson = JSON.toJSONString(timeMessage);
-                CLMQTTManager.getInstance().sendSingleMessage(timeJson,userId);
+//                CLMQTTManager.getInstance().sendSingleMessage(timeJson,userId);
                 /// 插入数据库
                 CLMessageBean.insertMessageData(timeMessage);
                 return timeMessage;
