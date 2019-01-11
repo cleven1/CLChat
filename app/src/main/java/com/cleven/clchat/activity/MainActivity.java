@@ -1,5 +1,6 @@
 package com.cleven.clchat.activity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,10 +14,10 @@ import android.widget.TextView;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.base.CLBaseFragment;
-import com.cleven.clchat.fragment.contack.CLContactFragment;
 import com.cleven.clchat.fragment.CLDiscoverFragment;
-import com.cleven.clchat.fragment.home.CLHomeFragment;
 import com.cleven.clchat.fragment.CLProfileFragment;
+import com.cleven.clchat.fragment.contack.CLContactFragment;
+import com.cleven.clchat.fragment.home.CLHomeFragment;
 import com.cleven.clchat.manager.CLMQTTManager;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
@@ -35,6 +36,7 @@ public class MainActivity extends CLBaseActivity {
     private TextView centerTextView;
     private CommonTitleBar titleBar;
     private TextView rightTextView;
+    private int mPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,27 @@ public class MainActivity extends CLBaseActivity {
             CLMQTTManager.getInstance().connectMQTT(this);
         }
     }
+    /**
+     * 原理  去除Super 切断原有恢复逻辑 保存位置
+     * @param outState
+     */
+    @SuppressLint("MissingSuperCall")
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        /* 记录当前的position */
+        outState.putInt("position", mPosition);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mPosition = savedInstanceState.getInt("position");
+        /// 获取Fragment
+        CLBaseFragment fragment = getFragment(mPosition);
+        /// 切换
+        switchFragment(preFragment,fragment);
+    }
+
 
     /// 连接MQTT
     private void initMqtt() {
