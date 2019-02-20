@@ -47,11 +47,11 @@ public class MainActivity extends CLBaseActivity {
 
         setupTitleBar();
 
-        initMqtt();
-
         initFragments();
 
         findViews();
+
+        initMqtt();
 
     }
 
@@ -99,7 +99,7 @@ public class MainActivity extends CLBaseActivity {
                 }else if (status == CLMQTTManager.CLMQTTStatus.connect_fail){
                     centerTextView.setText("连接失败");
                 }else {
-                    centerTextView.setText("连接中");
+                    centerTextView.setText("连接中...");
                 }
             }
         });
