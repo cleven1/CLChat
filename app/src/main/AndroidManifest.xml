@@ -8,14 +8,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- 录音 -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <!--播音-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 播音 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
     <!-- 不锁屏 -->
     <!-- <uses-permission android:name="android.permission.WAKE_LOCK" /> -->
+    <!-- android:name=".app.CLApplication" -->
     <application
         android:name=".app.CLApplication"
         android:allowBackup="true"
@@ -34,9 +35,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity"  android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".activity.MainActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".login.CLLoginActivity" />
-        <activity android:name=".home.activity.CLSessionActivity" android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".home.activity.CLSessionActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".base.CLBaseActivity" />
         <activity android:name=".contack.activity.CLAddFriendActivity" />
 
@@ -47,7 +52,7 @@
             android:name="design_height_in_dp"
             android:value="667" />
 
-        <activity android:name=".login.CLRegisgerActivity"></activity>
+        <activity android:name=".login.CLRegisgerActivity" />
     </application>
 
 </manifest>

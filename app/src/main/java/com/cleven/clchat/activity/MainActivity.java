@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.base.CLBaseFragment;
-import com.cleven.clchat.fragment.CLDiscoverFragment;
+import com.cleven.clchat.fragment.CLMomentsFragment;
 import com.cleven.clchat.fragment.CLProfileFragment;
 import com.cleven.clchat.fragment.contack.CLContactFragment;
 import com.cleven.clchat.fragment.home.CLHomeFragment;
@@ -146,7 +146,7 @@ public class MainActivity extends CLBaseActivity {
                     break;
                 case R.id.rb_main_discover:
                     currentSelectIndex = 2;
-                    centerTextView.setText("发现");
+                    centerTextView.setText("吐槽圈");
                     setRightBarShowOrHidden(false);
                     break;
                 case R.id.rb_main_profile:
@@ -204,7 +204,7 @@ public class MainActivity extends CLBaseActivity {
         CLContactFragment contactFragment = new CLContactFragment();
         contactFragment.setTitleBar(titleBar);
         fragments.add(contactFragment);
-        fragments.add(new CLDiscoverFragment());
+        fragments.add(new CLMomentsFragment());
         fragments.add(new CLProfileFragment());
     }
 

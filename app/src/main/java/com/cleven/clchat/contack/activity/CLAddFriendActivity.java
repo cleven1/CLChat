@@ -99,8 +99,9 @@ public class CLAddFriendActivity extends CLBaseActivity {
             public void onSearchClick(View view, String keyword) {
                 LogPrintUtils.eTag("keyword",keyword);
                 HttpParams params = new HttpParams();
-                params.put("user_id",keyword);
-                OkGoUtil.getRequets(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/queryFriend", "addFriend", params, new OkGoUtil.CLNetworkCallBack() {
+                params.put("keyword",keyword);
+                params.put("user_id",CLUserManager.getInstence().getUserInfo().getUserId());
+                OkGoUtil.getRequets(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/queryFriend", "queryFriend", params, new OkGoUtil.CLNetworkCallBack() {
                     @Override
                     public void onSuccess(Map response) {
                         LogPrintUtils.eTag("查询好友",response.toString());
@@ -191,7 +192,8 @@ public class CLAddFriendActivity extends CLBaseActivity {
                 public void onClick(View v) {
                     if (isAddFriend){
                         HttpParams params = new HttpParams();
-                        params.put("user_id",friendBean.getUserId());
+                        params.put("target_user_id",friendBean.getUserId());
+                        params.put("user_id",CLUserManager.getInstence().getUserInfo().getUserId());
                         OkGoUtil.postRequest(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/addFriend", "addFriend", params, new OkGoUtil.CLNetworkCallBack() {
                             @Override
                             public void onSuccess(Map response) {
@@ -227,7 +229,8 @@ public class CLAddFriendActivity extends CLBaseActivity {
                         });
                     }else {
                         HttpParams params = new HttpParams();
-                        params.put("user_id",friendBean.getUserId());
+                        params.put("target_user_id",friendBean.getUserId());
+                        params.put("user_id",CLUserManager.getInstence().getUserInfo().getUserId());
                         OkGoUtil.getRequets(CLAPPConst.HTTP_SERVER_BASE_URL + "friend/checkFriend", "checkFriend", params, new OkGoUtil.CLNetworkCallBack() {
                             @Override
                             public void onSuccess(Map response) {

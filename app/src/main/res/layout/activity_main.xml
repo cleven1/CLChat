@@ -42,7 +42,7 @@
         <RadioButton
             android:id="@+id/rb_main_discover"
             android:drawableTop="@drawable/rb_main_discover_selector"
-            android:text="发现"
+            android:text="吐槽圈"
             style="@style/tabBarStyle"
             />
         <RadioButton
