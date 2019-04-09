@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AndroidAudioConverter_lib/AndroidAudioConverter_lib.iml" filepath="$PROJECT_DIR$/AndroidAudioConverter_lib/AndroidAudioConverter_lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CLChat.iml" filepath="$PROJECT_DIR$/CLChat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CLChat-Android.iml" filepath="$PROJECT_DIR$/CLChat-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/LQRAudioRecord_library/LQRAudioRecord_library.iml" filepath="$PROJECT_DIR$/LQRAudioRecord_library/LQRAudioRecord_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/LQRImagePicker_library/LQRImagePicker_library.iml" filepath="$PROJECT_DIR$/LQRImagePicker_library/LQRImagePicker_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/WaveSideBar_app/WaveSideBar_app.iml" filepath="$PROJECT_DIR$/WaveSideBar_app/WaveSideBar_app.iml" />
