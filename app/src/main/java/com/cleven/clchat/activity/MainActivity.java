@@ -138,21 +138,25 @@ public class MainActivity extends CLBaseActivity {
                     currentSelectIndex = 0;
                     centerTextView.setText("首页");
                     setRightBarShowOrHidden(false);
+                    titleBar.setVisibility(View.VISIBLE);
                     break;
                 case R.id.rb_main_contact:
                     currentSelectIndex = 1;
                     centerTextView.setText("联系人");
                     setRightBarShowOrHidden(true);
+                    titleBar.setVisibility(View.VISIBLE);
                     break;
                 case R.id.rb_main_discover:
                     currentSelectIndex = 2;
                     centerTextView.setText("吐槽圈");
                     setRightBarShowOrHidden(false);
+                    titleBar.setVisibility(View.GONE);
                     break;
                 case R.id.rb_main_profile:
                     currentSelectIndex = 3;
                     centerTextView.setText("我");
                     setRightBarShowOrHidden(false);
+                    titleBar.setVisibility(View.VISIBLE);
                     break;
             }
             /// 获取Fragment

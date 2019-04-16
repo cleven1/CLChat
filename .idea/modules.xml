@@ -12,9 +12,8 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/easypermissions/easypermissions.iml" filepath="$PROJECT_DIR$/easypermissions/easypermissions.iml" />
       <module fileurl="file://$PROJECT_DIR$/../flutter_hybrid/.android/Flutter/flutter.iml" filepath="$PROJECT_DIR$/../flutter_hybrid/.android/Flutter/flutter.iml" />
-      <module fileurl="file:///usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/fluttertoast-3.0.3/android/fluttertoast.iml" filepath="/usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/fluttertoast-3.0.3/android/fluttertoast.iml" />
-      <module fileurl="file:///usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/image_picker_saver-0.1.0/android/image_picker_saver.iml" filepath="/usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/image_picker_saver-0.1.0/android/image_picker_saver.iml" />
-      <module fileurl="file:///usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-0.4.1/android/path_provider.iml" filepath="/usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-0.4.1/android/path_provider.iml" />
+      <module fileurl="file:///usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-0.5.0+1/android/path_provider.iml" filepath="/usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-0.5.0+1/android/path_provider.iml" />
+      <module fileurl="file:///usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/xs_progress_hud-1.0.2/android/xs_progress_hud.iml" filepath="/usr/local/flutter/.pub-cache/hosted/pub.dartlang.org/xs_progress_hud-1.0.2/android/xs_progress_hud.iml" />
     </modules>
   </component>
 </project>
