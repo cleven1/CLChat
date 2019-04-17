@@ -75,4 +75,7 @@ public class CLAPPConst {
     public static final int SESSIONMESSAGERESULTCODE = 10000;
     /// 添加好友界面回传值code
     public static final int ADDFRIENDRESULTCODE = 100;
+    /// 发布吐槽圈完成回调
+    public static final int PUBLISHMOMENTSFINISH = 9999;
+
 }

@@ -8,6 +8,8 @@ import android.widget.LinearLayout;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseFragment;
 import com.cleven.clchat.moments.activity.CLMomentsActivity;
+import com.cleven.clchat.moments.activity.CLPublishMomentActivity;
+import com.cleven.clchat.utils.CLAPPConst;
 
 import io.flutter.facade.Flutter;
 import io.flutter.plugin.common.MethodChannel;
@@ -18,6 +20,9 @@ import io.flutter.view.FlutterView;
  */
 
 public class CLMomentsFragment extends CLBaseFragment {
+
+    private MethodChannel channel;
+
     @Override
     public View initView() {
 
@@ -25,15 +30,18 @@ public class CLMomentsFragment extends CLBaseFragment {
 
         FlutterView flutterView = Flutter.createView((Activity) mContext, getLifecycle(), "moments");
 
-        MethodChannel channel = new MethodChannel(flutterView,"moment");
+        channel = new MethodChannel(flutterView,"moment");
 
         /// 监听点击flutter cell
-        channel.setMethodCallHandler((methodCall ,result) -> {
+        channel.setMethodCallHandler((methodCall , result) -> {
             if (methodCall.method.equals("gotoDetailPage")) { // 取值
                 String arguments = (String) methodCall.arguments;
                 Intent intent = new Intent(mContext,CLMomentsActivity.class);
                 intent.putExtra("moment_id", arguments);
                 mContext.startActivity(intent);
+            }else if (methodCall.method.equals("gotoMomentPublish")){
+                Intent intent = new Intent(mContext, CLPublishMomentActivity.class);
+                startActivityForResult(intent,CLAPPConst.PUBLISHMOMENTSFINISH);
             }
         });
 
@@ -47,5 +55,13 @@ public class CLMomentsFragment extends CLBaseFragment {
         super.initData();
 
         System.out.println("加载数据");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CLAPPConst.PUBLISHMOMENTSFINISH){ // 发布完成
+            channel.invokeMethod("updateMomentsData","");
+        }
     }
 }

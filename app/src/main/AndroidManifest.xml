@@ -19,7 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".moments.activity.CLMomentsActivity"></activity>
+        <activity android:name=".moments.activity.CLPublishMomentActivity"></activity>
+        <activity android:name=".moments.activity.CLMomentsActivity" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
