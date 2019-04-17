@@ -9,12 +9,16 @@ import android.widget.TextView;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.manager.CLUserManager;
+import com.cleven.clchat.utils.CLPhotoBrowser;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.flutter.facade.Flutter;
 import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.MethodChannel;
 import io.flutter.view.FlutterView;
 
 public class CLMomentsActivity extends CLBaseActivity {
@@ -29,8 +33,8 @@ public class CLMomentsActivity extends CLBaseActivity {
 
         /// 获取参数
         String moment_id = getIntent().getStringExtra("moment_id");
-
         Log.i("moment_id",moment_id);
+
         setupTitleBar();
 
         frameLayout = (FrameLayout) findViewById(R.id.fl_layout);
@@ -51,6 +55,19 @@ public class CLMomentsActivity extends CLBaseActivity {
 
             }
         });
+
+        MethodChannel methodChannel = new MethodChannel(flutterView, "detailMethodChannel");
+        methodChannel.setMethodCallHandler((call,result) -> {
+           if (call.method.equals("photoBrowser")){ /// 图片浏览
+               Map params = (Map) call.arguments;
+               Log.e("photo",params.toString());
+               List pics = (List) params.get("pics");
+               int index = (int)params.get("index");
+               CLPhotoBrowser.Browser(this,pics,index);
+           }
+        });
+
+
         frameLayout.addView(flutterView);
     }
 

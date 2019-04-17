@@ -2,6 +2,7 @@ package com.cleven.clchat.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -10,6 +11,10 @@ import com.cleven.clchat.base.CLBaseFragment;
 import com.cleven.clchat.moments.activity.CLMomentsActivity;
 import com.cleven.clchat.moments.activity.CLPublishMomentActivity;
 import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLPhotoBrowser;
+
+import java.util.List;
+import java.util.Map;
 
 import io.flutter.facade.Flutter;
 import io.flutter.plugin.common.MethodChannel;
@@ -42,6 +47,12 @@ public class CLMomentsFragment extends CLBaseFragment {
             }else if (methodCall.method.equals("gotoMomentPublish")){
                 Intent intent = new Intent(mContext, CLPublishMomentActivity.class);
                 startActivityForResult(intent,CLAPPConst.PUBLISHMOMENTSFINISH);
+            }else if (methodCall.method.equals("photoBrowser")) {
+                Map params = (Map) methodCall.arguments;
+                Log.e("photo",params.toString());
+                List pics = (List) params.get("pics");
+                int index = (int)params.get("index");
+                CLPhotoBrowser.Browser(mContext,pics,index);
             }
         });
 
