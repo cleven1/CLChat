@@ -3,6 +3,15 @@ apply plugin: 'realm-android'
 
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'cleven'
+            keyPassword 'heihei'
+            storeFile file('/Users/cleven/Desktop/android_fultter/chat_keys.jks')
+            storePassword 'heihei'
+        }
+    }
+
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.cleven.clchat"
@@ -14,11 +23,16 @@ android {
 
     }
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
+            debuggable true
+        }
+        release {
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             aaptOptions.cruncherEnabled = false
             aaptOptions.useNewCruncher = false
+            signingConfig signingConfigs.config
         }
     }
     /// 强制使用v4包
@@ -31,6 +45,16 @@ android {
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
+    }
+
+    /// 解决在真机上加载flutter崩溃问题
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'x86', 'x86_64', 'armeabi-v7a', 'armeabi'
+            universalApk false
+        }
     }
 }
 

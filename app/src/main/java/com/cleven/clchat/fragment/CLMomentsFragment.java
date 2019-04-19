@@ -41,7 +41,7 @@ public class CLMomentsFragment extends CLBaseFragment {
         channel.setMethodCallHandler((methodCall , result) -> {
             if (methodCall.method.equals("gotoDetailPage")) { // 取值
                 String arguments = (String) methodCall.arguments;
-                Intent intent = new Intent(mContext,CLMomentsActivity.class);
+                Intent intent = new Intent(mContext, CLMomentsActivity.class);
                 intent.putExtra("moment_id", arguments);
                 mContext.startActivity(intent);
             }else if (methodCall.method.equals("gotoMomentPublish")){
@@ -55,7 +55,6 @@ public class CLMomentsFragment extends CLBaseFragment {
                 CLPhotoBrowser.Browser(mContext,pics,index);
             }
         });
-
         view.addView(flutterView);
 
         return view;
