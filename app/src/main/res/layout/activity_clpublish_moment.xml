@@ -5,12 +5,14 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".moments.activity.CLPublishMomentActivity">
 
     <include layout="@layout/titlebar_layout"/>
 
     <FrameLayout
         android:id="@+id/fl_publish"
+        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>

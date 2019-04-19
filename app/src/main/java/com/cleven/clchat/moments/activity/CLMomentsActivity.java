@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.manager.CLUserManager;
+import com.cleven.clchat.utils.CLFlutterViewUtil;
 import com.cleven.clchat.utils.CLPhotoBrowser;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
@@ -67,8 +68,9 @@ public class CLMomentsActivity extends CLBaseActivity {
            }
         });
 
-
         frameLayout.addView(flutterView);
+        frameLayout.setVisibility(View.INVISIBLE);
+        CLFlutterViewUtil.firstFrameListener(frameLayout,flutterView);
     }
 
 

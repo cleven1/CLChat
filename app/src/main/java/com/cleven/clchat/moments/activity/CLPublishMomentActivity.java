@@ -11,6 +11,7 @@ import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLAPPConst;
+import com.cleven.clchat.utils.CLFlutterViewUtil;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.util.HashMap;
@@ -27,13 +28,15 @@ public class CLPublishMomentActivity extends CLBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /// 加载flutterView
+        FlutterView flutterView = Flutter.createView(this, getLifecycle(), "publishPage");
+
         setContentView(R.layout.activity_clpublish_moment);
 
         setupTitleBar();
 
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.fl_publish);
-
-        FlutterView flutterView = Flutter.createView(this, getLifecycle(), "publishPage");
 
         /// 发送数据给flutterView
         new EventChannel(flutterView,"publishChannel").setStreamHandler(new EventChannel.StreamHandler() {
@@ -60,6 +63,11 @@ public class CLPublishMomentActivity extends CLBaseActivity {
             }
         });
         frameLayout.addView(flutterView);
+        frameLayout.setVisibility(View.INVISIBLE);
+
+        /// 监听flutterView第一帧渲染
+        CLFlutterViewUtil.firstFrameListener(frameLayout,flutterView);
+
     }
 
     private void setupTitleBar(){
