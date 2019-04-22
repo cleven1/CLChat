@@ -221,51 +221,7 @@ public class CLMQTTManager {
         options.setPassword(PASSWORD.toCharArray());
         /// 设置遗嘱
         options.setWill(MQTT_BASE_TOPIC+MQTT_DISCONNECT_TOPIC + userId,"disconnect".getBytes(),1,false);
-        client.setCallback(new MqttCallback() {
-            @Override
-            public void connectionLost(Throwable cause) {
-                Log.e(TAG,"断开连接了");
-                currentStatus = CLMQTTStatus.disconnect_success;
-                /// 重新连接
-                initMQTT();
-            }
-            /// 消息到达
-            @Override
-            public void messageArrived(final String topic, final MqttMessage message) throws Exception {
-                Log.d(TAG,message.toString());
-                LogPrintUtils.eTag(TAG,"topic = " + topic);
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        String baseTopic = MQTT_BASE_TOPIC;
-                        if (topic.equals(baseTopic + MQTT_SINLE_CHAT_TOPIC + userId)){/// 单聊
-                            CLMessageManager.getInstance().receiveMessageHandler(message.toString());
-                        }else if (topic.equals(baseTopic + MQTT_GROUP_CHAT_TOPIC + userId)){ //群聊
 
-                        }else if (topic.equals(baseTopic + MQTT_ADD_FRIEND_TOPIC + userId)){ //添加好友
-                            CLMessageManager.getInstance().receiveFriendHandler(message.toString());
-                        }else if (topic.equals(baseTopic + MQTT_INVITE_TOPIC + userId)) { //添加好友邀请
-                            CLMessageManager.getInstance().receiveInviteFriendHandler(message.toString());
-                        }else if (topic.equals(baseTopic + MQTT_DELETE_FRIEND_TOPIC + userId)){ //删除好友
-
-                        }else if (topic.equals(baseTopic + MQTT_SYSTEM_TOPIC)){ //系统通知
-
-                        }
-                    }
-                };
-                /// 添加到线程池中执行
-                ThreadManager.getInstance().addTask(runnable);
-            }
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-                try {
-                    Log.d(TAG,token.getMessage().toString());
-                } catch (MqttException e) {
-                    e.printStackTrace();
-                    Log.e(TAG,e.getMessage());
-                }
-            }
-        });
         try {
             client.connect(options, null, new IMqttActionListener() {
                 @Override
@@ -274,13 +230,15 @@ public class CLMQTTManager {
                     retryCount = 0;
                     isConnect = false;
                     currentStatus = CLMQTTStatus.connect_succss;
+
+                    observerMessager(userId);
+                    subscribeTopic();
                     try {
                         /// 连接成功通知服务器
                         client.publish(MQTT_BASE_TOPIC + MQTT_CONNECT_TOPIC + userId,"connect".getBytes(),1,false);
                     } catch (MqttException e) {
                         e.printStackTrace();
                     }
-                    subscribeTopic();
                 }
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
@@ -335,6 +293,55 @@ public class CLMQTTManager {
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    private void observerMessager(String userId){
+        if (client == null) {return;}
+        client.setCallback(new MqttCallback() {
+            @Override
+            public void connectionLost(Throwable cause) {
+                Log.e(TAG,"断开连接了");
+                currentStatus = CLMQTTStatus.disconnect_success;
+                /// 重新连接
+                initMQTT();
+            }
+            /// 消息到达
+            @Override
+            public void messageArrived(final String topic, final MqttMessage message) {
+                Log.d(TAG,message.toString());
+                LogPrintUtils.eTag(TAG,"topic = " + topic);
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        String baseTopic = MQTT_BASE_TOPIC;
+                        if (topic.equals(baseTopic + MQTT_SINLE_CHAT_TOPIC + userId)){/// 单聊
+                            CLMessageManager.getInstance().receiveMessageHandler(message.toString());
+                        }else if (topic.equals(baseTopic + MQTT_GROUP_CHAT_TOPIC + userId)){ //群聊
+
+                        }else if (topic.equals(baseTopic + MQTT_ADD_FRIEND_TOPIC + userId)){ //添加好友
+                            CLMessageManager.getInstance().receiveFriendHandler(message.toString());
+                        }else if (topic.equals(baseTopic + MQTT_INVITE_TOPIC + userId)) { //添加好友邀请
+                            CLMessageManager.getInstance().receiveInviteFriendHandler(message.toString());
+                        }else if (topic.equals(baseTopic + MQTT_DELETE_FRIEND_TOPIC + userId)){ //删除好友
+
+                        }else if (topic.equals(baseTopic + MQTT_SYSTEM_TOPIC)){ //系统通知
+
+                        }
+                    }
+                };
+                /// 添加到线程池中执行
+                ThreadManager.getInstance().addTask(runnable);
+            }
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+                try {
+                    Log.d(TAG,token.getMessage().toString());
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                    Log.e(TAG,e.getMessage());
+                }
+            }
+        });
     }
 
 }

@@ -68,6 +68,9 @@ public class CLUserBean implements RealmModel {
     }
 
     public String getAvatarUrl() {
+        if (avatarUrl.startsWith("http")){
+            return avatarUrl;
+        }
         return CLAPPConst.QINGCLOUD_AVATAR_URL + avatarUrl;
     }
 

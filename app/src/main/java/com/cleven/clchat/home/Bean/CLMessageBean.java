@@ -99,23 +99,34 @@ public class CLMessageBean implements RealmModel {
 
     /// 插入或者更新数据
     public static void insertMessageData(CLMessageBean messageBean){
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.copyToRealmOrUpdate(messageBean);
-            }
-        }, new Realm.Transaction.OnSuccess() {
-            @Override
-            public void onSuccess() {
-                LogPrintUtils.eTag("插入消息", "成功");
-            }
-        }, new Realm.Transaction.OnError() {
-            @Override
-            public void onError(Throwable error) {
-                LogPrintUtils.eTag("插入消息", "失败");
-            }
-        });
+        try {
+            Realm realm = Realm.getDefaultInstance();
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.copyToRealmOrUpdate(messageBean);
+                }
+            });
+//            realm.executeTransactionAsync(new Realm.Transaction() {
+//                @Override
+//                public void execute(Realm realm) {
+//                    realm.copyToRealmOrUpdate(messageBean);
+//                }
+//            }, new Realm.Transaction.OnSuccess() {
+//                @Override
+//                public void onSuccess() {
+//                    LogPrintUtils.eTag("插入消息", "成功");
+//                }
+//            }, new Realm.Transaction.OnError() {
+//                @Override
+//                public void onError(Throwable error) {
+//                    LogPrintUtils.eTag("插入消息", "失败");
+//                }
+//            });
+        }catch (Exception error){
+            LogPrintUtils.eTag("插入消息","失败 == " + error.toString());
+        }
+
     }
     /// 更新消息已读未读状态
     public static void updateRecviveMessageStatus(String targetId){
