@@ -129,7 +129,22 @@ public class CLMessageBean implements RealmModel {
 
     }
     /// 更新消息已读未读状态
-    public static void updateRecviveMessageStatus(String targetId){
+    public static void updateRecviveSingleMessageStatus(String targetId,String messageId){
+        Realm realm = Realm.getDefaultInstance();
+        List<CLMessageBean> unReadMessageData = getUserUnReadSingleMessageData(targetId,messageId);
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (CLMessageBean messageBean : unReadMessageData){
+                    messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
+                    realm.copyToRealmOrUpdate(messageBean);
+                }
+            }
+        });
+    }
+
+    /// 更新全部消息已读未读状态
+    public static void updateRecviveAllMessageStatus(String targetId){
         Realm realm = Realm.getDefaultInstance();
         List<CLMessageBean> unReadMessageData = getUserUnReadMessageData(targetId);
         realm.executeTransactionAsync(new Realm.Transaction() {
@@ -196,6 +211,19 @@ public class CLMessageBean implements RealmModel {
                 .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
                 .equalTo("targetId",targetId)
                 .equalTo("receivedStatus", CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName())
+                .findAll();
+        List<CLMessageBean> beanList = realm.copyFromRealm(sessionBeans);
+        return beanList;
+    }
+
+    /// 查询用户单条未读的消息
+    public static List<CLMessageBean> getUserUnReadSingleMessageData(String targetId, String messageId){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<CLMessageBean> sessionBeans = realm.where(CLMessageBean.class)
+                .equalTo("currentUserId",CLUserManager.getInstence().getUserInfo().getUserId())
+                .equalTo("targetId",targetId)
+                .equalTo("receivedStatus", CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName())
+                .equalTo("messageId",messageId)
                 .findAll();
         List<CLMessageBean> beanList = realm.copyFromRealm(sessionBeans);
         return beanList;

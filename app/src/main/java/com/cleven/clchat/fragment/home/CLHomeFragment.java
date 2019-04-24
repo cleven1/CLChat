@@ -16,11 +16,14 @@ import com.cleven.clchat.base.CLBaseFragment;
 import com.cleven.clchat.fragment.home.bean.CLSessionBean;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
 import com.cleven.clchat.home.activity.CLSessionActivity;
+import com.cleven.clchat.manager.CLUserManager;
 import com.cleven.clchat.utils.CLAPPConst;
 import com.cleven.clchat.utils.CLImageLoadUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import dev.utils.LogPrintUtils;
 
 import static dev.DevUtils.runOnUiThread;
 
@@ -80,7 +83,9 @@ public class CLHomeFragment extends CLBaseFragment {
             CLSessionBean sessionBean = dataArray.get(i);
             Intent intent = new Intent(mContext,CLSessionActivity.class);
             intent.putExtra("userName", sessionBean.getName());
-            intent.putExtra("userId", sessionBean.getTargetId());
+            String userId = sessionBean.getCurrentUserId().equals(CLUserManager.getInstence().getUserInfo().getUserId()) ? sessionBean.getTargetId() : sessionBean.getCurrentUserId();
+            intent.putExtra("userId", userId);
+            LogPrintUtils.eTag("aaa",userId);
             startActivityForResult(intent,CLAPPConst.SESSIONMESSAGERESULTCODE);
         }
     }
@@ -89,6 +94,8 @@ public class CLHomeFragment extends CLBaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == CLAPPConst.SESSIONMESSAGERESULTCODE){
+            /// 查询消息会话
+            dataArray = CLSessionBean.getAllSessionData();
             adapter.notifyDataSetChanged();
         }
     }

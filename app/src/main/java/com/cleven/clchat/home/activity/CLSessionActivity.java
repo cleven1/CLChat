@@ -22,7 +22,6 @@ import com.cleven.clchat.R;
 import com.cleven.clchat.base.CLBaseActivity;
 import com.cleven.clchat.home.Bean.CLMessageBean;
 import com.cleven.clchat.home.Bean.CLMessageBodyType;
-import com.cleven.clchat.home.Bean.CLReceivedStatus;
 import com.cleven.clchat.home.Bean.CLSendStatus;
 import com.cleven.clchat.home.Bean.CLUploadStatus;
 import com.cleven.clchat.home.CLEmojiCommon.utils.CLEmojiCommonUtils;
@@ -94,6 +93,17 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         initData();
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        /// 退出停止播放
+        AudioRecordManager.getInstance(this).stopRecord();
+        AudioPlayManager.getInstance().stopPlay();
+        /// 回调
+        setResult(CLAPPConst.SESSIONMESSAGERESULTCODE);
+    }
+
     private void initData() {
         /// 在数据库中获取历史聊天信息
         messageList = CLMessageBean.getUserMessageData(mUserId);
@@ -104,7 +114,7 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         mRvSessionView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         scrollToBottom();
         /// 更新状态
-        CLMessageBean.updateRecviveMessageStatus(mUserId);
+        CLMessageBean.updateRecviveAllMessageStatus(mUserId);
         /// 回调
         setResult(CLAPPConst.SESSIONMESSAGERESULTCODE);
         /// 监听点击重发按钮
@@ -578,10 +588,9 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
                 if (!targetUserId.equals(mUserId)){
                     return;
                 }
-                /// 状态修改为已读
-                message.setReceivedStatus(CLReceivedStatus.ReceivedStatus_READ.getTypeName());
-                //TODO: 存储数据库
-                CLMessageBean.insertMessageData(message);
+
+                /// 更新状态
+                CLMessageBean.updateRecviveSingleMessageStatus(mUserId,message.getMessageId());
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -659,11 +668,4 @@ public class CLSessionActivity extends CLBaseActivity implements FuncLayout.OnFu
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        /// 退出停止播放
-        AudioRecordManager.getInstance(this).stopRecord();
-        AudioPlayManager.getInstance().stopPlay();
-    }
 }

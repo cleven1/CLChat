@@ -265,6 +265,9 @@ public class CLMessageManager {
     public CLMessageBean sendTimeMessage(String userId){
         /// 判断上一条时间消息和本条相差是否是两分钟,两分钟先发送时间消息
         CLMessageBean userMessageData = CLMessageBean.getUserMessageLastTimeData(userId);
+        if (userMessageData.getMessageType() != CLMessageBodyType.MessageBodyType_Time.getTypeName()){
+            return null;
+        }
         if (userMessageData == null || CLUtils.getTimeStamp() - Long.parseLong(userMessageData.getSendTime()) >= 2 * 60 * 1000){
             if (CLMQTTManager.getInstance().getCurrentStatus() == CLMQTTManager.CLMQTTStatus.connect_succss){
                 /// 发送时间
@@ -321,6 +324,16 @@ public class CLMessageManager {
     /// 收到聊天消息
     public void receiveMessageHandler(String msg){
         CLMessageBean messageBean = JSON.parseObject(msg, CLMessageBean.class);
+        /// 过滤掉自己发的信息
+        if (messageBean == null || messageBean.getCurrentUserId() == null) {
+            return;
+        }
+        if (messageBean.getCurrentUserId().equals(CLUserManager.getInstence().getUserInfo().getUserId())){
+            return;
+        }
+        messageBean.setTargetId(messageBean.getCurrentUserId());
+        messageBean.setCurrentUserId(CLUserManager.getInstence().getUserInfo().getUserId());
+
         messageBean.setReceivedStatus(CLReceivedStatus.ReceivedStatus_UNREAD.getTypeName());
         /// 插入数据库
         CLMessageBean.insertMessageData(messageBean);
