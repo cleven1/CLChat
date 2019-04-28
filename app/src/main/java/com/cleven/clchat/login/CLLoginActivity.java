@@ -95,6 +95,7 @@ public class CLLoginActivity extends CLBaseActivity implements View.OnClickListe
                             CLUserManager.getInstence().setUserInfo(userBean);
                             Intent intent = new Intent(CLLoginActivity.this,MainActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.cl_fade_in,R.anim.cl_fade_out);
                             CLHUDUtil.hideHUD();
                             finish();
                         }else {

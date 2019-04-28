@@ -64,6 +64,8 @@ public class CLProfileFragment extends CLBaseFragment {
 
                         Activity activity = (Activity) CLProfileFragment.this.mContext;
                         activity.finish();
+                        activity.overridePendingTransition(R.anim.cl_fade_in,R.anim.cl_fade_out);
+
                     }
 
                     @Override

@@ -50,9 +50,11 @@ public class SplashActivity extends AppCompatActivity {
                 if (CLUserManager.getInstence().getUserInfo() == null){
                     Intent intent = new Intent(SplashActivity.this,CLLoginActivity.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.cl_fade_in,R.anim.cl_fade_out);
                 }else {
                     Intent intent = new Intent(SplashActivity.this,MainActivity.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.cl_fade_in,R.anim.cl_fade_out);
                 }
                 finish();
             }
